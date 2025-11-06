@@ -5,13 +5,13 @@ import { Link } from 'react-router-dom'
 const ForgotPasswordLayer = () => {
     return (
         <>
-            <section className="auth forgot-password-page bg-base d-flex flex-wrap">
-                <div className="auth-left d-lg-block d-none">
+            <section className="auth forgot-password-page bg-base">
+                {/* <div className="auth-left d-lg-block d-none">
                     <div className="d-flex align-items-center flex-column h-100 justify-content-center">
                         <img src="assets/images/auth/forgot-pass-img.png" alt="" />
                     </div>
-                </div>
-                <div className="auth-right py-32 px-24 d-flex flex-column justify-content-center">
+                </div> */}
+                <div className="auth-center py-32 px-24 d-flex flex-column justify-content-center">
                     <div className="max-w-464-px mx-auto w-100">
                         <div>
                             <h4 className="mb-12">Forgot Password</h4>
