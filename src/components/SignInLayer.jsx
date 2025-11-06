@@ -4,18 +4,18 @@ import { Link } from "react-router-dom";
 
 const SignInLayer = () => {
   return (
-    <section className='auth bg-base d-flex flex-wrap'>
-      <div className='auth-left d-lg-block d-none'>
-        <div className='d-flex align-items-center flex-column h-100 justify-content-center'>
+    <section className='auth bg-base '>
+      {/* <div className='auth-left d-lg-block d-none'>
+         <div className='d-flex align-items-center flex-column h-100 justify-content-center'>
           <img src='assets/images/auth/auth-img.png' alt='' />
-        </div>
-      </div>
-      <div className='auth-right py-32 px-24 d-flex flex-column justify-content-center'>
+        </div> 
+      </div> */}
+      <div className='auth-center py-32 px-24 d-flex flex-column justify-content-center'>
         <div className='max-w-464-px mx-auto w-100'>
           <div>
-            <Link to='/' className='mb-40 max-w-290-px'>
+            {/* <Link to='/' className='mb-40 max-w-290-px'>
               <img src='assets/images/logo.png' alt='' />
-            </Link>
+            </Link> */}
             <h4 className='mb-12'>Sign In to your Account</h4>
             <p className='mb-32 text-secondary-light text-lg'>
               Welcome back! please enter your detail
@@ -74,31 +74,7 @@ const SignInLayer = () => {
               {" "}
               Sign In
             </button>
-            <div className='mt-32 center-border-horizontal text-center'>
-              <span className='bg-base z-1 px-4'>Or sign in with</span>
-            </div>
-            <div className='mt-32 d-flex align-items-center gap-3'>
-              <button
-                type='button'
-                className='fw-semibold text-primary-light py-16 px-24 w-50 border radius-12 text-md d-flex align-items-center justify-content-center gap-12 line-height-1 bg-hover-primary-50'
-              >
-                <Icon
-                  icon='ic:baseline-facebook'
-                  className='text-primary-600 text-xl line-height-1'
-                />
-                Google
-              </button>
-              <button
-                type='button'
-                className='fw-semibold text-primary-light py-16 px-24 w-50 border radius-12 text-md d-flex align-items-center justify-content-center gap-12 line-height-1 bg-hover-primary-50'
-              >
-                <Icon
-                  icon='logos:google-icon'
-                  className='text-primary-600 text-xl line-height-1'
-                />
-                Google
-              </button>
-            </div>
+            
             <div className='mt-32 text-center text-sm'>
               <p className='mb-0'>
                 Don’t have an account?{" "}
