@@ -1314,8 +1314,8 @@ const MasterLayout = ({ children }) => {
                   <Icon icon='heroicons:bars-3-solid' className='icon' />
                 </button>
                 <form className='navbar-search'>
-                  <input type='text' name='search' placeholder='Search' />
-                  <Icon icon='ion:search-outline' className='icon' />
+                  {/* <input type='text' name='search' placeholder='Search' />
+                  <Icon icon='ion:search-outline' className='icon' /> */}
                 </form>
               </div>
             </div>
@@ -1337,11 +1337,11 @@ const MasterLayout = ({ children }) => {
                   </button>
                   <div className='dropdown-menu to-top dropdown-menu-sm'>
                     <div className='py-12 px-16 radius-8 bg-primary-50 mb-16 d-flex align-items-center justify-content-between gap-2'>
-                      <div>
+                      {/* <div>
                         <h6 className='text-lg text-primary-light fw-semibold mb-0'>
                           Choose Your Language
                         </h6>
-                      </div>
+                      </div> */}
                     </div>
                     <div className='max-h-400-px overflow-y-auto scroll-sm pe-8'>
                       <div className='form-check style-check d-flex align-items-center justify-content-between mb-16'>
