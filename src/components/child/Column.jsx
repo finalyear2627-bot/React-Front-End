@@ -12,8 +12,7 @@ const Column = ({
     onDuplicateTask,
 }) => {
     return (
-        <div className="w-33 kanban-item radius-12 bg-light">
-            <div className="card p-0 radius-12 overflow-hidden shadow-none">
+                   <div className="card p-0 radius-12 overflow-hidden shadow-none">
                 <div className="card-body p-3 pb-3">
                     <div className="d-flex align-items-center justify-content-between px-3 py-2">
                         <h6 className="text-lg fw-semibold mb-0">{column.title}</h6>

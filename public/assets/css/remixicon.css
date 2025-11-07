@@ -2676,8 +2676,7 @@
 .ri-import-line:before { content: "\f447"; }
 .ri-information-2-fill:before { content: "\f448"; }
 .ri-information-2-line:before { content: "\f449"; }
-.ri-kanban-view-2:before { content: "\f44a"; }
-.ri-kanban-view:before { content: "\f44b"; }
+
 .ri-list-view:before { content: "\f44c"; }
 .ri-lock-star-fill:before { content: "\f44d"; }
 .ri-lock-star-line:before { content: "\f44e"; }

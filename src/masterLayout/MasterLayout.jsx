@@ -173,14 +173,14 @@ const MasterLayout = ({ children }) => {
             </li>
             <li>
               <NavLink
-                to='/kanban'
+                to=''
                 className={(navData) => (navData.isActive ? "active-page" : "")}
               >
                 <Icon
                   icon='material-symbols:map-outline'
                   className='menu-icon'
                 />
-                <span>Kanban</span>
+                
               </NavLink>
             </li>
 

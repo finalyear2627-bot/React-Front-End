@@ -37,9 +37,9 @@ import ImageGeneratorPage from "./pages/ImageGeneratorPage";
 import ImageUploadPage from "./pages/ImageUploadPage";
 import InvoiceAddPage from "./pages/InvoiceAddPage";
 import InvoiceEditPage from "./pages/InvoiceEditPage";
-import InvoiceListPage from "./pages/InvoiceListPage";
+
 import InvoicePreviewPage from "./pages/InvoicePreviewPage";
-import KanbanPage from "./pages/KanbanPage";
+
 import LanguagePage from "./pages/LanguagePage";
 import LineChartPage from "./pages/LineChartPage";
 import ListPage from "./pages/ListPage";
@@ -102,17 +102,9 @@ function App() {
     <BrowserRouter>
       <RouteScrollToTop />
       <Routes>
-        <Route exact path='/' element={<HomePageOne />} />
-        <Route exact path='/index-2' element={<HomePageTwo />} />
-        <Route exact path='/index-3' element={<HomePageThree />} />
-        <Route exact path='/index-4' element={<HomePageFour />} />
-        <Route exact path='/index-5' element={<HomePageFive />} />
+      
         <Route exact path='/index-6' element={<HomePageSix />} />
-        <Route exact path='/index-7' element={<HomePageSeven />} />
-        <Route exact path='/index-8' element={<HomePageEight />} />
-        <Route exact path='/index-9' element={<HomePageNine />} />
-        <Route exact path='/index-10' element={<HomePageTen />} />
-        <Route exact path='/index-11' element={<HomePageEleven />} />
+       
 
         {/* SL */}
         <Route exact path='/add-user' element={<AddUserPage />} />
@@ -160,14 +152,8 @@ function App() {
         <Route exact path='/access-denied' element={<AccessDeniedPage />} />
         <Route exact path='/maintenance' element={<MaintenancePage />} />
         <Route exact path='/blank-page' element={<BlankPagePage />} />
-
         <Route exact path='/image-generator' element={<ImageGeneratorPage />} />
         <Route exact path='/image-upload' element={<ImageUploadPage />} />
-        <Route exact path='/invoice-add' element={<InvoiceAddPage />} />
-        <Route exact path='/invoice-edit' element={<InvoiceEditPage />} />
-        <Route exact path='/invoice-list' element={<InvoiceListPage />} />
-        <Route exact path='/invoice-preview' element={<InvoicePreviewPage />} />
-        <Route exact path='/kanban' element={<KanbanPage />} />
         <Route exact path='/language' element={<LanguagePage />} />
         <Route exact path='/line-chart' element={<LineChartPage />} />
         <Route exact path='/list' element={<ListPage />} />

@@ -3672,10 +3672,6 @@ html[data-theme="dark"] .bg-light-pink {
     width: 20%;
   }
 }
-.kanban-wrapper {
-  min-width: 1560px;
-}
-
 @media (min-width: 425px) and (max-width: 575px) {
   .col-xs-6 {
     width: 50%;
@@ -7758,8 +7754,6 @@ h6,
 }
 
 /* === position css end === */
-/* === kanban css start === */
-/* =============================== Kanban Card Css Start =============================== */
 .ui-sortable-handle {
   cursor: move !important;
 }
@@ -7781,9 +7775,6 @@ h6,
   margin-top: 10px;
   max-width: 100%;
 }
-
-/* =============================== Kanban Card Css End =============================== */
-/* === kanban css end === */
 /* === preloader css start === */
 /* === preloader css end === */
 /* === buttons css start === */

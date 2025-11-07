@@ -23,24 +23,7 @@ const initialData = {
         },
     },
     tasks: {
-        'task-1': {
-            id: 'task-1',
-            title: 'Creating a new website',
-            description:
-                'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore',
-            tag: 'UI Design',
-            date: '2024-08-25',
-            image: 'assets/images/kanban/kanban-1.png',
-        },
-        'task-2': {
-            id: 'task-2',
-            title: 'Creating a new website',
-            description:
-                'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore',
-            tag: 'UI Design',
-            date: '2024-08-25',
-            image: 'assets/images/kanban/kanban-2.png',
-        },
+        
         'task-3': {
             id: 'task-3',
             title: 'Creating a new website',
@@ -50,15 +33,7 @@ const initialData = {
             date: '2024-08-25',
             image: null,
         },
-        'task-4': {
-            id: 'task-4',
-            title: 'Creating a new website',
-            description:
-                'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore',
-            tag: 'UI Design',
-            date: '2024-08-25',
-            image: 'assets/images/kanban/kanban-2.png',
-        },
+        
         'task-5': {
             id: 'task-5',
             title: 'Creating a new website',
@@ -76,27 +51,11 @@ const initialData = {
             date: '2024-08-25',
             image: null,
         },
-        'task-7': {
-            id: 'task-7',
-            title: 'Creating a new website',
-            description:
-                'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore',
-            tag: 'UI Design',
-            date: '2024-08-25',
-            image: 'assets/images/kanban/kanban-2.png',
-        },
+        
     },
     columnOrder: ['column-1', 'column-2', 'column-3'],
 };
-
-
-const KanbanBoard = () => {
-    const [data, setData] = useState(initialData);
-    const [showModal, setShowModal] = useState(false);
-    const [currentTask, setCurrentTask] = useState(null);
-    const [currentColumn, setCurrentColumn] = useState(null);
-
-    const onDragEnd = (result) => {
+  const onDragEnd = (result) => {
         const { destination, source, draggableId } = result;
 
         // If no destination, do nothing
@@ -282,8 +241,7 @@ const KanbanBoard = () => {
     };
 
     return (
-        <div className="kanban-wrapper p-4">
-            <DragDropContext onDragEnd={onDragEnd}>
+                    <DragDropContext onDragEnd={onDragEnd}>
                 <div
                     className="d-flex align-items-start gap-4"
                     style={{ overflowX: 'auto' }}
@@ -318,6 +276,5 @@ const KanbanBoard = () => {
             />
         </div>
     );
-};
 
-export default KanbanBoard;
+export default Board;

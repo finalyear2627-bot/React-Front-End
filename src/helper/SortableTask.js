@@ -27,23 +27,20 @@ function SortableTask({ id, task, onEdit, onDelete }) {
             style={style}
             {...attributes}
             {...listeners}
-            className="kanban-card bg-neutral-50 p-16 radius-8 mb-24"
-            id={id}
+                      id={id}
         >
             {task.image && (
                 <div className="radius-8 mb-12 max-h-350-px overflow-hidden">
                     <img src={task.image} alt="" className="w-100 h-100 object-fit-cover" />
                 </div>
             )}
-            <h6 className="kanban-title text-lg fw-semibold mb-8">{task.title}</h6>
-            <p className="kanban-desc text-secondary-light">{task.description}</p>
+            
             <button
                 type="button"
                 className="btn text-primary-600 border rounded border-primary-600 bg-hover-primary-600 text-hover-white d-flex align-items-center gap-2"
             >
                 <Icon icon="lucide:tag" className="icon" />
-                <span className="kanban-tag fw-semibold">{task.tag}</span>
-            </button>
+                            </button>
             <div className="mt-12 d-flex align-items-center justify-content-between gap-10">
                 <div className="d-flex align-items-center justify-content-between gap-10">
                     <Icon icon="solar:calendar-outline" className="text-primary-light" />

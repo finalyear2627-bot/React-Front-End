@@ -7,8 +7,7 @@ const TaskCard = ({ task, index, onEdit, onDelete, onDuplicate }) => {
         <Draggable draggableId={task.id} index={index}>
             {(provided, snapshot) => (
                 <div
-                    className="kanban-card bg-neutral-50 p-3 radius-8 mb-3"
-                    ref={provided.innerRef}
+                                        ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     style={{
@@ -29,8 +28,7 @@ const TaskCard = ({ task, index, onEdit, onDelete, onDuplicate }) => {
                             />
                         </div>
                     )}
-                    <h6 className="kanban-title text-lg fw-semibold pt-3 mb-2">{task.title}</h6>
-                    <p className="kanban-desc text-secondary-light">{task.description}</p>
+                    
                     <button
                         type="button"
                         className="btn text-primary-600 border rounded border-primary-600 bg-hover-primary-600 text-hover-white d-flex align-items-center gap-2 mb-2"
@@ -38,8 +36,7 @@ const TaskCard = ({ task, index, onEdit, onDelete, onDuplicate }) => {
 
                         <Icon icon="lucide:tag"
                             className="icon text-lg"></Icon>
-                        <span className="kanban-tag fw-semibold">{task.tag}</span>
-                    </button>
+                                           </button>
                     <div className="d-flex align-items-center justify-content-between">
                         <div className="d-flex align-items-center gap-2 pt-3">
 
