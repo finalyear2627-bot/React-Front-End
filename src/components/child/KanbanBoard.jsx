@@ -240,7 +240,6 @@ const initialData = {
         setShowModal(false);
     };
 
-    return (
                     <DragDropContext onDragEnd={onDragEnd}>
                 <div
                     className="d-flex align-items-start gap-4"
@@ -274,7 +273,4 @@ const initialData = {
                 handleSave={handleSaveTask}
                 task={currentTask}
             />
-        </div>
-    );
-
 export default Board;

@@ -186,7 +186,6 @@ const FaqLayer = () => {
                                                 aria-expanded="false"
                                                 aria-controls="collapseFour"
                                             >
-                                                Can other info be added to an invoice?
                                             </button>
                                         </h2>
                                         <div
@@ -346,7 +345,7 @@ const FaqLayer = () => {
                                                 aria-expanded="false"
                                                 aria-controls="c-4"
                                             >
-                                                Can other info be added to an invoice?
+                                           
                                             </button>
                                         </h2>
                                         <div
@@ -506,7 +505,7 @@ const FaqLayer = () => {
                                                 aria-expanded="false"
                                                 aria-controls="c-10"
                                             >
-                                                Can other info be added to an invoice?
+                                         
                                             </button>
                                         </h2>
                                         <div
@@ -666,7 +665,7 @@ const FaqLayer = () => {
                                                 aria-expanded="false"
                                                 aria-controls="c-16"
                                             >
-                                                Can other info be added to an invoice?
+                                           
                                             </button>
                                         </h2>
                                         <div
@@ -826,7 +825,7 @@ const FaqLayer = () => {
                                                 aria-expanded="false"
                                                 aria-controls="c-22"
                                             >
-                                                Can other info be added to an invoice?
+                                         
                                             </button>
                                         </h2>
                                         <div
