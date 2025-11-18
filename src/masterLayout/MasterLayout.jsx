@@ -93,8 +93,8 @@ const MasterLayout = ({ children }) => {
           sidebarActive
             ? "sidebar active "
             : mobileMenu
-            ? "sidebar sidebar-open"
-            : "sidebar"
+              ? "sidebar sidebar-open"
+              : "sidebar"
         }
       >
         <button
@@ -242,7 +242,7 @@ const MasterLayout = ({ children }) => {
                 <span>Table</span>
               </Link>
               <ul className='sidebar-submenu'>
-                
+
                 <li>
                   <NavLink
                     to='/table-data'
@@ -300,15 +300,7 @@ const MasterLayout = ({ children }) => {
               </ul>
             </li>
 
-            <li>
-              <NavLink
-                to='/widgets'
-                className={(navData) => (navData.isActive ? "active-page" : "")}
-              >
-                <Icon icon='fe:vector' className='menu-icon' />
-                <span>Widgets</span>
-              </NavLink>
-            </li>
+           
 
             {/* Users Dropdown */}
             <li className='dropdown'>
@@ -374,17 +366,7 @@ const MasterLayout = ({ children }) => {
                     Role &amp; Access
                   </NavLink>
                 </li>
-                <li>
-                  <NavLink
-                    to='/assign-role'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
-                    Assign Role
-                  </NavLink>
-                </li>
+                
               </ul>
             </li>
 
@@ -433,202 +415,9 @@ const MasterLayout = ({ children }) => {
               </ul>
             </li>
 
-            {/* gallery */}
-
-            <li className='dropdown'>
-              <Link to='#'>
-                <Icon
-                  icon='flowbite:users-group-outline'
-                  className='menu-icon'
-                />
-                <span>Gallery</span>
-              </Link>
-              <ul className='sidebar-submenu'>
-                <li>
-                  <NavLink
-                    to='/gallery-grid'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                    Gallery Grid
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/gallery'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
-                    Gallery Grid Desc
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/gallery-masonry'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-info-main w-auto' />{" "}
-                    Gallery Grid
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/gallery-hover'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-danger-main w-auto' />{" "}
-                    Gallery Hover Effect
-                  </NavLink>
-                </li>
-              </ul>
-            </li>
-
-            <li>
-              <NavLink
-                to='/pricing'
-                className={(navData) => (navData.isActive ? "active-page" : "")}
-              >
-                <Icon
-                  icon='hugeicons:money-send-square'
-                  className='menu-icon'
-                />
-                <span>Pricing</span>
-              </NavLink>
-            </li>
-
-            {/* Blog */}
-
-            <li className='dropdown'>
-              <Link to='#'>
-                <Icon
-                  icon='flowbite:users-group-outline'
-                  className='menu-icon'
-                />
-                <span>Blog</span>
-              </Link>
-              <ul className='sidebar-submenu'>
-                <li>
-                  <NavLink
-                    to='/blog'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                    Blog
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/blog-details'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
-                    Blog Details
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/add-blog'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-info-main w-auto' />{" "}
-                    Add Blog
-                  </NavLink>
-                </li>
-              </ul>
-            </li>
-
-            <li>
-              <NavLink
-                to='/testimonials'
-                className={(navData) => (navData.isActive ? "active-page" : "")}
-              >
-                <Icon
-                  icon='mage:message-question-mark-round'
-                  className='menu-icon'
-                />
-                <span>Testimonials</span>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to='/faq'
-                className={(navData) => (navData.isActive ? "active-page" : "")}
-              >
-                <Icon
-                  icon='mage:message-question-mark-round'
-                  className='menu-icon'
-                />
-                <span>FAQs.</span>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to='/error'
-                className={(navData) => (navData.isActive ? "active-page" : "")}
-              >
-                <Icon icon='streamline:straight-face' className='menu-icon' />
-                <span>404</span>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to='/terms-condition'
-                className={(navData) => (navData.isActive ? "active-page" : "")}
-              >
-                <Icon icon='octicon:info-24' className='menu-icon' />
-                <span>Terms &amp; Conditions</span>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to='/coming-soon'
-                className={(navData) => (navData.isActive ? "active-page" : "")}
-              >
-                <i className='ri-rocket-line menu-icon'></i>
-                <span>Coming Soon</span>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to='/access-denied'
-                className={(navData) => (navData.isActive ? "active-page" : "")}
-              >
-                <i className='ri-folder-lock-line menu-icon'></i>
-                <span>Access Denied</span>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to='/maintenance'
-                className={(navData) => (navData.isActive ? "active-page" : "")}
-              >
-                <i className='ri-hammer-line menu-icon'></i>
-                <span>Maintenance</span>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to='/blank-page'
-                className={(navData) => (navData.isActive ? "active-page" : "")}
-              >
-                <i className='ri-checkbox-multiple-blank-line menu-icon'></i>
-                <span>Blank Page</span>
-              </NavLink>
-            </li>
+           
+          
+            
 
             {/* Settings Dropdown */}
             <li className='dropdown'>
@@ -651,72 +440,7 @@ const MasterLayout = ({ children }) => {
                     Company
                   </NavLink>
                 </li>
-                <li>
-                  <NavLink
-                    to='/notification'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
-                    Notification
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/notification-alert'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-info-main w-auto' />{" "}
-                    Notification Alert
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/theme'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-danger-main w-auto' />{" "}
-                    Theme
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/currencies'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-danger-main w-auto' />{" "}
-                    Currencies
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/language'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-danger-main w-auto' />{" "}
-                    Languages
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/payment-gateway'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-danger-main w-auto' />{" "}
-                    Payment Gateway
-                  </NavLink>
-                </li>
+               
               </ul>
             </li>
           </ul>
@@ -1005,7 +729,7 @@ const MasterLayout = ({ children }) => {
         <footer className='d-footer'>
           <div className='row align-items-center justify-content-between'>
             <div className='col-auto'>
-              <p className='mb-0'>© 2024 WowDash. All Rights Reserved.</p>
+              <p className='mb-0'>© 2025 WowDash. All Rights Reserved.</p>
             </div>
             <div className='col-auto'>
               <p className='mb-0'>
