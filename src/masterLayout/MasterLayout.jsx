@@ -145,17 +145,7 @@ const MasterLayout = ({ children }) => {
                     AI
                   </NavLink>
                 </li>
-                <li>
-                  <NavLink
-                    to='/index-2'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
-                    CRM
-                  </NavLink>
-                </li>
+                
                 <li>
                   <NavLink
                     to='/index-3'
