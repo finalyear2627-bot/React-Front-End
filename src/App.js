@@ -12,7 +12,7 @@ import ChatProfilePage from "./pages/ChatProfilePage";
 import CodeGeneratorNewPage from "./pages/CodeGeneratorNewPage";
 import CodeGeneratorPage from "./pages/CodeGeneratorPage";
 import ColumnChartPage from "./pages/ColumnChartPage";
-import CurrenciesPage from "./pages/CurrenciesPage";
+
 import ErrorPage from "./pages/ErrorPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import FormLayoutPage from "./pages/FormLayoutPage";
@@ -20,13 +20,13 @@ import FormValidationPage from "./pages/FormValidationPage";
 import FormPage from "./pages/FormPage";
 import ImageGeneratorPage from "./pages/ImageGeneratorPage";
 import InvoiceAddPage from "./pages/InvoiceAddPage";
-import LanguagePage from "./pages/LanguagePage";
+
 import LineChartPage from "./pages/LineChartPage";
 import MarketplaceDetailsPage from "./pages/MarketplaceDetailsPage";
 import MarketplacePage from "./pages/MarketplacePage";
-import NotificationAlertPage from "./pages/NotificationAlertPage";
-import NotificationPage from "./pages/NotificationPage";
-import PaymentGatewayPage from "./pages/PaymentGatewayPage";
+
+
+
 import PieChartPage from "./pages/PieChartPage";
 import PortfolioPage from "./pages/PortfolioPage";
 import RoleAccessPage from "./pages/RoleAccessPage";
@@ -36,7 +36,7 @@ import StarredPage from "./pages/StarredPage";
 import TableBasicPage from "./pages/TableBasicPage";
 import TableDataPage from "./pages/TableDataPage";
 import TextGeneratorPage from "./pages/TextGeneratorPage";
-import ThemePage from "./pages/ThemePage";
+
 import UsersGridPage from "./pages/UsersGridPage";
 import UsersListPage from "./pages/UsersListPage";
 import ViewDetailsPage from "./pages/ViewDetailsPage";
@@ -86,7 +86,7 @@ function App() {
         />
 
         <Route exact path='/column-chart' element={<ColumnChartPage />} />
-        <Route exact path='/currencies' element={<CurrenciesPage />} />
+        
 
 
         
@@ -106,7 +106,7 @@ function App() {
         <Route exact path='/invoice-add' element={<InvoiceAddPage />} />
 
 
-        <Route exact path='/language' element={<LanguagePage />} />
+        
         <Route exact path='/line-chart' element={<LineChartPage />} />
         <Route
           exact
@@ -114,14 +114,10 @@ function App() {
           element={<MarketplaceDetailsPage />}
         />
         <Route exact path='/marketplace' element={<MarketplacePage />} />
-        <Route
-          exact
-          path='/notification-alert'
-          element={<NotificationAlertPage />}
-        />
-        <Route exact path='/notification' element={<NotificationPage />} />
+      
+        
 
-        <Route exact path='/payment-gateway' element={<PaymentGatewayPage />} />
+       
         <Route exact path='/pie-chart' element={<PieChartPage />} />
         <Route exact path='/portfolio' element={<PortfolioPage />} />
 
@@ -140,7 +136,7 @@ function App() {
           element={<TextGeneratorNewPage />}
         />
         <Route exact path='/text-generator' element={<TextGeneratorPage />} />
-        <Route exact path='/theme' element={<ThemePage />} />
+        
         <Route exact path='/users-grid' element={<UsersGridPage />} />
         <Route exact path='/users-list' element={<UsersListPage />} />
         <Route exact path='/view-details' element={<ViewDetailsPage />} />
