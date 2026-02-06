@@ -8,7 +8,6 @@ const axiosInstance = axios.create({
   },
 });
 
-// attach token automatically
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = tokenService.getAccessToken();

@@ -4,9 +4,10 @@ import { tokenService } from "../services/token.service";
 export const authService = {
   login: async (username, password) => {
     const response = await axiosInstance.post("/auth/login/", {
-      username,
-      password,
-    });
+  username,
+  password,
+});
+
 
     tokenService.setTokens(
       response.data.access,
