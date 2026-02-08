@@ -11,7 +11,7 @@ import ChatEmptyPage from "./pages/ChatEmptyPage";
 import ChatProfilePage from "./pages/ChatProfilePage";
 import CodeGeneratorNewPage from "./pages/CodeGeneratorNewPage";
 import CodeGeneratorPage from "./pages/CodeGeneratorPage";
-import ColumnChartPage from "./pages/ColumnChartPage";
+
 
 import ErrorPage from "./pages/ErrorPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
@@ -20,13 +20,12 @@ import FormValidationPage from "./pages/FormValidationPage";
 import FormPage from "./pages/FormPage";
 import InvoiceAddPage from "./pages/InvoiceAddPage";
 
-import LineChartPage from "./pages/LineChartPage";
+
 import MarketplaceDetailsPage from "./pages/MarketplaceDetailsPage";
 import MarketplacePage from "./pages/MarketplacePage";
 
 
 
-import PieChartPage from "./pages/PieChartPage";
 import PortfolioPage from "./pages/PortfolioPage";
 import RoleAccessPage from "./pages/RoleAccessPage";
 import SignInPage from "./pages/SignInPage";
@@ -84,7 +83,7 @@ function App() {
           element={<CodeGeneratorNewPage />}
         />
 
-        <Route exact path='/column-chart' element={<ColumnChartPage />} />
+       
         
 
 
@@ -106,7 +105,7 @@ function App() {
 
 
         
-        <Route exact path='/line-chart' element={<LineChartPage />} />
+     
         <Route
           exact
           path='/marketplace-details'
@@ -117,7 +116,7 @@ function App() {
         
 
        
-        <Route exact path='/pie-chart' element={<PieChartPage />} />
+        
         <Route exact path='/portfolio' element={<PortfolioPage />} />
 
 

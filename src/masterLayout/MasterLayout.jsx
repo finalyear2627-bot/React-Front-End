@@ -268,48 +268,6 @@ const MasterLayout = ({ children }) => {
               </ul>
             </li>
 
-            {/* Chart Dropdown */}
-            <li className='dropdown'>
-              <Link to='#'>
-                <Icon icon='solar:pie-chart-outline' className='menu-icon' />
-                <span>Chart</span>
-              </Link>
-              <ul className='sidebar-submenu'>
-                <li>
-                  <NavLink
-                    to='/line-chart'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-danger-main w-auto' />{" "}
-                    Line Chart
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/column-chart'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
-                    Column Chart
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/pie-chart'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-success-main w-auto' />{" "}
-                    Pie Chart
-                  </NavLink>
-                </li>
-              </ul>
-            </li>
 
             {/* Users Dropdown */}
             <li className='dropdown'>
