@@ -175,39 +175,9 @@ const MasterLayout = ({ children }) => {
                     Code Generator
                   </NavLink>
                 </li>
-                <li>
-                  <NavLink
-                    to='/image-generator'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-info-main w-auto' />{" "}
-                    Image Generator
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/voice-generator'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-danger-main w-auto' />{" "}
-                    Voice Generator
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/video-generator'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-success-main w-auto' />{" "}
-                    Video Generator
-                  </NavLink>
-                </li>
+                
+                
+                
               </ul>
             </li>
 

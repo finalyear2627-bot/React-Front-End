@@ -18,7 +18,6 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import FormLayoutPage from "./pages/FormLayoutPage";
 import FormValidationPage from "./pages/FormValidationPage";
 import FormPage from "./pages/FormPage";
-import ImageGeneratorPage from "./pages/ImageGeneratorPage";
 import InvoiceAddPage from "./pages/InvoiceAddPage";
 
 import LineChartPage from "./pages/LineChartPage";
@@ -40,9 +39,9 @@ import TextGeneratorPage from "./pages/TextGeneratorPage";
 import UsersGridPage from "./pages/UsersGridPage";
 import UsersListPage from "./pages/UsersListPage";
 import ViewDetailsPage from "./pages/ViewDetailsPage";
-import VideoGeneratorPage from "./pages/VideoGeneratorPage";
+
 import ViewProfilePage from "./pages/ViewProfilePage";
-import VoiceGeneratorPage from "./pages/VoiceGeneratorPage";
+
 import WizardPage from "./pages/WizardPage";
 import RouteScrollToTop from "./helper/RouteScrollToTop";
 import TextGeneratorNewPage from "./pages/TextGeneratorNewPage";
@@ -101,7 +100,7 @@ function App() {
         
         
 
-        <Route exact path='/image-generator' element={<ImageGeneratorPage />} />
+       
 
         <Route exact path='/invoice-add' element={<InvoiceAddPage />} />
 
@@ -140,9 +139,9 @@ function App() {
         <Route exact path='/users-grid' element={<UsersGridPage />} />
         <Route exact path='/users-list' element={<UsersListPage />} />
         <Route exact path='/view-details' element={<ViewDetailsPage />} />
-        <Route exact path='/video-generator' element={<VideoGeneratorPage />} />
+        
         <Route exact path='/view-profile' element={<ViewProfilePage />} />
-        <Route exact path='/voice-generator' element={<VoiceGeneratorPage />} />
+        
         <Route exact path='/wizard' element={<WizardPage />} />
 
         <Route exact path='*' element={<ErrorPage />} />
