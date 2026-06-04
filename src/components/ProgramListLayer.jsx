@@ -45,13 +45,22 @@ const ProgramListLayer = () => {
     <div className="card basic-data-table">
       <div className="card-header d-flex justify-content-between align-items-center">
         <h5 className="card-title mb-0">Programs</h5>
-        <Link
-          to="/program-add"
-          className="btn btn-sm btn-primary-600 radius-8 d-inline-flex align-items-center gap-1"
-        >
-          <Icon icon="ic:round-plus" className="text-xl" />
-          Add Program
-        </Link>
+        <div className="d-flex gap-8">
+          <Link
+            to="/program-bulk-upload"
+            className="btn btn-sm btn-outline-primary radius-8 d-inline-flex align-items-center gap-1"
+          >
+            <Icon icon="vscode-icons:file-type-excel" className="text-lg" />
+            Bulk Upload
+          </Link>
+          <Link
+            to="/program-add"
+            className="btn btn-sm btn-primary-600 radius-8 d-inline-flex align-items-center gap-1"
+          >
+            <Icon icon="ic:round-plus" className="text-xl" />
+            Add Program
+          </Link>
+        </div>
       </div>
 
       {error && (

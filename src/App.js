@@ -11,6 +11,7 @@ import ProgramListPage from "./pages/ProgramListPage";
 import ProgramAddPage from "./pages/ProgramAddPage";
 import ProgramEditPage from "./pages/ProgramEditPage";
 import ProgramViewPage from "./pages/ProgramViewPage";
+import ProgramBulkUploadPage from "./pages/ProgramBulkUploadPage";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route exact path='/program-add' element={<ProtectedRoute><ProgramAddPage /></ProtectedRoute>} />
         <Route exact path='/program-edit/:id' element={<ProtectedRoute><ProgramEditPage /></ProtectedRoute>} />
         <Route exact path='/program-view/:id' element={<ProtectedRoute><ProgramViewPage /></ProtectedRoute>} />
+        <Route exact path='/program-bulk-upload' element={<ProtectedRoute><ProgramBulkUploadPage /></ProtectedRoute>} />
 
         {/* Auth Routes */}
         <Route exact path='/forgot-password' element={<ForgotPasswordPage />} />

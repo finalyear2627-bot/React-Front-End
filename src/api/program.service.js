@@ -35,5 +35,23 @@ export const programService = {
   deleteProgram: async (id) => {
     await axiosInstance.delete(`/academics/programs/${id}/`);
   },
+
+  // Bulk create programs (one by one)
+  bulkCreatePrograms: async (programs) => {
+    const results = [];
+    for (const program of programs) {
+      try {
+        const data = await axiosInstance.post("/academics/programs/", program);
+        results.push({ success: true, data: data.data, code: program.code });
+      } catch (err) {
+        results.push({
+          success: false,
+          code: program.code,
+          error: err.response?.data?.detail || err.response?.data?.code?.[0] || "Failed to create",
+        });
+      }
+    }
+    return results;
+  },
 };
 
