@@ -1,7 +1,8 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { authService } from "../api/auth.service";
+import axiosInstance from "../api/axiosInstance";
+import { tokenService } from "../services/token.service";
 
 const SignInLayer = () => {
   const navigate = useNavigate();
@@ -17,18 +18,33 @@ const SignInLayer = () => {
     setError("");
 
     try {
-      await authService.login(username, password);
+      const response = await axiosInstance.post("/accounts/auth/login/", {
+        username,
+        password,
+      });
+
+      // Save tokens
+      tokenService.setTokens(response.data.access, response.data.refresh);
+
+      // Clear form
+      setUsername("");
+      setPassword("");
+
+      // Navigate to dashboard
       navigate("/dashboard");
     } catch (err) {
-  console.error("LOGIN ERROR:", err.response?.data);
+      console.error("LOGIN ERROR:", err.response?.data);
 
-  if (err.response?.data?.detail) {
-    setError(err.response.data.detail);
-  } else {
-    setError("Login failed. Check console.");
-  }
-}
-finally {
+      if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else if (err.response?.data?.non_field_errors) {
+        setError(err.response.data.non_field_errors[0]);
+      } else if (err.response?.status === 401) {
+        setError("Invalid username or password");
+      } else {
+        setError("Login failed. Please try again.");
+      }
+    } finally {
       setLoading(false);
     }
   };
@@ -96,7 +112,7 @@ finally {
                   Remember me
                 </label>
               </div>
-              <Link to="#" className="text-primary-600 fw-medium">
+              <Link to="/forgot-password" className="text-primary-600 fw-medium">
                 Forgot Password?
               </Link>
             </div>

@@ -1,8 +1,90 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axiosInstance from "../api/axiosInstance";
 
 const SignUpLayer = () => {
+  const navigate = useNavigate();
+  const [role, setRole] = useState("STUDENT");
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    passwordConfirm: "",
+    firstName: "",
+    lastName: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const validateForm = () => {
+    if (!formData.username || !formData.email || !formData.password || !formData.firstName || !formData.lastName) {
+      setError("All fields are required");
+      return false;
+    }
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters");
+      return false;
+    }
+    if (formData.password !== formData.passwordConfirm) {
+      setError("Passwords do not match");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (!validateForm()) return;
+
+    setLoading(true);
+
+    try {
+      const endpoint = role === "TEACHER" ? "/accounts/auth/register/teacher/" : "/accounts/auth/register/student/";
+
+      await axiosInstance.post(endpoint, {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        password_confirm: formData.passwordConfirm,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+      });
+
+      // After registration, login automatically
+      const loginResponse = await axiosInstance.post("/accounts/auth/login/", {
+        username: formData.username,
+        password: formData.password,
+      });
+
+      // Save tokens
+      localStorage.setItem("access_token", loginResponse.data.access);
+      localStorage.setItem("refresh_token", loginResponse.data.refresh);
+
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("SIGNUP ERROR:", err.response?.data);
+      const errorMessage = err.response?.data?.username?.[0] ||
+                          err.response?.data?.email?.[0] ||
+                          err.response?.data?.password?.[0] ||
+                          "Registration failed. Please try again.";
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section className='auth bg-base d-flex flex-wrap'>
       <div className='auth-left d-lg-block d-none'>
@@ -16,12 +98,87 @@ const SignUpLayer = () => {
             <Link to='/' className='mb-40 max-w-290-px'>
               <img src='assets/images/logo.png' alt='' />
             </Link>
-            <h4 className='mb-12'>Sign Up to your Account</h4>
+            <h4 className='mb-12'>Create Account</h4>
             <p className='mb-32 text-secondary-light text-lg'>
-              Welcome back! please enter your detail
+              Join us and get started!
             </p>
           </div>
-          <form action='#'>
+          <form onSubmit={handleSubmit}>
+            {/* ERROR MESSAGE */}
+            {error && (
+              <div className="alert alert-danger mb-16">
+                {error}
+              </div>
+            )}
+
+            {/* ROLE SELECTION */}
+            <div className='mb-20'>
+              <label className='form-label mb-8 text-sm fw-medium'>I am a</label>
+              <div className='d-flex gap-3'>
+                <div className='form-check'>
+                  <input
+                    className='form-check-input'
+                    type='radio'
+                    name='role'
+                    id='roleStudent'
+                    value='STUDENT'
+                    checked={role === 'STUDENT'}
+                    onChange={(e) => setRole(e.target.value)}
+                  />
+                  <label className='form-check-label' htmlFor='roleStudent'>
+                    Student
+                  </label>
+                </div>
+                <div className='form-check'>
+                  <input
+                    className='form-check-input'
+                    type='radio'
+                    name='role'
+                    id='roleTeacher'
+                    value='TEACHER'
+                    checked={role === 'TEACHER'}
+                    onChange={(e) => setRole(e.target.value)}
+                  />
+                  <label className='form-check-label' htmlFor='roleTeacher'>
+                    Teacher
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* FIRST NAME */}
+            <div className='icon-field mb-16'>
+              <span className='icon top-50 translate-middle-y'>
+                <Icon icon='f7:person' />
+              </span>
+              <input
+                type='text'
+                className='form-control h-56-px bg-neutral-50 radius-12'
+                placeholder='First Name'
+                name='firstName'
+                value={formData.firstName}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
+            {/* LAST NAME */}
+            <div className='icon-field mb-16'>
+              <span className='icon top-50 translate-middle-y'>
+                <Icon icon='f7:person' />
+              </span>
+              <input
+                type='text'
+                className='form-control h-56-px bg-neutral-50 radius-12'
+                placeholder='Last Name'
+                name='lastName'
+                value={formData.lastName}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
+            {/* USERNAME */}
             <div className='icon-field mb-16'>
               <span className='icon top-50 translate-middle-y'>
                 <Icon icon='f7:person' />
@@ -30,8 +187,14 @@ const SignUpLayer = () => {
                 type='text'
                 className='form-control h-56-px bg-neutral-50 radius-12'
                 placeholder='Username'
+                name='username'
+                value={formData.username}
+                onChange={handleInputChange}
+                required
               />
             </div>
+
+            {/* EMAIL */}
             <div className='icon-field mb-16'>
               <span className='icon top-50 translate-middle-y'>
                 <Icon icon='mage:email' />
@@ -40,38 +203,70 @@ const SignUpLayer = () => {
                 type='email'
                 className='form-control h-56-px bg-neutral-50 radius-12'
                 placeholder='Email'
+                name='email'
+                value={formData.email}
+                onChange={handleInputChange}
+                required
               />
             </div>
+
+            {/* PASSWORD */}
             <div className='mb-20'>
-              <div className='position-relative '>
+              <div className='position-relative'>
                 <div className='icon-field'>
                   <span className='icon top-50 translate-middle-y'>
                     <Icon icon='solar:lock-password-outline' />
                   </span>
                   <input
-                    type='password'
+                    type={showPassword ? 'text' : 'password'}
                     className='form-control h-56-px bg-neutral-50 radius-12'
                     id='your-password'
                     placeholder='Password'
+                    name='password'
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    required
                   />
                 </div>
                 <span
                   className='toggle-password ri-eye-line cursor-pointer position-absolute end-0 top-50 translate-middle-y me-16 text-secondary-light'
-                  data-toggle='#your-password'
+                  onClick={() => setShowPassword(!showPassword)}
                 />
               </div>
               <span className='mt-12 text-sm text-secondary-light'>
                 Your password must have at least 8 characters
               </span>
             </div>
+
+            {/* CONFIRM PASSWORD */}
+            <div className='mb-20'>
+              <div className='position-relative'>
+                <div className='icon-field'>
+                  <span className='icon top-50 translate-middle-y'>
+                    <Icon icon='solar:lock-password-outline' />
+                  </span>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    className='form-control h-56-px bg-neutral-50 radius-12'
+                    placeholder='Confirm Password'
+                    name='passwordConfirm'
+                    value={formData.passwordConfirm}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* TERMS & CONDITIONS */}
             <div className=''>
               <div className='d-flex justify-content-between gap-2'>
                 <div className='form-check style-check d-flex align-items-start'>
                   <input
                     className='form-check-input border border-neutral-300 mt-4'
                     type='checkbox'
-                    defaultValue=''
                     id='condition'
+                    required
                   />
                   <label
                     className='form-check-label text-sm'
@@ -79,48 +274,27 @@ const SignUpLayer = () => {
                   >
                     By creating an account means you agree to the
                     <Link to='#' className='text-primary-600 fw-semibold'>
-                      Terms &amp; Conditions
+                      {" "}Terms &amp; Conditions
                     </Link>{" "}
                     and our
                     <Link to='#' className='text-primary-600 fw-semibold'>
-                      Privacy Policy
+                      {" "}Privacy Policy
                     </Link>
                   </label>
                 </div>
               </div>
             </div>
+
+            {/* SIGN UP BUTTON */}
             <button
               type='submit'
               className='btn btn-primary text-sm btn-sm px-12 py-16 w-100 radius-12 mt-32'
+              disabled={loading}
             >
-              {" "}
-              Sign Up
+              {loading ? "Creating Account..." : "Sign Up"}
             </button>
-            <div className='mt-32 center-border-horizontal text-center'>
-              <span className='bg-base z-1 px-4'>Or sign up with</span>
-            </div>
-            <div className='mt-32 d-flex align-items-center gap-3'>
-              <button
-                type='button'
-                className='fw-semibold text-primary-light py-16 px-24 w-50 border radius-12 text-md d-flex align-items-center justify-content-center gap-12 line-height-1 bg-hover-primary-50'
-              >
-                <Icon
-                  icon='ic:baseline-facebook'
-                  className='text-primary-600 text-xl line-height-1'
-                />
-                Google
-              </button>
-              <button
-                type='button'
-                className='fw-semibold text-primary-light py-16 px-24 w-50 border radius-12 text-md d-flex align-items-center justify-content-center gap-12 line-height-1 bg-hover-primary-50'
-              >
-                <Icon
-                  icon='logos:google-icon'
-                  className='text-primary-600 text-xl line-height-1'
-                />
-                Google
-              </button>
-            </div>
+
+            {/* SIGN IN LINK */}
             <div className='mt-32 text-center text-sm'>
               <p className='mb-0'>
                 Already have an account?{" "}
