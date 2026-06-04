@@ -34,3 +34,722 @@ webpack compiled [1m[32msuccessfully[39m[22m
 Compiling...
 Compiled successfully!
 webpack compiled [1m[32msuccessfully[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\components\SignInLayer.jsx
+  Line 12:16:  'setRole' is assigned a value but never used  no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\components\SignInLayer.jsx
+  Line 12:16:  'setRole' is assigned a value but never used  no-unused-vars
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled successfully!
+webpack compiled [1m[32msuccessfully[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Failed to compile.
+
+[eslint] 
+src\components\SignInLayer.jsx
+  Line 85:30:   'role' is not defined     no-undef
+  Line 86:38:   'setRole' is not defined  no-undef
+  Line 99:30:   'role' is not defined     no-undef
+  Line 100:38:  'setRole' is not defined  no-undef
+  Line 113:30:  'role' is not defined     no-undef
+  Line 114:38:  'setRole' is not defined  no-undef
+
+Search for the keywords to learn more about each error.
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+[39m[22m
+
+[1m[31mERROR[39m[22m in [1m[eslint] 
+src\components\SignInLayer.jsx
+  Line 85:30:   'role' is not defined     no-undef
+  Line 86:38:   'setRole' is not defined  no-undef
+  Line 99:30:   'role' is not defined     no-undef
+  Line 100:38:  'setRole' is not defined  no-undef
+  Line 113:30:  'role' is not defined     no-undef
+  Line 114:38:  'setRole' is not defined  no-undef
+
+Search for the keywords to learn more about each [1m[31merror[39m[22m[1m.[39m[22m
+
+webpack compiled with [1m[31m1 error[39m[22m and [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 22:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 22:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 22:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 22:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 22:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+src\masterLayout\MasterLayout.jsx
+  Line 290:27:  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 22:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+src\masterLayout\MasterLayout.jsx
+  Line 290:27:  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 22:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+src\masterLayout\MasterLayout.jsx
+  Line 290:27:  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 22:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+src\masterLayout\MasterLayout.jsx
+  Line 290:27:  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 22:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+src\masterLayout\MasterLayout.jsx
+  Line 276:25:  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 22:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+src\masterLayout\MasterLayout.jsx
+  Line 276:25:  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 22:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+src\masterLayout\MasterLayout.jsx
+  Line 276:25:  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 22:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+src\masterLayout\MasterLayout.jsx
+  Line 276:25:  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 22:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+src\masterLayout\MasterLayout.jsx
+  Line 276:25:  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 22:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+src\masterLayout\MasterLayout.jsx
+  Line 276:25:  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 22:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+src\masterLayout\MasterLayout.jsx
+  Line 276:25:  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 22:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+src\masterLayout\MasterLayout.jsx
+  Line 276:25:  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 19:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+src\masterLayout\MasterLayout.jsx
+  Line 276:25:  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 19:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+src\masterLayout\MasterLayout.jsx
+  Line 276:25:  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 19:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+src\masterLayout\MasterLayout.jsx
+  Line 276:25:  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 19:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+src\masterLayout\MasterLayout.jsx
+  Line 276:25:  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 19:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+src\masterLayout\MasterLayout.jsx
+  Line 276:25:  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\components\ProgramAddLayer.jsx
+  Line 1:10:  'Icon' is defined but never used  no-unused-vars
+
+src\components\ProgramEditLayer.jsx
+  Line 1:10:  'Icon' is defined but never used                                                                                 no-unused-vars
+  Line 19:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\ProgramListLayer.jsx
+  Line 7:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src\components\ProgramViewLayer.jsx
+  Line 7:9:   'navigate' is assigned a value but never used                                                                    no-unused-vars
+  Line 15:6:  React Hook useEffect has a missing dependency: 'fetchProgram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\components\SignUpLayer.jsx
+  Line 63:13:  'registerResponse' is assigned a value but never used  no-unused-vars
+
+src\masterLayout\MasterLayout.jsx
+  Line 276:25:  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m

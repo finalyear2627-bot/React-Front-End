@@ -143,252 +143,49 @@ const MasterLayout = ({ children }) => {
               </NavLink>
             </li>
 
-            <li className='sidebar-menu-group-title'>Application</li>
-          
-            {/* Ai Application Dropdown */}
+            <li className='sidebar-menu-group-title'>Management</li>
+
+            {/* Programs Dropdown */}
             <li className='dropdown'>
               <Link to='#'>
-                <i className='ri-robot-2-line mr-10' />
-
-                <span>Ai Application</span>
+                <Icon icon='solar:book-outline' className='menu-icon' />
+                <span>Programs</span>
               </Link>
               <ul className='sidebar-submenu'>
                 <li>
                   <NavLink
-                    to='/text-generator'
+                    to='/programs'
                     className={(navData) =>
                       navData.isActive ? "active-page" : ""
                     }
                   >
                     <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                    Text Generator
+                    List Programs
                   </NavLink>
                 </li>
                 <li>
                   <NavLink
-                    to='/code-generator'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
-                    Code Generator
-                  </NavLink>
-                </li>
-                
-                
-                
-              </ul>
-            </li>
-
-            <li className='sidebar-menu-group-title'>UI Elements</li>
-            {/* Forms Dropdown */}
-            <li className='dropdown'>
-              <Link to='#'>
-                <Icon icon='heroicons:document' className='menu-icon' />
-                <span>Forms</span>
-              </Link>
-              <ul className='sidebar-submenu'>
-                <li>
-                  <NavLink
-                    to='/form'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                    Input Forms
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/form-layout'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
-                    Input Layout
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/form-validation'
+                    to='/program-add'
                     className={(navData) =>
                       navData.isActive ? "active-page" : ""
                     }
                   >
                     <i className='ri-circle-fill circle-icon text-success-main w-auto' />{" "}
-                    Form Validation
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/wizard'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-danger-main w-auto' />{" "}
-                    Form Wizard
+                    Add Program
                   </NavLink>
                 </li>
               </ul>
             </li>
 
-            {/* Table Dropdown */}
-            <li className='dropdown'>
-              <Link to='#'>
-                <Icon icon='mingcute:storage-line' className='menu-icon' />
-                <span>Table</span>
-              </Link>
-              <ul className='sidebar-submenu'>
-                <li>
-                  <NavLink
-                    to='/table-basic'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                    Basic Table
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/table-data'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
-                    Data Table
-                  </NavLink>
-                </li>
-              </ul>
-            </li>
-
-
-            {/* Users Dropdown */}
-            <li className='dropdown'>
-              <Link to='#'>
-                <Icon
-                  icon='flowbite:users-group-outline'
-                  className='menu-icon'
-                />
-                <span>Users</span>
-              </Link>
-              <ul className='sidebar-submenu'>
-                <li>
-                  <NavLink
-                    to='/users-list'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                    Users List
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/users-grid'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
-                    Users Grid
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/add-user'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-info-main w-auto' />{" "}
-                    Add User
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/view-profile'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-danger-main w-auto' />{" "}
-                    View Profile
-                  </NavLink>
-                </li>
-              </ul>
-            </li>
-
-            {/* Role & Access Dropdown */}
-            <li className='dropdown'>
-              <Link to='#'>
-                <i className='ri-user-settings-line' />
-                <span>Role &amp; Access</span>
-              </Link>
-              <ul className='sidebar-submenu'>
-                <li>
-                  <NavLink
-                    to='/role-access'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                    Role &amp; Access
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/assign-role'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
-                    Assign Role
-                  </NavLink>
-                </li>
-              </ul>
-            </li>
-
-            <li className='sidebar-menu-group-title'>Application</li>
+            <li className='sidebar-menu-group-title'>Account</li>
 
             {/* Authentication Dropdown */}
             <li className='dropdown'>
               <Link to='#'>
-                <Icon icon='simple-line-icons:vector' className='menu-icon' />
-                <span>Authentication</span>
+                <Icon icon='solar:lock-outline' className='menu-icon' />
+                <span>Auth</span>
               </Link>
               <ul className='sidebar-submenu'>
-                <li>
-                  <NavLink
-                    to='/sign-in'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                    Sign In
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/sign-up'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
-                    Sign Up
-                  </NavLink>
-                </li>
                 <li>
                   <NavLink
                     to='/forgot-password'
@@ -402,8 +199,6 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
-           
           </ul>
         </div>
       </aside>
@@ -463,7 +258,7 @@ const MasterLayout = ({ children }) => {
                   </button>
                   
                   <div className='dropdown-menu to-top dropdown-menu-sm'>
-                    
+
                     <ul className='to-top-list'>
                       <li>
                         <Link
@@ -478,33 +273,18 @@ const MasterLayout = ({ children }) => {
                         </Link>
                       </li>
                       <li>
-                        <Link
-                          className='dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3'
-                          to='/email'
+                        <a
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleLogout();
+                          }}
+                          className="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-danger d-flex align-items-center gap-3"
                         >
-                          <Icon
-                            icon='tabler:message-check'
-                            className='icon text-xl'
-                          />{" "}
-                          Inbox
-                        </Link>
+                          <Icon icon='ri:logout-box-line' className='icon text-xl' />
+                          Log Out
+                        </a>
                       </li>
-                      
-                      return (
-                        <li>
-                          <a
-                            href="#"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              handleLogout();
-                            }}
-                            className="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-danger d-flex align-items-center gap-3"
-                          >
-                            Log Out
-                          </a>
-                        </li>
-                      );
-
                     </ul>
                   </div>
                 </div>

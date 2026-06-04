@@ -51,9 +51,16 @@ const SignUpLayer = () => {
     setLoading(true);
 
     try {
-      const endpoint = role === "TEACHER" ? "/accounts/auth/register/teacher/" : "/accounts/auth/register/student/";
+      let endpoint;
+      if (role === "TEACHER") {
+        endpoint = "/accounts/auth/register/teacher/";
+      } else if (role === "ADMIN") {
+        endpoint = "/accounts/auth/register/admin/";
+      } else {
+        endpoint = "/accounts/auth/register/student/";
+      }
 
-      await axiosInstance.post(endpoint, {
+      const registerResponse = await axiosInstance.post(endpoint, {
         username: formData.username,
         email: formData.email,
         password: formData.password,
@@ -63,14 +70,23 @@ const SignUpLayer = () => {
       });
 
       // After registration, login automatically
-      const loginResponse = await axiosInstance.post("/accounts/auth/login/", {
+      const loginEndpoint = role === "ADMIN"
+        ? "/accounts/auth/login/admin/"
+        : role === "TEACHER"
+        ? "/accounts/auth/login/teacher/"
+        : "/accounts/auth/login/";
+
+      const loginResponse = await axiosInstance.post(loginEndpoint, {
         username: formData.username,
         password: formData.password,
       });
 
-      // Save tokens
+      // Save tokens and role
       localStorage.setItem("access_token", loginResponse.data.access);
       localStorage.setItem("refresh_token", loginResponse.data.refresh);
+      localStorage.setItem("user_role", role);
+      localStorage.setItem("user_id", loginResponse.data.user_id || "");
+      localStorage.setItem("username", formData.username);
 
       navigate("/dashboard");
     } catch (err) {
@@ -114,7 +130,7 @@ const SignUpLayer = () => {
             {/* ROLE SELECTION */}
             <div className='mb-20'>
               <label className='form-label mb-8 text-sm fw-medium'>I am a</label>
-              <div className='d-flex gap-3'>
+              <div className='d-flex gap-3 flex-wrap'>
                 <div className='form-check'>
                   <input
                     className='form-check-input'
@@ -141,6 +157,20 @@ const SignUpLayer = () => {
                   />
                   <label className='form-check-label' htmlFor='roleTeacher'>
                     Teacher
+                  </label>
+                </div>
+                <div className='form-check'>
+                  <input
+                    className='form-check-input'
+                    type='radio'
+                    name='role'
+                    id='roleAdmin'
+                    value='ADMIN'
+                    checked={role === 'ADMIN'}
+                    onChange={(e) => setRole(e.target.value)}
+                  />
+                  <label className='form-check-label' htmlFor='roleAdmin'>
+                    Admin
                   </label>
                 </div>
               </div>

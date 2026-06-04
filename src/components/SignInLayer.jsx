@@ -23,8 +23,11 @@ const SignInLayer = () => {
         password,
       });
 
-      // Save tokens
+      // Save tokens and role from response
       tokenService.setTokens(response.data.access, response.data.refresh);
+      localStorage.setItem("user_role", response.data.role || "STUDENT");
+      localStorage.setItem("user_id", response.data.user_id || "");
+      localStorage.setItem("username", username);
 
       // Clear form
       setUsername("");
