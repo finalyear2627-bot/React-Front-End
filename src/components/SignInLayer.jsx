@@ -1,8 +1,9 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
 import { tokenService } from "../services/token.service";
+import { showError, showSuccess } from "../utils/toast";
 
 const SignInLayer = () => {
   const navigate = useNavigate();
@@ -10,15 +11,20 @@ const SignInLayer = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (sessionStorage.getItem("session_expired")) {
+      sessionStorage.removeItem("session_expired");
+      showError("Your session has expired. Please sign in again.");
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     try {
-      const response = await axiosInstance.post("/accounts/auth/login/", {
+      const response = await axiosInstance.post("/auth/login/", {
         username,
         password,
       });
@@ -33,19 +39,17 @@ const SignInLayer = () => {
       setUsername("");
       setPassword("");
 
-      // Navigate to dashboard
+      showSuccess("Signed in successfully");
       navigate("/dashboard");
     } catch (err) {
-      console.error("LOGIN ERROR:", err.response?.data);
-
       if (err.response?.data?.detail) {
-        setError(err.response.data.detail);
+        showError(err.response.data.detail);
       } else if (err.response?.data?.non_field_errors) {
-        setError(err.response.data.non_field_errors[0]);
+        showError(err.response.data.non_field_errors[0]);
       } else if (err.response?.status === 401) {
-        setError("Invalid username or password");
+        showError("Invalid username or password");
       } else {
-        setError("Login failed. Please try again.");
+        showError("Login failed. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -64,13 +68,6 @@ const SignInLayer = () => {
           </div>
 
           <form onSubmit={handleSubmit}>
-            {/* ERROR MESSAGE */}
-            {error && (
-              <div className="alert alert-danger mb-16">
-                {error}
-              </div>
-            )}
-
             {/* USERNAME */}
             <div className="icon-field mb-16">
               <span className="icon top-50 translate-middle-y">

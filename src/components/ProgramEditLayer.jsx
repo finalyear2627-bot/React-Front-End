@@ -2,16 +2,13 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { programService } from "../api/program.service";
+import { showSuccess, showError, getApiError } from "../utils/toast";
 
 const ProgramEditLayer = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [formData, setFormData] = useState({
-    code: "",
-    name: "",
-  });
+  const [formData, setFormData] = useState({ code: "", name: "" });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -22,11 +19,11 @@ const ProgramEditLayer = () => {
     try {
       setLoading(true);
       const data = await programService.getProgramById(id);
-      setFormData(data);
-      setError("");
+      const program = data?.result?.[0] ?? data;
+      setFormData({ code: program.code || "", name: program.name || "" });
     } catch (err) {
-      console.error("Error fetching program:", err);
-      setError("Failed to load program");
+      showError(getApiError(err));
+      navigate("/programs");
     } finally {
       setLoading(false);
     }
@@ -34,23 +31,19 @@ const ProgramEditLayer = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     setSubmitting(true);
-
     try {
-      await programService.updateProgram(id, formData);
+      const res = await programService.updateProgram(id, formData);
+      const msg = res?.status?.message || "Program updated successfully";
+      showSuccess(msg);
       navigate("/programs");
     } catch (err) {
-      console.error("Error updating program:", err);
-      setError(err.response?.data?.detail || err.response?.data?.non_field_errors?.[0] || "Failed to update program");
+      showError(getApiError(err));
     } finally {
       setSubmitting(false);
     }
@@ -59,9 +52,7 @@ const ProgramEditLayer = () => {
   if (loading) {
     return (
       <div className="card h-100 p-0 radius-12">
-        <div className="card-body p-24">
-          <div className="text-center">Loading...</div>
-        </div>
+        <div className="card-body p-24 text-center">Loading...</div>
       </div>
     );
   }
@@ -76,8 +67,6 @@ const ProgramEditLayer = () => {
                 <h5 className="mb-0">Edit Program</h5>
               </div>
               <div className="card-body">
-                {error && <div className="alert alert-danger mb-20">{error}</div>}
-
                 <form onSubmit={handleSubmit}>
                   <div className="mb-20">
                     <label htmlFor="code" className="form-label fw-semibold text-primary-light text-sm mb-8">
@@ -138,4 +127,3 @@ const ProgramEditLayer = () => {
 };
 
 export default ProgramEditLayer;
-

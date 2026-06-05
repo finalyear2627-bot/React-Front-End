@@ -19,4 +19,16 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      tokenService.clearTokens();
+      sessionStorage.setItem("session_expired", "1");
+      window.location.href = "/sign-in";
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default axiosInstance;

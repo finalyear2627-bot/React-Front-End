@@ -42,12 +42,25 @@ export const programService = {
     for (const program of programs) {
       try {
         const data = await axiosInstance.post("/academics/programs/", program);
-        results.push({ success: true, data: data.data, code: program.code });
+        const statusCode = data.data?.status?.code;
+        if (statusCode !== undefined && statusCode !== 0) {
+          results.push({
+            success: false,
+            code: program.code,
+            error: data.data?.status?.message || "Failed to create",
+          });
+        } else {
+          results.push({ success: true, data: data.data, code: program.code });
+        }
       } catch (err) {
         results.push({
           success: false,
           code: program.code,
-          error: err.response?.data?.detail || err.response?.data?.code?.[0] || "Failed to create",
+          error:
+            err.response?.data?.status?.message ||
+            err.response?.data?.detail ||
+            err.response?.data?.code?.[0] ||
+            "Failed to create",
         });
       }
     }

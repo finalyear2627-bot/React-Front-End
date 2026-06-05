@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { programService } from "../api/program.service";
+import { showError, getApiError } from "../utils/toast";
 
 const ProgramViewLayer = () => {
   const navigate = useNavigate();
@@ -18,10 +19,11 @@ const ProgramViewLayer = () => {
     try {
       setLoading(true);
       const data = await programService.getProgramById(id);
-      setProgram(data);
+      const program = data?.result?.[0] ?? data?.result ?? data;
+      setProgram(program);
       setError("");
     } catch (err) {
-      console.error("Error fetching program:", err);
+      showError(getApiError(err));
       setError("Failed to load program");
     } finally {
       setLoading(false);

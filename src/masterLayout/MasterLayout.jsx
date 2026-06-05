@@ -177,6 +177,38 @@ const MasterLayout = ({ children }) => {
               </ul>
             </li>
 
+            {/* Courses Dropdown */}
+            <li className='dropdown'>
+              <Link to='#'>
+                <Icon icon='solar:notebook-outline' className='menu-icon' />
+                <span>Courses</span>
+              </Link>
+              <ul className='sidebar-submenu'>
+                <li>
+                  <NavLink
+                    to='/courses'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                    List Courses
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/course-add'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-success-main w-auto' />{" "}
+                    Add Course
+                  </NavLink>
+                </li>
+              </ul>
+            </li>
+
             <li className='sidebar-menu-group-title'>Account</li>
 
             {/* Authentication Dropdown */}

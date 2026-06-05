@@ -101,7 +101,7 @@ npm start
 |----------|--------|---------|
 | `/accounts/auth/register/student/` | POST | Register new student |
 | `/accounts/auth/register/teacher/` | POST | Register new teacher |
-| `/accounts/auth/login/` | POST | Login user |
+| `/auth/login/` | POST | Login user |
 | `/accounts/me/` | GET | Get current user info |
 | `/accounts/users/` | GET | List all users (Admin only) |
 

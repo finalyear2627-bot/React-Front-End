@@ -2,35 +2,28 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { programService } from "../api/program.service";
+import { showSuccess, showError, getApiError } from "../utils/toast";
 
 const ProgramAddLayer = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    code: "",
-    name: "",
-  });
+  const [formData, setFormData] = useState({ code: "", name: "" });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
-
     try {
-      await programService.createProgram(formData);
+      const res = await programService.createProgram(formData);
+      const msg = res?.status?.message || "Program created successfully";
+      showSuccess(msg);
       navigate("/programs");
     } catch (err) {
-      console.error("Error creating program:", err);
-      setError(err.response?.data?.detail || err.response?.data?.non_field_errors?.[0] || "Failed to create program");
+      showError(getApiError(err));
     } finally {
       setLoading(false);
     }
@@ -46,8 +39,6 @@ const ProgramAddLayer = () => {
                 <h5 className="mb-0">Add New Program</h5>
               </div>
               <div className="card-body">
-                {error && <div className="alert alert-danger mb-20">{error}</div>}
-
                 <form onSubmit={handleSubmit}>
                   <div className="mb-20">
                     <label htmlFor="code" className="form-label fw-semibold text-primary-light text-sm mb-8">
@@ -108,4 +99,3 @@ const ProgramAddLayer = () => {
 };
 
 export default ProgramAddLayer;
-

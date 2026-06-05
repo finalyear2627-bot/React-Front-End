@@ -21,13 +21,13 @@ The authentication system now supports **JSON API** with role-based login for **
 **API Endpoints Used:**
 ```javascript
 // Student
-POST /accounts/auth/login/
+POST /auth/login/
 
 // Teacher
-POST /accounts/auth/login/teacher/
+POST /auth/login/teacher/
 
 // Admin
-POST /accounts/auth/login/admin/
+POST /auth/login/admin/
 ```
 
 **Expected JSON Response:**
@@ -175,9 +175,9 @@ The login/signup components handle:
 Your backend should provide these endpoints:
 
 ```
-POST /api/accounts/auth/login/
-POST /api/accounts/auth/login/teacher/
-POST /api/accounts/auth/login/admin/
+POST /api/auth/login/
+POST /api/auth/login/teacher/
+POST /api/auth/login/admin/
 POST /api/accounts/auth/register/student/
 POST /api/accounts/auth/register/teacher/
 POST /api/accounts/auth/register/admin/

@@ -1,659 +1,432 @@
 {
   "info": {
-    "name": "Smart Assessment AI - Role-Based Backend APIs",
+    "name": "Smart Assessment AI - Backend APIs",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "JWT Auth with Role-Based Access Control (RBAC). After login, role is automatically assigned and determines API access.",
-    "contact": {
-      "name": "API Support",
-      "url": "http://127.0.0.1:8000"
-    }
+    "description": "Standardized response format: all responses wrapped in {status, result}. JWT Auth, Accounts, Academics (Programs, Courses, PLO, CLO), Assessments."
   },
   "variable": [
-    {
-      "key": "base_url",
-      "value": "http://127.0.0.1:8000"
-    },
-    {
-      "key": "access_token",
-      "value": ""
-    },
-    {
-      "key": "refresh_token",
-      "value": ""
-    },
-    {
-      "key": "user_role",
-      "value": ""
-    }
+    { "key": "base_url", "value": "http://127.0.0.1:8000" },
+    { "key": "access_token", "value": "" },
+    { "key": "refresh_token", "value": "" }
   ],
   "item": [
     {
-      "name": "🔐 AUTHENTICATION & REGISTRATION",
-      "description": "Simple login - role is assigned automatically during registration. No frontend selection needed.",
+      "name": "AUTH",
       "item": [
         {
-          "name": "📝 Register as Student",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"student_new\",\n  \"email\": \"student@example.com\",\n  \"password\": \"SecurePass@123\",\n  \"password_confirm\": \"SecurePass@123\",\n  \"first_name\": \"Ahmed\",\n  \"last_name\": \"Khan\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/accounts/auth/register/student/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "accounts", "auth", "register", "student", ""]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "📝 Register as Teacher",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"teacher_new\",\n  \"email\": \"teacher@example.com\",\n  \"password\": \"SecurePass@123\",\n  \"password_confirm\": \"SecurePass@123\",\n  \"first_name\": \"Hassan\",\n  \"last_name\": \"Ahmed\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/accounts/auth/register/teacher/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "accounts", "auth", "register", "teacher", ""]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "🔑 Login - Simple (Any Role)",
+          "name": "Login (JWT)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (pm.response.code === 200) {",
-                  "  var jsonData = pm.response.json();",
-                  "  pm.environment.set('access_token', jsonData.access);",
-                  "  pm.environment.set('refresh_token', jsonData.refresh);",
-                  "  pm.environment.set('user_role', jsonData.user.role);",
-                  "  console.log('Login successful! Role: ' + jsonData.user.role);",
+                  "var res = pm.response.json();",
+                  "if (res.access) {",
+                  "    pm.collectionVariables.set('access_token', res.access);",
+                  "    pm.collectionVariables.set('refresh_token', res.refresh);",
                   "}"
-                ]
+                ],
+                "type": "text/javascript"
               }
             }
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"student1\",\n  \"password\": \"Student@123\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/accounts/auth/login/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "accounts", "auth", "login", ""]
-            },
-            "description": "Simple login endpoint. No role selection. Backend assigns role automatically based on user account type."
-          },
-          "response": []
-        },
-        {
-          "name": "🔑 Login - Teacher Account",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 200) {",
-                  "  var jsonData = pm.response.json();",
-                  "  pm.environment.set('access_token', jsonData.access);",
-                  "  pm.environment.set('refresh_token', jsonData.refresh);",
-                  "  pm.environment.set('user_role', jsonData.user.role);",
-                  "  console.log('Teacher login successful! Role: ' + jsonData.user.role);",
-                  "}"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"teacher1\",\n  \"password\": \"Teacher@123\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/accounts/auth/login/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "accounts", "auth", "login", ""]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "🔑 Login - Admin Account",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 200) {",
-                  "  var jsonData = pm.response.json();",
-                  "  pm.environment.set('access_token', jsonData.access);",
-                  "  pm.environment.set('refresh_token', jsonData.refresh);",
-                  "  pm.environment.set('user_role', jsonData.user.role);",
-                  "  console.log('Admin login successful! Role: ' + jsonData.user.role);",
-                  "}"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"username\": \"administrator\",\n  \"password\": \"finalyear2627\"\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/accounts/auth/login/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "accounts", "auth", "login", ""]
-            }
-          },
-          "response": []
+            "url": "{{base_url}}/api/auth/login/"
+          }
         },
         {
-          "name": "🔄 Refresh Token",
+          "name": "Refresh Token",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/auth/refresh/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "auth", "refresh", ""]
-            }
-          },
-          "response": []
+            "url": "{{base_url}}/api/auth/refresh/"
+          }
         }
       ]
     },
     {
-      "name": "👤 ACCOUNTS - User Management",
-      "description": "User management endpoints. Access controlled by role.",
+      "name": "ACCOUNTS",
       "item": [
         {
-          "name": "👤 Get Current User (All Authenticated Users)",
+          "name": "Get Current User",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/accounts/me/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "accounts", "me", ""]
-            },
-            "description": "Get current logged-in user details including role."
-          },
-          "response": []
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/accounts/me/"
+          }
         },
         {
-          "name": "📋 List All Users (🔒 ADMIN ONLY)",
+          "name": "List Users (Admin Only)",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/accounts/users/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "accounts", "users", ""]
-            },
-            "description": "List all users in system. ADMIN ONLY. Returns 403 Forbidden for other roles."
-          },
-          "response": []
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/accounts/users/"
+          }
         }
       ]
     },
     {
-      "name": "📚 ACADEMICS - Programs",
-      "description": "Academic program management. ADMIN can create/edit/delete. All authenticated users can read.",
+      "name": "ACADEMICS - PROGRAMS",
       "item": [
         {
-          "name": "📖 List Programs (All Authenticated Users)",
+          "name": "List Programs",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/academics/programs/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "academics", "programs", ""]
-            },
-            "description": "List all academic programs. Accessible to all authenticated users (ADMIN, TEACHER, STUDENT)."
-          },
-          "response": []
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/academics/programs/"
+          }
         },
         {
-          "name": "✏️ Create Program (🔒 ADMIN ONLY)",
+          "name": "Create Program",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"code\": \"BSSE\",\n  \"name\": \"BS Software Engineering\"\n}"
+              "raw": "{\n  \"code\": \"BSCS\",\n  \"name\": \"BS Computer Science\"\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/academics/programs/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "academics", "programs", ""]
-            },
-            "description": "Create a new program. ADMIN ONLY. Returns 403 Forbidden for other roles."
-          },
-          "response": []
+            "url": "{{base_url}}/api/academics/programs/"
+          }
         },
         {
-          "name": "📤 Bulk Upload Programs (🔒 ADMIN ONLY)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "file",
-                  "type": "file"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/api/academics/programs/bulk-import/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "academics", "programs", "bulk-import", ""]
-            },
-            "description": "Bulk import programs from Excel file. ADMIN ONLY. Excel should have columns: code, name"
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "📚 ACADEMICS - Courses",
-      "description": "Course management. ADMIN can create/edit/delete. All authenticated users can read.",
-      "item": [
-        {
-          "name": "📖 List Courses (All Authenticated Users)",
+          "name": "Get Program",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/academics/courses/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "academics", "courses", ""]
-            },
-            "description": "List all courses. Accessible to all authenticated users."
-          },
-          "response": []
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/academics/programs/1/"
+          }
         },
         {
-          "name": "✏️ Create Course (🔒 ADMIN ONLY)",
+          "name": "Update Program",
           "request": {
-            "method": "POST",
+            "method": "PUT",
             "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"code\": \"CS201\",\n  \"name\": \"Data Structures\",\n  \"course_class\": \"CORE\",\n  \"credit_hours_theory\": 3,\n  \"credit_hours_lab\": 1\n}"
+              "raw": "{\n  \"code\": \"BSCS\",\n  \"name\": \"BS Computer Science (Updated)\"\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/academics/courses/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "academics", "courses", ""]
-            },
-            "description": "Create a new course. ADMIN ONLY."
-          },
-          "response": []
+            "url": "{{base_url}}/api/academics/programs/1/"
+          }
         },
         {
-          "name": "📤 Bulk Upload Courses (🔒 ADMIN ONLY)",
+          "name": "Delete Program",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/academics/programs/1/"
+          }
+        },
+        {
+          "name": "Bulk Upload Programs",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [{ "key": "file", "type": "file", "description": "CSV or Excel (.xlsx/.xls). Columns: code, name" }]
+            },
+            "url": "{{base_url}}/api/academics/programs/bulk-import/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ACADEMICS - COURSES",
+      "item": [
+        {
+          "name": "List Courses",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/academics/courses/"
+          }
+        },
+        {
+          "name": "Create Course",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"program\": 1,\n  \"code\": \"CMC111\",\n  \"name\": \"Programming Fundamentals\",\n  \"course_class\": \"CORE\",\n  \"credit_hours_theory\": 3,\n  \"credit_hours_lab\": 0\n}"
+            },
+            "url": "{{base_url}}/api/academics/courses/"
+          }
+        },
+        {
+          "name": "Get Course",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/academics/courses/1/"
+          }
+        },
+        {
+          "name": "Update Course",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"program\": 1,\n  \"code\": \"CMC111\",\n  \"name\": \"Programming Fundamentals (Updated)\",\n  \"course_class\": \"CORE\",\n  \"credit_hours_theory\": 3,\n  \"credit_hours_lab\": 0\n}"
+            },
+            "url": "{{base_url}}/api/academics/courses/1/"
+          }
+        },
+        {
+          "name": "Delete Course",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/academics/courses/1/"
+          }
+        },
+        {
+          "name": "Bulk Upload Courses",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
             "body": {
               "mode": "formdata",
               "formdata": [
                 {
                   "key": "file",
-                  "type": "file"
+                  "type": "file",
+                  "description": "CSV or Excel (.xlsx/.xls). Columns: code, name, course_class (CORE/GER/ELECTIVE), credit_hours_theory, credit_hours_lab, program_code, pre_requisites (comma-separated), co_requisites (comma-separated)"
                 }
               ]
             },
-            "url": {
-              "raw": "{{base_url}}/api/academics/courses/bulk-import/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "academics", "courses", "bulk-import", ""]
-            },
-            "description": "Bulk import courses from Excel file. ADMIN ONLY. Excel should have columns: code, name, program_code, course_class, credit_hours_theory, credit_hours_lab"
-          },
-          "response": []
+            "url": "{{base_url}}/api/academics/courses/bulk-import/"
+          }
         }
       ]
     },
     {
-      "name": "📚 ACADEMICS - PLOs (Program Learning Outcomes)",
-      "description": "PLO management. ADMIN can create/edit/delete. All authenticated users can read.",
+      "name": "ACADEMICS - PLO",
       "item": [
         {
-          "name": "📖 List PLOs (All Authenticated Users)",
+          "name": "List PLOs",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/academics/plos/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "academics", "plos", ""]
-            },
-            "description": "List all PLOs. Accessible to all authenticated users."
-          },
-          "response": []
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/academics/plos/"
+          }
         },
         {
-          "name": "📤 Bulk Upload PLOs (🔒 ADMIN ONLY)",
+          "name": "Create PLO",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"program\": 1,\n  \"description\": \"Ability to apply knowledge of mathematics, science, and engineering.\"\n}"
+            },
+            "url": "{{base_url}}/api/academics/plos/"
+          }
+        },
+        {
+          "name": "Get PLO",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/academics/plos/1/"
+          }
+        },
+        {
+          "name": "Update PLO",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"program\": 1,\n  \"description\": \"Updated PLO description.\"\n}"
+            },
+            "url": "{{base_url}}/api/academics/plos/1/"
+          }
+        },
+        {
+          "name": "Delete PLO",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/academics/plos/1/"
+          }
+        },
+        {
+          "name": "Bulk Upload PLOs",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
             "body": {
               "mode": "formdata",
               "formdata": [
                 {
                   "key": "file",
-                  "type": "file"
+                  "type": "file",
+                  "description": "CSV or Excel (.xlsx/.xls). Columns: program_code, description"
                 }
               ]
             },
-            "url": {
-              "raw": "{{base_url}}/api/academics/plos/bulk-import/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "academics", "plos", "bulk-import", ""]
-            },
-            "description": "Bulk import PLOs from Excel file. ADMIN ONLY. Excel should have columns: program_code, description"
-          },
-          "response": []
+            "url": "{{base_url}}/api/academics/plos/bulk-import/"
+          }
         }
       ]
     },
     {
-      "name": "📚 ACADEMICS - CLOs (Course Learning Outcomes)",
-      "description": "CLO management. ADMIN can create/edit/delete. All authenticated users can read.",
+      "name": "ACADEMICS - CLO",
       "item": [
         {
-          "name": "📖 List CLOs (All Authenticated Users)",
+          "name": "List CLOs",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/academics/clos/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "academics", "clos", ""]
-            },
-            "description": "List all CLOs. Accessible to all authenticated users."
-          },
-          "response": []
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/academics/clos/"
+          }
         },
         {
-          "name": "📤 Bulk Upload CLOs (🔒 ADMIN ONLY)",
+          "name": "Create CLO",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course\": 1,\n  \"description\": \"Student will be able to write basic programs.\"\n}"
+            },
+            "url": "{{base_url}}/api/academics/clos/"
+          }
+        },
+        {
+          "name": "Get CLO",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/academics/clos/1/"
+          }
+        },
+        {
+          "name": "Update CLO",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course\": 1,\n  \"description\": \"Updated CLO description.\"\n}"
+            },
+            "url": "{{base_url}}/api/academics/clos/1/"
+          }
+        },
+        {
+          "name": "Delete CLO",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/academics/clos/1/"
+          }
+        },
+        {
+          "name": "Bulk Upload CLOs",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
             "body": {
               "mode": "formdata",
               "formdata": [
                 {
                   "key": "file",
-                  "type": "file"
+                  "type": "file",
+                  "description": "CSV or Excel (.xlsx/.xls). Columns: course_code, description"
                 }
               ]
             },
-            "url": {
-              "raw": "{{base_url}}/api/academics/clos/bulk-import/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "academics", "clos", "bulk-import", ""]
-            },
-            "description": "Bulk import CLOs from Excel file. ADMIN ONLY. Excel should have columns: course_code, description"
-          },
-          "response": []
+            "url": "{{base_url}}/api/academics/clos/bulk-import/"
+          }
         }
       ]
     },
     {
-      "name": "📝 ASSESSMENTS",
-      "description": "Assessment management. Teachers and Admins can create/manage. Students can view.",
+      "name": "ASSESSMENTS",
       "item": [
         {
-          "name": "📖 List Assessments (All Authenticated Users)",
+          "name": "List Assessments",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/assessments/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "assessments", ""]
-            },
-            "description": "List all assessments. Accessible to all authenticated users."
-          },
-          "response": []
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/assessments/"
+          }
         },
         {
-          "name": "✏️ Create Assessment (🔒 TEACHER/ADMIN ONLY)",
+          "name": "Create Assessment",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"title\": \"Midterm Exam\",\n  \"total_marks\": 50\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/assessments/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "assessments", ""]
-            },
-            "description": "Create a new assessment. TEACHER and ADMIN ONLY. Students cannot create assessments."
-          },
-          "response": []
+            "url": "{{base_url}}/api/assessments/"
+          }
         },
         {
-          "name": "📄 Generate Assessment PDF (🔒 TEACHER/ADMIN ONLY)",
+          "name": "Generate Assessment PDF",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Quiz 1\",\n  \"questions\": [\n    {\n      \"text\": \"What is 2+2?\",\n      \"type\": \"multiple_choice\",\n      \"options\": [\"3\", \"4\", \"5\"]\n    }\n  ]\n}"
+              "raw": "{\n  \"title\": \"Midterm Exam\",\n  \"course\": \"CMC111\",\n  \"questions\": []\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/assessments/generate-pdf/",
-              "protocol": "http",
-              "host": ["127", "0", "0", "1"],
-              "port": "8000",
-              "path": ["api", "assessments", "generate-pdf", ""]
-            },
-            "description": "Generate assessment PDF using AI. TEACHER and ADMIN ONLY. Uses Gemini API for PDF generation."
-          },
-          "response": []
+            "url": "{{base_url}}/api/assessments/generate-pdf/"
+          }
+        },
+        {
+          "name": "List Questions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/assessments/questions/"
+          }
         }
       ]
     }
-  ],
-  "auth": {
-    "type": "bearer",
-    "bearer": [
-      {
-        "key": "token",
-        "value": "{{access_token}}",
-        "type": "string"
-      }
-    ]
-  }
+  ]
 }

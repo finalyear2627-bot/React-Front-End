@@ -3,10 +3,11 @@ import { tokenService } from "../services/token.service";
 
 export const authService = {
   login: async (username, password) => {
-    const response = await axiosInstance.post("/accounts/auth/login/", {
+    const response = await axiosInstance.post("/auth/login/", {
       username,
       password,
     });
+
 
     tokenService.setTokens(
       response.data.access,
@@ -22,10 +23,10 @@ export const authService = {
 
   register: async (userData, role = "STUDENT") => {
     const endpoint = role === "ADMIN"
-      ? "/accounts/auth/register/admin/"
+      ? "/auth/register/admin/"
       : role === "TEACHER"
-      ? "/accounts/auth/register/teacher/"
-      : "/accounts/auth/register/student/";
+      ? "/auth/register/teacher/"
+      : "/auth/register/student/";
 
     return await axiosInstance.post(endpoint, userData);
   },

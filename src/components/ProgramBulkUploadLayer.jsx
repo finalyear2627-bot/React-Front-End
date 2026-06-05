@@ -3,6 +3,7 @@ import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { programService } from "../api/program.service";
 import { downloadExcelTemplate, parseExcelFile } from "../utils/excelHelper";
+import { showSuccess, showError, showInfo } from "../utils/toast";
 
 const ProgramBulkUploadLayer = () => {
   const navigate = useNavigate();
@@ -74,7 +75,17 @@ const ProgramBulkUploadLayer = () => {
       const res = await programService.bulkCreatePrograms(parsedData);
       setResults(res);
       setDone(true);
+      const ok = res.filter((r) => r.success).length;
+      const fail = res.filter((r) => !r.success).length;
+      if (fail === 0) {
+        showSuccess(`All ${ok} programs uploaded successfully`);
+      } else if (ok === 0) {
+        showError(`All ${fail} programs failed to upload`);
+      } else {
+        showInfo(`${ok} uploaded, ${fail} failed — check the results below`);
+      }
     } catch (err) {
+      showError("Upload failed: " + (err.message || "Unknown error"));
       setParseError("Upload failed: " + (err.message || "Unknown error"));
     } finally {
       setUploading(false);

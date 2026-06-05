@@ -71,10 +71,10 @@ const SignUpLayer = () => {
 
       // After registration, login automatically
       const loginEndpoint = role === "ADMIN"
-        ? "/accounts/auth/login/admin/"
+        ? "/auth/login/admin/"
         : role === "TEACHER"
-        ? "/accounts/auth/login/teacher/"
-        : "/accounts/auth/login/";
+        ? "/auth/login/teacher/"
+        : "/auth/login/";
 
       const loginResponse = await axiosInstance.post(loginEndpoint, {
         username: formData.username,
