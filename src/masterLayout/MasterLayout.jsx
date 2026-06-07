@@ -12,8 +12,8 @@ const MasterLayout = ({ children }) => {
   const location = useLocation(); // Hook to get the current route
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    authService.logout();
+  const handleLogout = async () => {
+    await authService.logout();
     navigate("/sign-in");
   };
   useEffect(() => {
@@ -209,28 +209,107 @@ const MasterLayout = ({ children }) => {
               </ul>
             </li>
 
-            <li className='sidebar-menu-group-title'>Account</li>
-
-            {/* Authentication Dropdown */}
+            {/* Course Assignments Dropdown */}
             <li className='dropdown'>
               <Link to='#'>
-                <Icon icon='solar:lock-outline' className='menu-icon' />
-                <span>Auth</span>
+                <Icon icon='solar:bookmark-square-minimalistic-outline' className='menu-icon' />
+                <span>Course Assignments</span>
               </Link>
               <ul className='sidebar-submenu'>
                 <li>
                   <NavLink
-                    to='/forgot-password'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    to='/course-assignments'
+                    className={(navData) => navData.isActive ? "active-page" : ""}
+                  >
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                    All Assignments
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/course-assignment-add'
+                    className={(navData) => navData.isActive ? "active-page" : ""}
+                  >
+                    <i className='ri-circle-fill circle-icon text-success-main w-auto' />{" "}
+                    Assign Course
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/my-courses'
+                    className={(navData) => navData.isActive ? "active-page" : ""}
                   >
                     <i className='ri-circle-fill circle-icon text-info-main w-auto' />{" "}
-                    Forgot Password
+                    My Courses
                   </NavLink>
                 </li>
               </ul>
             </li>
+
+            {/* Users Dropdown */}
+            <li className='dropdown'>
+              <Link to='#'>
+                <Icon icon='solar:users-group-rounded-outline' className='menu-icon' />
+                <span>Users</span>
+              </Link>
+              <ul className='sidebar-submenu'>
+                <li>
+                  <NavLink
+                    to='/users'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                    List Users
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/user-add'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-success-main w-auto' />{" "}
+                    Add User
+                  </NavLink>
+                </li>
+              </ul>
+            </li>
+
+            {/* Role Permissions Dropdown */}
+            <li className='dropdown'>
+              <Link to='#'>
+                <Icon icon='solar:shield-keyhole-outline' className='menu-icon' />
+                <span>Role Permissions</span>
+              </Link>
+              <ul className='sidebar-submenu'>
+                <li>
+                  <NavLink
+                    to='/role-permissions'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                    List Permissions
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/role-permission-add'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-success-main w-auto' />{" "}
+                    Add Permission
+                  </NavLink>
+                </li>
+              </ul>
+            </li>
+
           </ul>
         </div>
       </aside>
@@ -297,20 +376,23 @@ const MasterLayout = ({ children }) => {
                           className='dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3'
                           to='/view-profile'
                         >
-                          <Icon
-                            icon='solar:user-linear'
-                            className='icon text-xl'
-                          />{" "}
+                          <Icon icon='solar:user-linear' className='icon text-xl' />{" "}
                           My Profile
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          className='dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3'
+                          to='/view-profile?tab=password'
+                        >
+                          <Icon icon='solar:lock-password-outline' className='icon text-xl' />{" "}
+                          Change Password
                         </Link>
                       </li>
                       <li>
                         <a
                           href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleLogout();
-                          }}
+                          onClick={(e) => { e.preventDefault(); handleLogout(); }}
                           className="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-danger d-flex align-items-center gap-3"
                         >
                           <Icon icon='ri:logout-box-line' className='icon text-xl' />

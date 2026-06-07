@@ -26,6 +26,16 @@ export const courseService = {
     return response.data;
   },
 
+  activateCourse: async (id) => {
+    const response = await axiosInstance.post(`/academics/courses/${id}/activate/`);
+    return response.data;
+  },
+
+  deactivateCourse: async (id) => {
+    const response = await axiosInstance.post(`/academics/courses/${id}/deactivate/`);
+    return response.data;
+  },
+
   bulkUploadCourses: async (file) => {
     const formData = new FormData();
     formData.append("file", file);

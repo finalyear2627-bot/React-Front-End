@@ -35,7 +35,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"administrator\",\n  \"password\": \"finalyear2627\"\n}"
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"finalyear2627\"\n}"
             },
             "url": "{{base_url}}/api/auth/login/"
           }
@@ -50,6 +50,21 @@
               "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"
             },
             "url": "{{base_url}}/api/auth/refresh/"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"
+            },
+            "url": "{{base_url}}/api/accounts/logout/"
           }
         }
       ]
@@ -66,11 +81,358 @@
           }
         },
         {
-          "name": "List Users (Admin Only)",
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/accounts/profile/"
+          }
+        },
+        {
+          "name": "Update Profile (Full)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\"\n}"
+            },
+            "url": "{{base_url}}/api/accounts/profile/"
+          }
+        },
+        {
+          "name": "Update Profile (Partial)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"John\"\n}"
+            },
+            "url": "{{base_url}}/api/accounts/profile/"
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"current_password\": \"oldPassword123\",\n  \"new_password\": \"newPassword123\",\n  \"confirm_password\": \"newPassword123\"\n}"
+            },
+            "url": "{{base_url}}/api/accounts/change-password/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "USER MANAGEMENT (Admin Only)",
+      "item": [
+        {
+          "name": "List Users",
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
             "url": "{{base_url}}/api/accounts/users/"
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"john_doe\",\n  \"email\": \"john@example.com\",\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"role\": \"TEACHER\",\n  \"password\": \"securePass123\",\n  \"confirm_password\": \"securePass123\"\n}"
+            },
+            "url": "{{base_url}}/api/accounts/users/"
+          }
+        },
+        {
+          "name": "Get User",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/accounts/users/1/"
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john_updated@example.com\",\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"role\": \"TEACHER\"\n}"
+            },
+            "url": "{{base_url}}/api/accounts/users/1/"
+          }
+        },
+        {
+          "name": "Partial Update User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john_updated@example.com\"\n}"
+            },
+            "url": "{{base_url}}/api/accounts/users/1/"
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/accounts/users/1/"
+          }
+        },
+        {
+          "name": "Activate User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/accounts/users/1/activate/"
+          }
+        },
+        {
+          "name": "Deactivate User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/accounts/users/1/deactivate/"
+          }
+        },
+        {
+          "name": "Change User Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"TEACHER\"\n}"
+            },
+            "url": "{{base_url}}/api/accounts/users/1/change-role/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ROLE PERMISSIONS (Admin Only)",
+      "item": [
+        {
+          "name": "List Role Permissions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/accounts/role-permissions/"
+          }
+        },
+        {
+          "name": "Create Role Permission",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"TEACHER\",\n  \"can_manage_users\": false,\n  \"can_manage_programs\": false,\n  \"can_manage_courses\": true,\n  \"can_manage_assessments\": true,\n  \"can_view_reports\": true,\n  \"is_active\": true\n}"
+            },
+            "url": "{{base_url}}/api/accounts/role-permissions/"
+          }
+        },
+        {
+          "name": "Get Role Permission",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/accounts/role-permissions/1/"
+          }
+        },
+        {
+          "name": "Update Role Permission",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"TEACHER\",\n  \"can_manage_users\": false,\n  \"can_manage_programs\": true,\n  \"can_manage_courses\": true,\n  \"can_manage_assessments\": true,\n  \"can_view_reports\": true,\n  \"is_active\": true\n}"
+            },
+            "url": "{{base_url}}/api/accounts/role-permissions/1/"
+          }
+        },
+        {
+          "name": "Partial Update Role Permission",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"can_manage_courses\": false\n}"
+            },
+            "url": "{{base_url}}/api/accounts/role-permissions/1/"
+          }
+        },
+        {
+          "name": "Delete Role Permission",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/accounts/role-permissions/1/"
+          }
+        },
+        {
+          "name": "Activate Role Permission",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/accounts/role-permissions/1/activate/"
+          }
+        },
+        {
+          "name": "Deactivate Role Permission",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/accounts/role-permissions/1/deactivate/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "COURSE ASSIGNMENTS (Admin Only)",
+      "item": [
+        {
+          "name": "Assign Course to Teacher",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"teacher\": 2,\n  \"course\": 1\n}"
+            },
+            "url": "{{base_url}}/api/academics/course-assignments/"
+          }
+        },
+        {
+          "name": "List All Assignments",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/academics/course-assignments/"
+          }
+        },
+        {
+          "name": "List Assignments by Teacher",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/academics/course-assignments/?teacher_id=2",
+              "query": [{ "key": "teacher_id", "value": "2" }]
+            }
+          }
+        },
+        {
+          "name": "List Theory Assignments by Teacher",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/academics/course-assignments/?teacher_id=2&course_type=THEORY",
+              "query": [
+                { "key": "teacher_id", "value": "2" },
+                { "key": "course_type", "value": "THEORY" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Remove Assignment",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/academics/course-assignments/1/"
+          }
+        },
+        {
+          "name": "Activate Assignment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/academics/course-assignments/1/activate/"
+          }
+        },
+        {
+          "name": "Deactivate Assignment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/academics/course-assignments/1/deactivate/"
+          }
+        },
+        {
+          "name": "My Courses (Teacher - All)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/academics/course-assignments/my-courses/"
+          }
+        },
+        {
+          "name": "My Courses (Teacher - Theory Only)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/academics/course-assignments/my-courses/?course_type=THEORY",
+              "query": [{ "key": "course_type", "value": "THEORY" }]
+            }
+          }
+        },
+        {
+          "name": "My Courses (Teacher - Lab Only)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/academics/course-assignments/my-courses/?course_type=LAB",
+              "query": [{ "key": "course_type", "value": "LAB" }]
+            }
           }
         }
       ]
@@ -158,7 +520,7 @@
           }
         },
         {
-          "name": "Create Course",
+          "name": "Create Course (Theory)",
           "request": {
             "method": "POST",
             "header": [
@@ -167,7 +529,22 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"program\": 1,\n  \"code\": \"CMC111\",\n  \"name\": \"Programming Fundamentals\",\n  \"course_class\": \"CORE\",\n  \"credit_hours_theory\": 3,\n  \"credit_hours_lab\": 0\n}"
+              "raw": "{\n  \"program\": 1,\n  \"semester\": 1,\n  \"code\": \"CMC111\",\n  \"name\": \"Programming Fundamentals\",\n  \"course_type\": \"THEORY\",\n  \"course_class\": \"CORE\",\n  \"credit_hours_theory\": 3,\n  \"credit_hours_lab\": 0\n}"
+            },
+            "url": "{{base_url}}/api/academics/courses/"
+          }
+        },
+        {
+          "name": "Create Course (Lab)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"program\": 1,\n  \"semester\": 1,\n  \"code\": \"CMC111-L\",\n  \"name\": \"Programming Fundamentals (Lab)\",\n  \"course_type\": \"LAB\",\n  \"course_class\": \"CORE\",\n  \"credit_hours_theory\": 0,\n  \"credit_hours_lab\": 1\n}"
             },
             "url": "{{base_url}}/api/academics/courses/"
           }
@@ -190,7 +567,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"program\": 1,\n  \"code\": \"CMC111\",\n  \"name\": \"Programming Fundamentals (Updated)\",\n  \"course_class\": \"CORE\",\n  \"credit_hours_theory\": 3,\n  \"credit_hours_lab\": 0\n}"
+              "raw": "{\n  \"program\": 1,\n  \"semester\": 1,\n  \"code\": \"CMC111\",\n  \"name\": \"Programming Fundamentals (Updated)\",\n  \"course_type\": \"THEORY\",\n  \"course_class\": \"CORE\",\n  \"credit_hours_theory\": 3,\n  \"credit_hours_lab\": 0\n}"
             },
             "url": "{{base_url}}/api/academics/courses/1/"
           }
@@ -204,6 +581,22 @@
           }
         },
         {
+          "name": "Activate Course (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/academics/courses/1/activate/"
+          }
+        },
+        {
+          "name": "Deactivate Course (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/academics/courses/1/deactivate/"
+          }
+        },
+        {
           "name": "Bulk Upload Courses",
           "request": {
             "method": "POST",
@@ -214,7 +607,7 @@
                 {
                   "key": "file",
                   "type": "file",
-                  "description": "CSV or Excel (.xlsx/.xls). Columns: code, name, course_class (CORE/GER/ELECTIVE), credit_hours_theory, credit_hours_lab, program_code, pre_requisites (comma-separated), co_requisites (comma-separated)"
+                  "description": "CSV or Excel (.xlsx/.xls). Each row = ONE course (theory and lab are SEPARATE rows with separate codes e.g. CMC111 and CMC111-L).\nColumns: semester, code, name, course_type (THEORY/LAB), course_class (CORE/GER/ELECTIVE), credit_hours_theory, credit_hours_lab, program_code, pre_requisites (comma-separated codes), co_requisites (comma-separated codes)\nExample theory row: 1,CMC111,Programming Fundamentals,THEORY,CORE,3,0,BSCS,,CMC111-L\nExample lab row:    1,CMC111-L,Programming Fundamentals (Lab),LAB,CORE,0,1,BSCS,,"
                 }
               ]
             },

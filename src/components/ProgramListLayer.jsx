@@ -3,12 +3,15 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { programService } from "../api/program.service";
 import { showSuccess, showError, getApiError } from "../utils/toast";
+import TablePagination from "./TablePagination";
 
 const ProgramListLayer = () => {
   const navigate = useNavigate();
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(""); // kept for load error only
+  const [error, setError] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
 
   useEffect(() => {
     fetchPrograms();
@@ -40,6 +43,8 @@ const ProgramListLayer = () => {
     }
   };
 
+  const paginated = programs.slice((page - 1) * pageSize, page * pageSize);
+
   if (loading) return <div className="card"><div className="card-body">Loading...</div></div>;
 
   return (
@@ -65,7 +70,7 @@ const ProgramListLayer = () => {
       </div>
 
       {error && (
-        <div className="card-body">
+        <div className="card-body pb-0">
           <div className="alert alert-danger">{error}</div>
         </div>
       )}
@@ -79,48 +84,53 @@ const ProgramListLayer = () => {
             </Link>
           </div>
         ) : (
-          <table className="table bordered-table mb-0">
-            <thead>
-              <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Code</th>
-                <th scope="col">Name</th>
-                <th scope="col">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {programs.map((program, index) => (
-                <tr key={program.id || index}>
-                  <td>{program.id}</td>
-                  <td className="fw-medium">{program.code || "N/A"}</td>
-                  <td>{program.name || "N/A"}</td>
-                  <td>
-                    <Link
-                      to={`/program-view/${program.id}`}
-                      className="w-32-px h-32-px me-8 bg-primary-light text-primary-600 rounded-circle d-inline-flex align-items-center justify-content-center"
-                      title="View"
-                    >
-                      <Icon icon="iconamoon:eye-light" />
-                    </Link>
-                    <Link
-                      to={`/program-edit/${program.id}`}
-                      className="w-32-px h-32-px me-8 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center"
-                      title="Edit"
-                    >
-                      <Icon icon="lucide:edit" />
-                    </Link>
-                    {/* <button
-                      onClick={() => handleDelete(program.id)}
-                      className="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
-                      title="Delete"
-                    >
-                      <Icon icon="mingcute:delete-2-line" />
-                    </button> */}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <>
+            <div className="table-responsive">
+              <table className="table bordered-table mb-0">
+                <thead>
+                  <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Code</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginated.map((program, index) => (
+                    <tr key={program.id || index}>
+                      <td>{program.id}</td>
+                      <td className="fw-medium">{program.code || "N/A"}</td>
+                      <td>{program.name || "N/A"}</td>
+                      <td>
+                        <Link
+                          to={`/program-view/${program.id}`}
+                          className="w-32-px h-32-px me-8 bg-primary-light text-primary-600 rounded-circle d-inline-flex align-items-center justify-content-center"
+                          title="View"
+                        >
+                          <Icon icon="iconamoon:eye-light" />
+                        </Link>
+                        <Link
+                          to={`/program-edit/${program.id}`}
+                          className="w-32-px h-32-px me-8 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center"
+                          title="Edit"
+                        >
+                          <Icon icon="lucide:edit" />
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <TablePagination
+              total={programs.length}
+              page={page}
+              pageSize={pageSize}
+              onPageChange={setPage}
+              onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+            />
+          </>
         )}
       </div>
     </div>
@@ -128,4 +138,3 @@ const ProgramListLayer = () => {
 };
 
 export default ProgramListLayer;
-

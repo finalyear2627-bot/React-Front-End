@@ -111,14 +111,16 @@ const CourseBulkUploadLayer = () => {
             <h6 className="mb-0 text-primary-light">Download Excel Template</h6>
           </div>
           <p className="text-secondary-light text-sm ms-40 mb-4">
-            Download <strong>Courses_Template.csv</strong> and fill in your course data. Required columns:
+            Download <strong>Courses_Template.csv</strong> and fill in your course data. Each row = one course (Theory and Lab are <strong>separate rows</strong> e.g. CMC111 and CMC111-L).
           </p>
           <ul className="text-secondary-light text-sm ms-40 mb-12">
-            <li><strong>code</strong> — Course code (e.g., CMC111)</li>
+            <li><strong>semester</strong> — Semester number (e.g., 1)</li>
+            <li><strong>code</strong> — Course code (e.g., CMC111 or CMC111-L)</li>
             <li><strong>name</strong> — Course name</li>
+            <li><strong>course_type</strong> — THEORY or LAB</li>
             <li><strong>course_class</strong> — CORE, GER, or ELECTIVE</li>
-            <li><strong>credit_hours_theory</strong> — Theory credit hours</li>
-            <li><strong>credit_hours_lab</strong> — Lab credit hours</li>
+            <li><strong>credit_hours_theory</strong> — Theory credit hours (0 for LAB rows)</li>
+            <li><strong>credit_hours_lab</strong> — Lab credit hours (0 for THEORY rows)</li>
             <li><strong>program_code</strong> — Program code (e.g., BSCS)</li>
             <li><strong>pre_requisites</strong> — Comma-separated course codes (optional)</li>
             <li><strong>co_requisites</strong> — Comma-separated course codes (optional)</li>
@@ -183,8 +185,10 @@ const CourseBulkUploadLayer = () => {
                 <thead>
                   <tr>
                     <th>#</th>
+                    <th>Sem</th>
                     <th>Code</th>
                     <th>Name</th>
+                    <th>Type</th>
                     <th>Class</th>
                     <th>Theory</th>
                     <th>Lab</th>
@@ -195,8 +199,10 @@ const CourseBulkUploadLayer = () => {
                   {parsedData.map((row, i) => (
                     <tr key={i}>
                       <td className="text-secondary-light">{i + 1}</td>
+                      <td>{row.semester}</td>
                       <td className="fw-medium">{row.code}</td>
                       <td>{row.name}</td>
+                      <td>{row.course_type}</td>
                       <td>{row.course_class}</td>
                       <td>{row.credit_hours_theory}</td>
                       <td>{row.credit_hours_lab}</td>

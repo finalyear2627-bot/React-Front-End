@@ -20,6 +20,20 @@ import CourseEditPage from "./pages/CourseEditPage";
 import CourseViewPage from "./pages/CourseViewPage";
 import CourseBulkUploadPage from "./pages/CourseBulkUploadPage";
 
+import UserListPage from "./pages/UserListPage";
+import UserAddPage from "./pages/UserAddPage";
+import UserEditPage from "./pages/UserEditPage";
+
+import RolePermissionListPage from "./pages/RolePermissionListPage";
+import RolePermissionAddPage from "./pages/RolePermissionAddPage";
+import RolePermissionEditPage from "./pages/RolePermissionEditPage";
+
+import ViewProfilePage from "./pages/ViewProfilePage";
+
+import CourseAssignmentListPage from "./pages/CourseAssignmentListPage";
+import CourseAssignmentAddPage from "./pages/CourseAssignmentAddPage";
+import MyCoursesPage from "./pages/MyCoursesPage";
+
 function App() {
   return (
     <BrowserRouter>
@@ -42,6 +56,24 @@ function App() {
         <Route exact path='/course-edit/:id' element={<ProtectedRoute><CourseEditPage /></ProtectedRoute>} />
         <Route exact path='/course-view/:id' element={<ProtectedRoute><CourseViewPage /></ProtectedRoute>} />
         <Route exact path='/course-bulk-upload' element={<ProtectedRoute><CourseBulkUploadPage /></ProtectedRoute>} />
+
+        {/* User Routes */}
+        <Route exact path='/users' element={<ProtectedRoute><UserListPage /></ProtectedRoute>} />
+        <Route exact path='/user-add' element={<ProtectedRoute><UserAddPage /></ProtectedRoute>} />
+        <Route exact path='/user-edit/:id' element={<ProtectedRoute><UserEditPage /></ProtectedRoute>} />
+
+        {/* Role Permission Routes */}
+        <Route exact path='/role-permissions' element={<ProtectedRoute><RolePermissionListPage /></ProtectedRoute>} />
+        <Route exact path='/role-permission-add' element={<ProtectedRoute><RolePermissionAddPage /></ProtectedRoute>} />
+        <Route exact path='/role-permission-edit/:id' element={<ProtectedRoute><RolePermissionEditPage /></ProtectedRoute>} />
+
+        {/* Course Assignment Routes */}
+        <Route exact path='/course-assignments' element={<ProtectedRoute><CourseAssignmentListPage /></ProtectedRoute>} />
+        <Route exact path='/course-assignment-add' element={<ProtectedRoute><CourseAssignmentAddPage /></ProtectedRoute>} />
+        <Route exact path='/my-courses' element={<ProtectedRoute><MyCoursesPage /></ProtectedRoute>} />
+
+        {/* Profile Routes */}
+        <Route exact path='/view-profile' element={<ProtectedRoute><ViewProfilePage /></ProtectedRoute>} />
 
         {/* Auth Routes */}
         <Route exact path='/forgot-password' element={<ForgotPasswordPage />} />
