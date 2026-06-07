@@ -1,172 +1,280 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
 import { rolePermissionService } from "../api/rolePermission.service";
 import { showSuccess, showError, getApiError } from "../utils/toast";
-import TablePagination from "./TablePagination";
+import { MODULES } from "../utils/permissions";
 
-const Check = ({ value }) => (
-  <Icon
-    icon={value ? "material-symbols:check-circle" : "material-symbols:cancel"}
-    className={value ? "text-success-main" : "text-danger-main"}
-    style={{ fontSize: 18 }}
-  />
+const ROLES = ["ADMIN", "TEACHER", "STUDENT"];
+
+const MODULE_LABEL = {
+  PROGRAMS:           "Programs",
+  COURSES:            "Courses",
+  PLO:                "PLO",
+  CLO:                "CLO",
+  USERS:              "Users",
+  ASSESSMENTS:        "Assessments",
+  COURSE_ASSIGNMENTS: "Course Assignments",
+  REPORTS:            "Reports",
+};
+
+const MODULE_ICON = {
+  PROGRAMS:           "solar:book-outline",
+  COURSES:            "solar:notebook-outline",
+  PLO:                "solar:diploma-outline",
+  CLO:                "solar:clipboard-list-outline",
+  USERS:              "solar:users-group-rounded-outline",
+  ASSESSMENTS:        "solar:document-text-outline",
+  COURSE_ASSIGNMENTS: "solar:bookmark-square-minimalistic-outline",
+  REPORTS:            "solar:chart-2-outline",
+};
+
+const emptyRow = (module) => ({ module, can_view: false, can_create: false, can_edit: false, can_delete: false });
+
+const CheckCell = ({ checked, onChange, disabled }) => (
+  <td className="text-center" style={{ verticalAlign: "middle" }}>
+    <div className="form-check d-flex justify-content-center mb-0">
+      <input
+        type="checkbox"
+        className="form-check-input"
+        checked={checked}
+        onChange={onChange}
+        disabled={disabled}
+        style={{ width: 18, height: 18, cursor: disabled ? "not-allowed" : "pointer" }}
+      />
+    </div>
+  </td>
 );
 
 const RolePermissionListLayer = () => {
-  const [permissions, setPermissions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [togglingId, setTogglingId] = useState(null);
-  const [error, setError] = useState("");
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [activeRole, setActiveRole] = useState("TEACHER");
+  const [matrix, setMatrix]         = useState({}); // { MODULE: { can_view, can_create, can_edit, can_delete, id? } }
+  const [loading, setLoading]       = useState(false);
+  const [saving,  setSaving]        = useState(false);
+  const [dirty,   setDirty]         = useState(false);
 
-  useEffect(() => { fetchPermissions(); }, []);
+  const isAdmin = activeRole === "ADMIN";
 
-  const fetchPermissions = async () => {
+  const fetchPermissions = useCallback(async (role) => {
+    setLoading(true);
+    setDirty(false);
     try {
-      setLoading(true);
-      const data = await rolePermissionService.getAllRolePermissions();
-      setPermissions(Array.isArray(data) ? data : data.result || data.results || []);
-      setError("");
+      const data = await rolePermissionService.getByRole(role);
+      const list = data?.result || data?.results || (Array.isArray(data) ? data : []);
+      const map  = {};
+      MODULES.forEach((m) => { map[m] = emptyRow(m); });
+      list.forEach((p) => {
+        if (p.module) map[p.module] = { ...emptyRow(p.module), ...p };
+      });
+      setMatrix(map);
     } catch (err) {
       showError(getApiError(err));
-      setError("Failed to load role permissions");
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    if (!isAdmin) fetchPermissions(activeRole);
+    else {
+      // ADMIN — all permissions true by default (display only)
+      const map = {};
+      MODULES.forEach((m) => { map[m] = { module: m, can_view: true, can_create: true, can_edit: true, can_delete: true }; });
+      setMatrix(map);
+      setDirty(false);
+    }
+  }, [activeRole, isAdmin, fetchPermissions]);
+
+  const toggle = (module, field) => {
+    if (isAdmin) return;
+    setMatrix((prev) => ({
+      ...prev,
+      [module]: { ...prev[module], [field]: !prev[module][field] },
+    }));
+    setDirty(true);
   };
 
-  const handleToggleStatus = async (perm) => {
-    setTogglingId(perm.id);
+  const setAll = (field, value) => {
+    if (isAdmin) return;
+    setMatrix((prev) => {
+      const next = { ...prev };
+      MODULES.forEach((m) => { next[m] = { ...next[m], [field]: value }; });
+      return next;
+    });
+    setDirty(true);
+  };
+
+  const handleSave = async () => {
+    if (isAdmin) return;
+    setSaving(true);
     try {
-      const isActive = perm.is_active;
-      const res = isActive
-        ? await rolePermissionService.deactivateRolePermission(perm.id)
-        : await rolePermissionService.activateRolePermission(perm.id);
-      if (res?.status?.code !== 0) {
-        showError(res?.status?.message || "Action failed");
-        return;
-      }
-      showSuccess(res?.status?.message || `Role permission ${isActive ? "deactivated" : "activated"}`);
-      setPermissions((prev) => prev.map((p) => p.id === perm.id ? { ...p, is_active: !isActive } : p));
+      const permissions = MODULES.map((m) => ({
+        module:     m,
+        can_view:   matrix[m]?.can_view   ?? false,
+        can_create: matrix[m]?.can_create ?? false,
+        can_edit:   matrix[m]?.can_edit   ?? false,
+        can_delete: matrix[m]?.can_delete ?? false,
+      }));
+      const res = await rolePermissionService.setBulk({ role: activeRole, permissions });
+      if (res?.status?.code !== 0) { showError(res?.status?.message || "Save failed"); return; }
+      showSuccess(res?.status?.message || `${activeRole} permissions saved`);
+      setDirty(false);
+      // refresh to get ids
+      fetchPermissions(activeRole);
     } catch (err) {
       showError(getApiError(err));
     } finally {
-      setTogglingId(null);
+      setSaving(false);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this role permission?")) {
-      try {
-        const res = await rolePermissionService.deleteRolePermission(id);
-        setPermissions((prev) => prev.filter((p) => p.id !== id));
-        showSuccess(res?.status?.message || "Role permission deleted");
-      } catch (err) {
-        showError(getApiError(err));
-      }
-    }
-  };
-
-  const paginated = permissions.slice((page - 1) * pageSize, page * pageSize);
-
-  if (loading) return <div className="card"><div className="card-body">Loading...</div></div>;
+  const allChecked = (field) => MODULES.every((m) => matrix[m]?.[field]);
 
   return (
     <div className="card basic-data-table">
-      <div className="card-header d-flex justify-content-between align-items-center">
+      <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
         <h5 className="card-title mb-0">Role Permissions</h5>
-        <Link to="/role-permission-add" className="btn btn-sm btn-primary-600 radius-8 d-inline-flex align-items-center gap-1">
-          <Icon icon="ic:round-plus" className="text-xl" />
-          Add Role Permission
-        </Link>
+        {!isAdmin && dirty && (
+          <button className="btn btn-primary radius-8 d-inline-flex align-items-center gap-1" onClick={handleSave} disabled={saving}>
+            <Icon icon={saving ? "svg-spinners:180-ring" : "material-symbols:save-outline"} className="text-xl" />
+            {saving ? "Saving…" : "Save Changes"}
+          </button>
+        )}
       </div>
 
-      {error && <div className="card-body pb-0"><div className="alert alert-danger">{error}</div></div>}
+      {/* Role Tabs */}
+      <div className="card-body pb-0">
+        <ul className="nav nav-pills d-inline-flex border radius-8 p-4 gap-2 mb-0">
+          {ROLES.map((role) => (
+            <li key={role} className="nav-item">
+              <button
+                type="button"
+                className={`nav-link px-20 py-8 radius-6 fw-medium ${activeRole === role ? "active bg-primary-600 text-white" : "text-secondary-light"}`}
+                onClick={() => setActiveRole(role)}
+              >
+                {role}
+                {role === "ADMIN" && (
+                  <span className="badge bg-danger-focus text-danger-main ms-8 radius-4 text-xs">Full Access</span>
+                )}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
 
+      {/* Admin notice */}
+      {isAdmin && (
+        <div className="card-body pb-0">
+          <div className="alert alert-info d-flex align-items-center gap-2 radius-8 mb-0">
+            <Icon icon="solar:shield-check-outline" className="text-xl flex-shrink-0" />
+            <span>ADMIN role always has full access to all modules. Permissions cannot be restricted.</span>
+          </div>
+        </div>
+      )}
+
+      {/* Matrix Table */}
       <div className="card-body">
-        {permissions.length === 0 ? (
+        {loading ? (
           <div className="text-center py-40">
-            <p className="text-secondary-light">No role permissions found</p>
-            <Link to="/role-permission-add" className="btn btn-sm btn-primary mt-16">Add First Role Permission</Link>
+            <Icon icon="svg-spinners:180-ring" className="text-primary-600" style={{ fontSize: 32 }} />
+            <p className="text-secondary-light mt-12">Loading permissions…</p>
           </div>
         ) : (
-          <React.Fragment>
-            <div className="table-responsive">
-              <table className="table bordered-table mb-0">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Role</th>
-                    <th>Users</th>
-                    <th>Programs</th>
-                    <th>Courses</th>
-                    <th>Assessments</th>
-                    <th>Reports</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginated.map((perm, index) => (
-                    <tr key={perm.id || index}>
-                      <td>{perm.id}</td>
+          <div className="table-responsive">
+            <table className="table bordered-table mb-0" style={{ minWidth: 600 }}>
+              <thead>
+                <tr className="bg-base">
+                  <th style={{ minWidth: 200 }}>Module</th>
+                  <th className="text-center">
+                    <div>View</div>
+                    {!isAdmin && (
+                      <input type="checkbox" className="form-check-input mt-4"
+                        checked={allChecked("can_view")}
+                        onChange={(e) => setAll("can_view", e.target.checked)}
+                        title="Toggle all"
+                        style={{ width: 14, height: 14, cursor: "pointer" }}
+                      />
+                    )}
+                  </th>
+                  <th className="text-center">
+                    <div>Create</div>
+                    {!isAdmin && (
+                      <input type="checkbox" className="form-check-input mt-4"
+                        checked={allChecked("can_create")}
+                        onChange={(e) => setAll("can_create", e.target.checked)}
+                        title="Toggle all"
+                        style={{ width: 14, height: 14, cursor: "pointer" }}
+                      />
+                    )}
+                  </th>
+                  <th className="text-center">
+                    <div>Edit</div>
+                    {!isAdmin && (
+                      <input type="checkbox" className="form-check-input mt-4"
+                        checked={allChecked("can_edit")}
+                        onChange={(e) => setAll("can_edit", e.target.checked)}
+                        title="Toggle all"
+                        style={{ width: 14, height: 14, cursor: "pointer" }}
+                      />
+                    )}
+                  </th>
+                  <th className="text-center">
+                    <div>Delete</div>
+                    {!isAdmin && (
+                      <input type="checkbox" className="form-check-input mt-4"
+                        checked={allChecked("can_delete")}
+                        onChange={(e) => setAll("can_delete", e.target.checked)}
+                        title="Toggle all"
+                        style={{ width: 14, height: 14, cursor: "pointer" }}
+                      />
+                    )}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {MODULES.map((module) => {
+                  const perm = matrix[module] || emptyRow(module);
+                  return (
+                    <tr key={module}>
                       <td>
-                        <span className="badge bg-primary-100 text-primary-600 radius-4 fw-semibold">
-                          {perm.role || "N/A"}
-                        </span>
+                        <div className="d-flex align-items-center gap-8">
+                          <div className="w-32-px h-32-px bg-primary-100 rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0">
+                            <Icon icon={MODULE_ICON[module] || "solar:document-outline"} className="text-primary-600" />
+                          </div>
+                          <span className="fw-medium">{MODULE_LABEL[module]}</span>
+                        </div>
                       </td>
-                      <td><Check value={perm.can_manage_users} /></td>
-                      <td><Check value={perm.can_manage_programs} /></td>
-                      <td><Check value={perm.can_manage_courses} /></td>
-                      <td><Check value={perm.can_manage_assessments} /></td>
-                      <td><Check value={perm.can_view_reports} /></td>
-                      <td>
-                        <span className={`badge radius-4 ${perm.is_active ? "bg-success-focus text-success-main" : "bg-danger-focus text-danger-main"}`}>
-                          {perm.is_active ? "Active" : "Inactive"}
-                        </span>
-                      </td>
-                      <td>
-                        <Link
-                          to={`/role-permission-edit/${perm.id}`}
-                          className="w-32-px h-32-px me-8 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center"
-                          title="Edit"
-                        >
-                          <Icon icon="lucide:edit" />
-                        </Link>
-                        <button
-                          onClick={() => handleToggleStatus(perm)}
-                          disabled={togglingId === perm.id}
-                          className={`w-32-px h-32-px me-8 rounded-circle d-inline-flex align-items-center justify-content-center border-0 ${perm.is_active ? "bg-warning-focus text-warning-main" : "bg-success-focus text-success-main"}`}
-                          title={perm.is_active ? "Deactivate" : "Activate"}
-                        >
-                          {togglingId === perm.id
-                            ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
-                            : <Icon icon={perm.is_active ? "mingcute:pause-circle-line" : "mingcute:play-circle-line"} />
-                          }
-                        </button>
-                        <button
-                          onClick={() => handleDelete(perm.id)}
-                          className="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
-                          title="Delete"
-                        >
-                          <Icon icon="mingcute:delete-2-line" />
-                        </button>
-                      </td>
+                      <CheckCell checked={perm.can_view}   onChange={() => toggle(module, "can_view")}   disabled={isAdmin} />
+                      <CheckCell checked={perm.can_create} onChange={() => toggle(module, "can_create")} disabled={isAdmin} />
+                      <CheckCell checked={perm.can_edit}   onChange={() => toggle(module, "can_edit")}   disabled={isAdmin} />
+                      <CheckCell checked={perm.can_delete} onChange={() => toggle(module, "can_delete")} disabled={isAdmin} />
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Bottom save bar */}
+        {!isAdmin && !loading && (
+          <div className="d-flex justify-content-between align-items-center mt-20 pt-16 border-top">
+            <span className="text-secondary-light text-sm">
+              {dirty
+                ? <span className="text-warning-main"><Icon icon="material-symbols:circle" className="me-4" style={{ fontSize: 8 }} />Unsaved changes</span>
+                : <span className="text-success-main"><Icon icon="material-symbols:check-circle-outline" className="me-4" />Saved</span>
+              }
+            </span>
+            <div className="d-flex gap-2">
+              <button className="btn btn-outline-secondary radius-8"
+                onClick={() => fetchPermissions(activeRole)} disabled={saving}>
+                <Icon icon="material-symbols:refresh" className="me-4" /> Discard
+              </button>
+              <button className="btn btn-primary radius-8" onClick={handleSave} disabled={saving || !dirty}>
+                <Icon icon={saving ? "svg-spinners:180-ring" : "material-symbols:save-outline"} className="me-4" />
+                {saving ? "Saving…" : "Save Changes"}
+              </button>
             </div>
-            <TablePagination
-              total={permissions.length}
-              page={page}
-              pageSize={pageSize}
-              onPageChange={setPage}
-              onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
-            />
-          </React.Fragment>
+          </div>
         )}
       </div>
     </div>

@@ -40,4 +40,10 @@ export const userService = {
     const response = await axiosInstance.post(`/accounts/users/${id}/change-role/`, { role });
     return response.data;
   },
+
+  // Admin-only: set a user's password via PATCH
+  setUserPassword: async (id, password, confirm_password) => {
+    const response = await axiosInstance.patch(`/accounts/users/${id}/`, { password, confirm_password });
+    return response.data;
+  },
 };

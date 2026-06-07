@@ -4,6 +4,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import ThemeToggleButton from "../helper/ThemeToggleButton";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../api/auth.service";
+import { canView, canCreate } from "../utils/permissions";
 
 
 const MasterLayout = ({ children }) => {
@@ -145,170 +146,123 @@ const MasterLayout = ({ children }) => {
 
             <li className='sidebar-menu-group-title'>Management</li>
 
-            {/* Programs Dropdown */}
-            <li className='dropdown'>
-              <Link to='#'>
-                <Icon icon='solar:book-outline' className='menu-icon' />
-                <span>Programs</span>
-              </Link>
-              <ul className='sidebar-submenu'>
-                <li>
-                  <NavLink
-                    to='/programs'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                    List Programs
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/program-add'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-success-main w-auto' />{" "}
-                    Add Program
-                  </NavLink>
-                </li>
-              </ul>
-            </li>
+            {/* Programs */}
+            {canView("PROGRAMS") && (
+              <li className='dropdown'>
+                <Link to='#'>
+                  <Icon icon='solar:book-outline' className='menu-icon' />
+                  <span>Programs</span>
+                </Link>
+                <ul className='sidebar-submenu'>
+                  <li>
+                    <NavLink to='/programs' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> List Programs
+                    </NavLink>
+                  </li>
+                  {canCreate("PROGRAMS") && (
+                    <li>
+                      <NavLink to='/program-add' className={(n) => n.isActive ? "active-page" : ""}>
+                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Add Program
+                      </NavLink>
+                    </li>
+                  )}
+                </ul>
+              </li>
+            )}
 
-            {/* Courses Dropdown */}
-            <li className='dropdown'>
-              <Link to='#'>
-                <Icon icon='solar:notebook-outline' className='menu-icon' />
-                <span>Courses</span>
-              </Link>
-              <ul className='sidebar-submenu'>
-                <li>
-                  <NavLink
-                    to='/courses'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                    List Courses
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/course-add'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-success-main w-auto' />{" "}
-                    Add Course
-                  </NavLink>
-                </li>
-              </ul>
-            </li>
+            {/* Courses */}
+            {canView("COURSES") && (
+              <li className='dropdown'>
+                <Link to='#'>
+                  <Icon icon='solar:notebook-outline' className='menu-icon' />
+                  <span>Courses</span>
+                </Link>
+                <ul className='sidebar-submenu'>
+                  <li>
+                    <NavLink to='/courses' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> List Courses
+                    </NavLink>
+                  </li>
+                  {canCreate("COURSES") && (
+                    <li>
+                      <NavLink to='/course-add' className={(n) => n.isActive ? "active-page" : ""}>
+                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Add Course
+                      </NavLink>
+                    </li>
+                  )}
+                </ul>
+              </li>
+            )}
 
-            {/* Course Assignments Dropdown */}
-            <li className='dropdown'>
-              <Link to='#'>
-                <Icon icon='solar:bookmark-square-minimalistic-outline' className='menu-icon' />
-                <span>Course Assignments</span>
-              </Link>
-              <ul className='sidebar-submenu'>
-                <li>
-                  <NavLink
-                    to='/course-assignments'
-                    className={(navData) => navData.isActive ? "active-page" : ""}
-                  >
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                    All Assignments
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/course-assignment-add'
-                    className={(navData) => navData.isActive ? "active-page" : ""}
-                  >
-                    <i className='ri-circle-fill circle-icon text-success-main w-auto' />{" "}
-                    Assign Course
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/my-courses'
-                    className={(navData) => navData.isActive ? "active-page" : ""}
-                  >
-                    <i className='ri-circle-fill circle-icon text-info-main w-auto' />{" "}
-                    My Courses
-                  </NavLink>
-                </li>
-              </ul>
-            </li>
+            {/* Course Assignments */}
+            {canView("COURSE_ASSIGNMENTS") && (
+              <li className='dropdown'>
+                <Link to='#'>
+                  <Icon icon='solar:bookmark-square-minimalistic-outline' className='menu-icon' />
+                  <span>Course Assignments</span>
+                </Link>
+                <ul className='sidebar-submenu'>
+                  <li>
+                    <NavLink to='/course-assignments' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> All Assignments
+                    </NavLink>
+                  </li>
+                  {canCreate("COURSE_ASSIGNMENTS") && (
+                    <li>
+                      <NavLink to='/course-assignment-add' className={(n) => n.isActive ? "active-page" : ""}>
+                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Assign Course
+                      </NavLink>
+                    </li>
+                  )}
+                  <li>
+                    <NavLink to='/my-courses' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-info-main w-auto' /> My Courses
+                    </NavLink>
+                  </li>
+                </ul>
+              </li>
+            )}
 
-            {/* Users Dropdown */}
-            <li className='dropdown'>
-              <Link to='#'>
-                <Icon icon='solar:users-group-rounded-outline' className='menu-icon' />
-                <span>Users</span>
-              </Link>
-              <ul className='sidebar-submenu'>
-                <li>
-                  <NavLink
-                    to='/users'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                    List Users
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/user-add'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-success-main w-auto' />{" "}
-                    Add User
-                  </NavLink>
-                </li>
-              </ul>
-            </li>
+            {/* Users */}
+            {canView("USERS") && (
+              <li className='dropdown'>
+                <Link to='#'>
+                  <Icon icon='solar:users-group-rounded-outline' className='menu-icon' />
+                  <span>Users</span>
+                </Link>
+                <ul className='sidebar-submenu'>
+                  <li>
+                    <NavLink to='/users' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> List Users
+                    </NavLink>
+                  </li>
+                  {canCreate("USERS") && (
+                    <li>
+                      <NavLink to='/user-add' className={(n) => n.isActive ? "active-page" : ""}>
+                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Add User
+                      </NavLink>
+                    </li>
+                  )}
+                </ul>
+              </li>
+            )}
 
-            {/* Role Permissions Dropdown */}
-            <li className='dropdown'>
-              <Link to='#'>
-                <Icon icon='solar:shield-keyhole-outline' className='menu-icon' />
-                <span>Role Permissions</span>
-              </Link>
-              <ul className='sidebar-submenu'>
-                <li>
-                  <NavLink
-                    to='/role-permissions'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                    List Permissions
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/role-permission-add'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-success-main w-auto' />{" "}
-                    Add Permission
-                  </NavLink>
-                </li>
-              </ul>
-            </li>
+            {/* Role Permissions — admin only */}
+            {localStorage.getItem("user_role") === "ADMIN" && (
+              <li className='dropdown'>
+                <Link to='#'>
+                  <Icon icon='solar:shield-keyhole-outline' className='menu-icon' />
+                  <span>Role Permissions</span>
+                </Link>
+                <ul className='sidebar-submenu'>
+                  <li>
+                    <NavLink to='/role-permissions' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Manage Permissions
+                    </NavLink>
+                  </li>
+                </ul>
+              </li>
+            )}
 
           </ul>
         </div>

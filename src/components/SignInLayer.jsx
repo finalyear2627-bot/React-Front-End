@@ -1,8 +1,7 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axiosInstance from "../api/axiosInstance";
-import { tokenService } from "../services/token.service";
+import { authService } from "../api/auth.service";
 import { showError, showSuccess } from "../utils/toast";
 
 const SignInLayer = () => {
@@ -24,33 +23,25 @@ const SignInLayer = () => {
     setLoading(true);
 
     try {
-      const response = await axiosInstance.post("/auth/login/", {
-        username,
-        password,
-      });
+      const data = await authService.login(username, password);
 
-      // Save tokens and role from response
-      tokenService.setTokens(response.data.access, response.data.refresh);
-      localStorage.setItem("user_role", response.data.role || "STUDENT");
-      localStorage.setItem("user_id", response.data.user_id || "");
-      localStorage.setItem("username", username);
+      // app-level error check (HTTP 200 but status.code !== 0)
+      if (data?.status?.code !== 0) {
+        showError(data?.status?.message || "Login failed");
+        return;
+      }
 
-      // Clear form
       setUsername("");
       setPassword("");
-
-      showSuccess("Signed in successfully");
+      showSuccess(data?.status?.message || "Signed in successfully");
       navigate("/dashboard");
     } catch (err) {
-      if (err.response?.data?.detail) {
-        showError(err.response.data.detail);
-      } else if (err.response?.data?.non_field_errors) {
-        showError(err.response.data.non_field_errors[0]);
-      } else if (err.response?.status === 401) {
-        showError("Invalid username or password");
-      } else {
-        showError("Login failed. Please try again.");
-      }
+      const msg =
+        err.response?.data?.status?.message ||
+        err.response?.data?.detail ||
+        err.response?.data?.non_field_errors?.[0] ||
+        (err.response?.status === 401 ? "Invalid username or password" : "Login failed. Please try again.");
+      showError(msg);
     } finally {
       setLoading(false);
     }

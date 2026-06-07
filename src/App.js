@@ -25,8 +25,6 @@ import UserAddPage from "./pages/UserAddPage";
 import UserEditPage from "./pages/UserEditPage";
 
 import RolePermissionListPage from "./pages/RolePermissionListPage";
-import RolePermissionAddPage from "./pages/RolePermissionAddPage";
-import RolePermissionEditPage from "./pages/RolePermissionEditPage";
 
 import ViewProfilePage from "./pages/ViewProfilePage";
 
@@ -64,8 +62,6 @@ function App() {
 
         {/* Role Permission Routes */}
         <Route exact path='/role-permissions' element={<ProtectedRoute><RolePermissionListPage /></ProtectedRoute>} />
-        <Route exact path='/role-permission-add' element={<ProtectedRoute><RolePermissionAddPage /></ProtectedRoute>} />
-        <Route exact path='/role-permission-edit/:id' element={<ProtectedRoute><RolePermissionEditPage /></ProtectedRoute>} />
 
         {/* Course Assignment Routes */}
         <Route exact path='/course-assignments' element={<ProtectedRoute><CourseAssignmentListPage /></ProtectedRoute>} />

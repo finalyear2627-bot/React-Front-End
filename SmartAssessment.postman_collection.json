@@ -21,9 +21,9 @@
               "script": {
                 "exec": [
                   "var res = pm.response.json();",
-                  "if (res.access) {",
-                  "    pm.collectionVariables.set('access_token', res.access);",
-                  "    pm.collectionVariables.set('refresh_token', res.refresh);",
+                  "if (res.result && res.result[0]) {",
+                  "    pm.collectionVariables.set('access_token', res.result[0].access);",
+                  "    pm.collectionVariables.set('refresh_token', res.result[0].refresh);",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -36,6 +36,33 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"finalyear2627\"\n}"
+            },
+            "url": "{{base_url}}/api/auth/login/"
+          }
+        },
+        {
+          "name": "Login as Teacher",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var res = pm.response.json();",
+                  "if (res.result && res.result[0]) {",
+                  "    pm.collectionVariables.set('access_token', res.result[0].access);",
+                  "    pm.collectionVariables.set('refresh_token', res.result[0].refresh);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"teacher1\",\n  \"password\": \"teacher123\"\n}"
             },
             "url": "{{base_url}}/api/auth/login/"
           }
@@ -244,7 +271,7 @@
       "name": "ROLE PERMISSIONS (Admin Only)",
       "item": [
         {
-          "name": "List Role Permissions",
+          "name": "List All Permissions",
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
@@ -252,7 +279,40 @@
           }
         },
         {
-          "name": "Create Role Permission",
+          "name": "Filter by Role",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/accounts/role-permissions/?role=TEACHER",
+              "query": [{ "key": "role", "value": "TEACHER" }]
+            }
+          }
+        },
+        {
+          "name": "Filter by Module",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/accounts/role-permissions/?module=PROGRAMS",
+              "query": [{ "key": "module", "value": "PROGRAMS" }]
+            }
+          }
+        },
+        {
+          "name": "Get All Modules for a Role (by-role)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/accounts/role-permissions/by-role/?role=TEACHER",
+              "query": [{ "key": "role", "value": "TEACHER" }]
+            }
+          }
+        },
+        {
+          "name": "Create Single Permission",
           "request": {
             "method": "POST",
             "header": [
@@ -261,13 +321,28 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"role\": \"TEACHER\",\n  \"can_manage_users\": false,\n  \"can_manage_programs\": false,\n  \"can_manage_courses\": true,\n  \"can_manage_assessments\": true,\n  \"can_view_reports\": true,\n  \"is_active\": true\n}"
+              "raw": "{\n  \"role\": \"TEACHER\",\n  \"module\": \"PROGRAMS\",\n  \"can_view\": true,\n  \"can_create\": false,\n  \"can_edit\": false,\n  \"can_delete\": false,\n  \"is_active\": true\n}"
             },
             "url": "{{base_url}}/api/accounts/role-permissions/"
           }
         },
         {
-          "name": "Get Role Permission",
+          "name": "Bulk Save Role Permissions (set-bulk)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"TEACHER\",\n  \"permissions\": [\n    { \"module\": \"PROGRAMS\",          \"can_view\": true,  \"can_create\": false, \"can_edit\": false, \"can_delete\": false },\n    { \"module\": \"COURSES\",           \"can_view\": true,  \"can_create\": true,  \"can_edit\": true,  \"can_delete\": false },\n    { \"module\": \"PLO\",               \"can_view\": true,  \"can_create\": false, \"can_edit\": false, \"can_delete\": false },\n    { \"module\": \"CLO\",               \"can_view\": true,  \"can_create\": false, \"can_edit\": false, \"can_delete\": false },\n    { \"module\": \"USERS\",             \"can_view\": false, \"can_create\": false, \"can_edit\": false, \"can_delete\": false },\n    { \"module\": \"ASSESSMENTS\",       \"can_view\": true,  \"can_create\": true,  \"can_edit\": true,  \"can_delete\": false },\n    { \"module\": \"COURSE_ASSIGNMENTS\",\"can_view\": true,  \"can_create\": false, \"can_edit\": false, \"can_delete\": false },\n    { \"module\": \"REPORTS\",           \"can_view\": true,  \"can_create\": false, \"can_edit\": false, \"can_delete\": false }\n  ]\n}"
+            },
+            "url": "{{base_url}}/api/accounts/role-permissions/set-bulk/"
+          }
+        },
+        {
+          "name": "Get Permission",
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
@@ -275,7 +350,7 @@
           }
         },
         {
-          "name": "Update Role Permission",
+          "name": "Update Permission",
           "request": {
             "method": "PUT",
             "header": [
@@ -284,13 +359,13 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"role\": \"TEACHER\",\n  \"can_manage_users\": false,\n  \"can_manage_programs\": true,\n  \"can_manage_courses\": true,\n  \"can_manage_assessments\": true,\n  \"can_view_reports\": true,\n  \"is_active\": true\n}"
+              "raw": "{\n  \"role\": \"TEACHER\",\n  \"module\": \"PROGRAMS\",\n  \"can_view\": true,\n  \"can_create\": true,\n  \"can_edit\": false,\n  \"can_delete\": false,\n  \"is_active\": true\n}"
             },
             "url": "{{base_url}}/api/accounts/role-permissions/1/"
           }
         },
         {
-          "name": "Partial Update Role Permission",
+          "name": "Partial Update Permission",
           "request": {
             "method": "PATCH",
             "header": [
@@ -299,13 +374,13 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"can_manage_courses\": false\n}"
+              "raw": "{\n  \"can_create\": true\n}"
             },
             "url": "{{base_url}}/api/accounts/role-permissions/1/"
           }
         },
         {
-          "name": "Delete Role Permission",
+          "name": "Delete Permission",
           "request": {
             "method": "DELETE",
             "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
@@ -313,7 +388,7 @@
           }
         },
         {
-          "name": "Activate Role Permission",
+          "name": "Activate Permission",
           "request": {
             "method": "POST",
             "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
@@ -321,7 +396,7 @@
           }
         },
         {
-          "name": "Deactivate Role Permission",
+          "name": "Deactivate Permission",
           "request": {
             "method": "POST",
             "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],

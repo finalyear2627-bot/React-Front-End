@@ -1,38 +1,28 @@
 import axiosInstance from "./axiosInstance";
 
+const BASE = "/accounts/role-permissions";
+
 export const rolePermissionService = {
-  getAllRolePermissions: async () => {
-    const response = await axiosInstance.get("/accounts/role-permissions/");
-    return response.data;
-  },
+  // All entries, optional ?role=&module= filters
+  getAll: (params = {}) =>
+    axiosInstance.get(`${BASE}/`, { params }).then((r) => r.data),
 
-  getRolePermissionById: async (id) => {
-    const response = await axiosInstance.get(`/accounts/role-permissions/${id}/`);
-    return response.data;
-  },
+  // All 8 modules for one role (missing ones return all-false)
+  getByRole: (role) =>
+    axiosInstance.get(`${BASE}/by-role/`, { params: { role } }).then((r) => r.data),
 
-  createRolePermission: async (data) => {
-    const response = await axiosInstance.post("/accounts/role-permissions/", data);
-    return response.data;
-  },
+  // Save all modules for a role at once
+  // payload: { role, permissions: [{ module, can_view, can_create, can_edit, can_delete }] }
+  setBulk: (data) =>
+    axiosInstance.post(`${BASE}/set-bulk/`, data).then((r) => r.data),
 
-  updateRolePermission: async (id, data) => {
-    const response = await axiosInstance.put(`/accounts/role-permissions/${id}/`, data);
-    return response.data;
-  },
+  // Single-entry CRUD (kept for legacy / fine-grained use)
+  create: (data) =>
+    axiosInstance.post(`${BASE}/`, data).then((r) => r.data),
 
-  deleteRolePermission: async (id) => {
-    const response = await axiosInstance.delete(`/accounts/role-permissions/${id}/`);
-    return response.data;
-  },
+  patch: (id, data) =>
+    axiosInstance.patch(`${BASE}/${id}/`, data).then((r) => r.data),
 
-  activateRolePermission: async (id) => {
-    const response = await axiosInstance.post(`/accounts/role-permissions/${id}/activate/`);
-    return response.data;
-  },
-
-  deactivateRolePermission: async (id) => {
-    const response = await axiosInstance.post(`/accounts/role-permissions/${id}/deactivate/`);
-    return response.data;
-  },
+  delete: (id) =>
+    axiosInstance.delete(`${BASE}/${id}/`).then((r) => r.data),
 };

@@ -1,23 +1,37 @@
 import axiosInstance from "./axiosInstance";
 import { tokenService } from "../services/token.service";
+import { savePermissions, clearPermissions } from "../utils/permissions";
 
 export const authService = {
   login: async (username, password) => {
-    const response = await axiosInstance.post("/auth/login/", {
-      username,
-      password,
-    });
+    const response = await axiosInstance.post("/auth/login/", { username, password });
 
-    tokenService.setTokens(response.data.access, response.data.refresh);
-    // role may live at top-level or inside result
-    const role =
-      response.data.role ||
-      response.data.result?.role ||
-      response.data.user?.role ||
-      "";
-    localStorage.setItem("user_role", role);
-    localStorage.setItem("user_id", response.data.user_id || response.data.result?.user_id || "");
-    localStorage.setItem("username", username);
+    const result = response.data.result?.[0] ?? {};
+    const user   = result.user ?? {};
+
+    tokenService.setTokens(result.access, result.refresh);
+    localStorage.setItem("user_role",       user.role       || "");
+    localStorage.setItem("user_id",         String(user.id  || ""));
+    localStorage.setItem("username",        user.username   || username);
+    localStorage.setItem("user_email",      user.email      || "");
+    localStorage.setItem("user_first_name", user.first_name || "");
+    localStorage.setItem("user_last_name",  user.last_name  || "");
+
+    // Load role permissions (non-blocking — ADMIN has no restrictions so skip)
+    if (user.role && user.role !== "ADMIN") {
+      try {
+        const permRes = await axiosInstance.get("/accounts/role-permissions/by-role/", {
+          params: { role: user.role },
+          headers: { Authorization: `Bearer ${result.access}` },
+        });
+        const perms = permRes.data?.result || permRes.data?.results || permRes.data || [];
+        savePermissions(Array.isArray(perms) ? perms : []);
+      } catch (_) {
+        // if it fails just continue — ADMIN will see everything anyway
+      }
+    } else {
+      clearPermissions(); // ADMIN — no restriction map needed
+    }
 
     return response.data;
   },
@@ -42,6 +56,10 @@ export const authService = {
     localStorage.removeItem("user_role");
     localStorage.removeItem("user_id");
     localStorage.removeItem("username");
+    localStorage.removeItem("user_email");
+    localStorage.removeItem("user_first_name");
+    localStorage.removeItem("user_last_name");
+    clearPermissions();
   },
 
   getCurrentUser: () => ({
