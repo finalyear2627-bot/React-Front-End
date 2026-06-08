@@ -80,22 +80,29 @@ const DashBoardLayerOne = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  // Derived values — handles different key names the backend might use
-  const totalUsers    = stats?.total_users    ?? stats?.users_total    ?? 0;
-  const totalAdmins   = stats?.total_admins   ?? stats?.admin_count    ?? stats?.admins   ?? 0;
-  const totalTeachers = stats?.total_teachers ?? stats?.teacher_count  ?? stats?.teachers ?? 0;
-  const totalStudents = stats?.total_students ?? stats?.student_count  ?? stats?.students ?? 0;
+  // Helper: returns the value only if it's a number, otherwise null (so ?? chains work correctly)
+  const n = (v) => (typeof v === "number" ? v : null);
 
-  const totalPrograms   = stats?.total_programs   ?? stats?.programs_total   ?? 0;
-  const totalCourses    = stats?.total_courses    ?? stats?.courses_total    ?? 0;
-  const activeCourses   = stats?.active_courses   ?? stats?.courses_active   ?? 0;
-  const inactiveCourses = stats?.inactive_courses ?? stats?.courses_inactive ?? 0;
+  // Handle both flat format { total_users: 10 } and nested format { users: { total: 10, admin: 2 } }
+  const usersObj   = stats?.users   && typeof stats.users   === "object" ? stats.users   : null;
+  const semObj     = stats?.semesters && typeof stats.semesters === "object" ? stats.semesters : null;
+  const coursesObj = stats?.courses && typeof stats.courses === "object" ? stats.courses : null;
 
-  const totalSemesters     = stats?.total_semesters     ?? stats?.semesters_total     ?? 0;
-  const activeSemesters    = stats?.active_semesters    ?? stats?.semesters_active    ?? 0;
-  const totalAssignments   = stats?.total_assignments   ?? stats?.course_assignments  ?? 0;
-  const totalPLOs          = stats?.total_plos          ?? stats?.plos_total          ?? 0;
-  const totalCLOs          = stats?.total_clos          ?? stats?.clos_total          ?? 0;
+  const totalUsers    = n(usersObj?.total)    ?? n(stats?.total_users)    ?? n(stats?.users_total)    ?? 0;
+  const totalAdmins   = n(usersObj?.admin)    ?? n(stats?.total_admins)   ?? n(stats?.admin_count)    ?? n(stats?.admins)   ?? 0;
+  const totalTeachers = n(usersObj?.teacher)  ?? n(stats?.total_teachers) ?? n(stats?.teacher_count)  ?? n(stats?.teachers) ?? 0;
+  const totalStudents = n(usersObj?.student)  ?? n(stats?.total_students) ?? n(stats?.student_count)  ?? n(stats?.students) ?? 0;
+
+  const totalPrograms   = n(stats?.programs)      ?? n(stats?.total_programs)   ?? n(stats?.programs_total)   ?? 0;
+  const totalCourses    = n(coursesObj?.total)    ?? n(stats?.total_courses)    ?? n(stats?.courses_total)    ?? 0;
+  const activeCourses   = n(coursesObj?.active)   ?? n(stats?.active_courses)   ?? n(stats?.courses_active)   ?? 0;
+  const inactiveCourses = n(coursesObj?.inactive) ?? n(stats?.inactive_courses) ?? n(stats?.courses_inactive) ?? 0;
+
+  const totalSemesters   = n(semObj?.total)    ?? n(stats?.total_semesters)  ?? n(stats?.semesters_total)  ?? 0;
+  const activeSemesters  = n(semObj?.active)   ?? n(stats?.active_semesters) ?? n(stats?.semesters_active) ?? 0;
+  const totalAssignments = n(stats?.course_assignments) ?? n(stats?.total_assignments) ?? 0;
+  const totalPLOs        = n(stats?.plo_count) ?? n(stats?.total_plos) ?? n(stats?.plos_total) ?? 0;
+  const totalCLOs        = n(stats?.clo_count) ?? n(stats?.total_clos) ?? n(stats?.clos_total) ?? 0;
 
   return (
     <div>
