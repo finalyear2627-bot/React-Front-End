@@ -8,6 +8,7 @@ const ROLES = ["ADMIN", "TEACHER", "STUDENT"];
 
 const MODULE_LABEL = {
   PROGRAMS:           "Programs",
+  SEMESTERS:          "Semesters",
   COURSES:            "Courses",
   PLO:                "PLO",
   CLO:                "CLO",
@@ -19,6 +20,7 @@ const MODULE_LABEL = {
 
 const MODULE_ICON = {
   PROGRAMS:           "solar:book-outline",
+  SEMESTERS:          "solar:calendar-outline",
   COURSES:            "solar:notebook-outline",
   PLO:                "solar:diploma-outline",
   CLO:                "solar:clipboard-list-outline",

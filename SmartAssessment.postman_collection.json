@@ -2,12 +2,21 @@
   "info": {
     "name": "Smart Assessment AI - Backend APIs",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Standardized response format: all responses wrapped in {status, result}. JWT Auth, Accounts, Academics (Programs, Courses, PLO, CLO), Assessments."
+    "description": "Standardized response format: all responses wrapped in {status, result}. JWT Auth, Accounts, Academics (Programs, Semesters, Courses, PLO, CLO), Assessments. CLO creation blocked for inactive courses. PLO creation blocked when all program semesters are inactive."
   },
   "variable": [
-    { "key": "base_url", "value": "http://127.0.0.1:8000" },
-    { "key": "access_token", "value": "" },
-    { "key": "refresh_token", "value": "" }
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "refresh_token",
+      "value": ""
+    }
   ],
   "item": [
     {
@@ -32,7 +41,12 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"finalyear2627\"\n}"
@@ -59,7 +73,12 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"username\": \"teacher1\",\n  \"password\": \"teacher123\"\n}"
@@ -71,7 +90,12 @@
           "name": "Refresh Token",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"
@@ -84,8 +108,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -103,7 +133,12 @@
           "name": "Get Current User",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/accounts/me/"
           }
         },
@@ -111,7 +146,12 @@
           "name": "Get Profile",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/accounts/profile/"
           }
         },
@@ -120,8 +160,14 @@
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -135,8 +181,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -150,8 +202,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -169,7 +227,12 @@
           "name": "List Users",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/accounts/users/"
           }
         },
@@ -178,8 +241,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -192,7 +261,12 @@
           "name": "Get User",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/accounts/users/1/"
           }
         },
@@ -201,8 +275,14 @@
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -216,8 +296,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -230,7 +316,12 @@
           "name": "Delete User",
           "request": {
             "method": "DELETE",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/accounts/users/1/"
           }
         },
@@ -238,7 +329,12 @@
           "name": "Activate User",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/accounts/users/1/activate/"
           }
         },
@@ -246,7 +342,12 @@
           "name": "Deactivate User",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/accounts/users/1/deactivate/"
           }
         },
@@ -255,8 +356,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -274,7 +381,12 @@
           "name": "List All Permissions",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/accounts/role-permissions/"
           }
         },
@@ -282,10 +394,20 @@
           "name": "Filter by Role",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/accounts/role-permissions/?role=TEACHER",
-              "query": [{ "key": "role", "value": "TEACHER" }]
+              "query": [
+                {
+                  "key": "role",
+                  "value": "TEACHER"
+                }
+              ]
             }
           }
         },
@@ -293,10 +415,20 @@
           "name": "Filter by Module",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/accounts/role-permissions/?module=PROGRAMS",
-              "query": [{ "key": "module", "value": "PROGRAMS" }]
+              "query": [
+                {
+                  "key": "module",
+                  "value": "PROGRAMS"
+                }
+              ]
             }
           }
         },
@@ -304,10 +436,20 @@
           "name": "Get All Modules for a Role (by-role)",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/accounts/role-permissions/by-role/?role=TEACHER",
-              "query": [{ "key": "role", "value": "TEACHER" }]
+              "query": [
+                {
+                  "key": "role",
+                  "value": "TEACHER"
+                }
+              ]
             }
           }
         },
@@ -316,8 +458,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -331,8 +479,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -345,7 +499,12 @@
           "name": "Get Permission",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/accounts/role-permissions/1/"
           }
         },
@@ -354,8 +513,14 @@
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -369,8 +534,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -383,7 +554,12 @@
           "name": "Delete Permission",
           "request": {
             "method": "DELETE",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/accounts/role-permissions/1/"
           }
         },
@@ -391,7 +567,12 @@
           "name": "Activate Permission",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/accounts/role-permissions/1/activate/"
           }
         },
@@ -399,7 +580,12 @@
           "name": "Deactivate Permission",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/accounts/role-permissions/1/deactivate/"
           }
         }
@@ -413,8 +599,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -427,7 +619,12 @@
           "name": "List All Assignments",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/academics/course-assignments/"
           }
         },
@@ -435,10 +632,20 @@
           "name": "List Assignments by Teacher",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/academics/course-assignments/?teacher_id=2",
-              "query": [{ "key": "teacher_id", "value": "2" }]
+              "query": [
+                {
+                  "key": "teacher_id",
+                  "value": "2"
+                }
+              ]
             }
           }
         },
@@ -446,12 +653,23 @@
           "name": "List Theory Assignments by Teacher",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/academics/course-assignments/?teacher_id=2&course_type=THEORY",
               "query": [
-                { "key": "teacher_id", "value": "2" },
-                { "key": "course_type", "value": "THEORY" }
+                {
+                  "key": "teacher_id",
+                  "value": "2"
+                },
+                {
+                  "key": "course_type",
+                  "value": "THEORY"
+                }
               ]
             }
           }
@@ -460,7 +678,12 @@
           "name": "Remove Assignment",
           "request": {
             "method": "DELETE",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/academics/course-assignments/1/"
           }
         },
@@ -468,7 +691,12 @@
           "name": "Activate Assignment",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/academics/course-assignments/1/activate/"
           }
         },
@@ -476,7 +704,12 @@
           "name": "Deactivate Assignment",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/academics/course-assignments/1/deactivate/"
           }
         },
@@ -484,7 +717,12 @@
           "name": "My Courses (Teacher - All)",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/academics/course-assignments/my-courses/"
           }
         },
@@ -492,10 +730,20 @@
           "name": "My Courses (Teacher - Theory Only)",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/academics/course-assignments/my-courses/?course_type=THEORY",
-              "query": [{ "key": "course_type", "value": "THEORY" }]
+              "query": [
+                {
+                  "key": "course_type",
+                  "value": "THEORY"
+                }
+              ]
             }
           }
         },
@@ -503,10 +751,20 @@
           "name": "My Courses (Teacher - Lab Only)",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/academics/course-assignments/my-courses/?course_type=LAB",
-              "query": [{ "key": "course_type", "value": "LAB" }]
+              "query": [
+                {
+                  "key": "course_type",
+                  "value": "LAB"
+                }
+              ]
             }
           }
         }
@@ -519,7 +777,12 @@
           "name": "List Programs",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/academics/programs/"
           }
         },
@@ -528,8 +791,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -542,7 +811,12 @@
           "name": "Get Program",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/academics/programs/1/"
           }
         },
@@ -551,8 +825,14 @@
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -565,7 +845,12 @@
           "name": "Delete Program",
           "request": {
             "method": "DELETE",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/academics/programs/1/"
           }
         },
@@ -573,12 +858,198 @@
           "name": "Bulk Upload Programs",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
-              "formdata": [{ "key": "file", "type": "file", "description": "CSV or Excel (.xlsx/.xls). Columns: code, name" }]
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "CSV or Excel (.xlsx/.xls). Columns: code, name"
+                }
+              ]
             },
             "url": "{{base_url}}/api/academics/programs/bulk-import/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ACADEMICS - SEMESTERS",
+      "item": [
+        {
+          "name": "List Semesters",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/semesters/"
+          }
+        },
+        {
+          "name": "List Semesters (filter by program)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/semesters/?program=1&study_year=2024-2025"
+          }
+        },
+        {
+          "name": "Create Semester",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/semesters/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"program\": 1,\n  \"study_year\": \"2024-2025\",\n  \"semester_number\": 1,\n  \"name\": \"Fall 2024\",\n  \"start_date\": \"2024-09-01\",\n  \"end_date\": \"2025-01-31\",\n  \"is_active\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Semester",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/semesters/1/"
+          }
+        },
+        {
+          "name": "Update Semester",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/semesters/1/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Fall 2024 Updated\",\n  \"end_date\": \"2025-02-15\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Activate Semester",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/semesters/1/activate/",
+            "description": "Activates semester AND sets all linked courses to is_active=True"
+          }
+        },
+        {
+          "name": "Deactivate Semester",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/semesters/1/deactivate/",
+            "description": "Deactivates semester AND sets all linked courses to is_active=False"
+          }
+        },
+        {
+          "name": "Assign Courses to Semester",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/semesters/1/assign-courses/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course_ids\": [\n    1,\n    2,\n    3\n  ],\n  \"replace\": false\n}"
+            },
+            "description": "Links courses to this semester (sets semester_ref FK). replace=true unlinks existing courses first."
+          }
+        },
+        {
+          "name": "List Semester Courses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/semesters/1/courses/"
+          }
+        },
+        {
+          "name": "List Semester Courses (Theory Only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/semesters/1/courses/?course_type=THEORY"
+          }
+        },
+        {
+          "name": "Delete Semester",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/semesters/1/"
           }
         }
       ]
@@ -590,7 +1061,12 @@
           "name": "List Courses",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/academics/courses/"
           }
         },
@@ -599,8 +1075,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -614,8 +1096,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -628,7 +1116,12 @@
           "name": "Get Course",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/academics/courses/1/"
           }
         },
@@ -637,8 +1130,14 @@
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -651,7 +1150,12 @@
           "name": "Delete Course",
           "request": {
             "method": "DELETE",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/academics/courses/1/"
           }
         },
@@ -659,7 +1163,12 @@
           "name": "Activate Course (Admin Only)",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/academics/courses/1/activate/"
           }
         },
@@ -667,7 +1176,12 @@
           "name": "Deactivate Course (Admin Only)",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/academics/courses/1/deactivate/"
           }
         },
@@ -675,7 +1189,12 @@
           "name": "Bulk Upload Courses",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -698,8 +1217,40 @@
           "name": "List PLOs",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/academics/plos/"
+          }
+        },
+        {
+          "name": "List PLOs by Program",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/plos/?program=1",
+            "description": "Filter PLOs for a specific program"
+          }
+        },
+        {
+          "name": "Get PLO",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/plos/1/"
           }
         },
         {
@@ -707,22 +1258,21 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
+            "url": "{{base_url}}/api/academics/plos/",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"program\": 1,\n  \"description\": \"Ability to apply knowledge of mathematics, science, and engineering.\"\n}"
+              "raw": "{\n  \"program\": 1,\n  \"plo_number\": 1,\n  \"description\": \"Understand and apply core concepts in computer science and engineering.\"\n}"
             },
-            "url": "{{base_url}}/api/academics/plos/"
-          }
-        },
-        {
-          "name": "Get PLO",
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
-            "url": "{{base_url}}/api/academics/plos/1/"
+            "description": "Blocked if all program semesters are inactive"
           }
         },
         {
@@ -730,40 +1280,68 @@
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
+            "url": "{{base_url}}/api/academics/plos/1/",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"program\": 1,\n  \"description\": \"Updated PLO description.\"\n}"
-            },
-            "url": "{{base_url}}/api/academics/plos/1/"
+              "raw": "{\n  \"program\": 1,\n  \"plo_number\": 1,\n  \"description\": \"Updated PLO description\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Partial Update PLO",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/plos/1/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Updated description only\"\n}"
+            }
           }
         },
         {
           "name": "Delete PLO",
           "request": {
             "method": "DELETE",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/academics/plos/1/"
           }
         },
         {
-          "name": "Bulk Upload PLOs",
+          "name": "Bulk Import PLOs",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "file",
-                  "type": "file",
-                  "description": "CSV or Excel (.xlsx/.xls). Columns: program_code, description"
-                }
-              ]
-            },
-            "url": "{{base_url}}/api/academics/plos/bulk-import/"
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/plos/bulk-import/",
+            "description": "Multipart form: file (CSV/XLSX). Columns: program_code, plo_number, description"
           }
         }
       ]
@@ -775,8 +1353,40 @@
           "name": "List CLOs",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/academics/clos/"
+          }
+        },
+        {
+          "name": "List CLOs by Course",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/clos/?course=1",
+            "description": "Filter CLOs for a specific course"
+          }
+        },
+        {
+          "name": "Get CLO",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/clos/1/"
           }
         },
         {
@@ -784,22 +1394,42 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
+            "url": "{{base_url}}/api/academics/clos/",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"course\": 1,\n  \"description\": \"Student will be able to write basic programs.\"\n}"
+              "raw": "{\n  \"course\": 1,\n  \"clo_number\": 1,\n  \"description\": \"Understand fundamental concepts of Programming Fundamentals.\",\n  \"mapped_plos\": [\n    1,\n    2,\n    3\n  ]\n}"
             },
-            "url": "{{base_url}}/api/academics/clos/"
+            "description": "mapped_plos = list of PLO IDs. Blocked if course is inactive or course semester is inactive."
           }
         },
         {
-          "name": "Get CLO",
+          "name": "Create CLO (no PLO mapping)",
           "request": {
-            "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
-            "url": "{{base_url}}/api/academics/clos/1/"
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/clos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course\": 1,\n  \"clo_number\": 2,\n  \"description\": \"Apply concepts of Programming Fundamentals to solve problems.\",\n  \"mapped_plos\": []\n}"
+            }
           }
         },
         {
@@ -807,40 +1437,82 @@
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
+            "url": "{{base_url}}/api/academics/clos/1/",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"course\": 1,\n  \"description\": \"Updated CLO description.\"\n}"
-            },
-            "url": "{{base_url}}/api/academics/clos/1/"
+              "raw": "{\n  \"course\": 1,\n  \"clo_number\": 1,\n  \"description\": \"Updated CLO description.\",\n  \"mapped_plos\": [\n    1,\n    2\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Partial Update CLO (change PLO mapping)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/clos/1/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mapped_plos\": [\n    1,\n    3,\n    5\n  ]\n}"
+            }
           }
         },
         {
           "name": "Delete CLO",
           "request": {
             "method": "DELETE",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/academics/clos/1/"
           }
         },
         {
-          "name": "Bulk Upload CLOs",
+          "name": "Get CLO-PLO Statement for Course",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/courses/1/clo-plo-statement/",
+            "description": "Returns combined CLO descriptions + mapped PLOs for a course (matches Curriculum_CLO_PLO sheet)"
+          }
+        },
+        {
+          "name": "Bulk Import CLOs",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "file",
-                  "type": "file",
-                  "description": "CSV or Excel (.xlsx/.xls). Columns: course_code, description"
-                }
-              ]
-            },
-            "url": "{{base_url}}/api/academics/clos/bulk-import/"
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/clos/bulk-import/",
+            "description": "Multipart form: file (CSV/XLSX). Columns: course_code, clo_number, description, mapped_plos (e.g. \"1,2,3\" or \"PLO-1,PLO-2\"). Skips inactive course rows."
           }
         }
       ]
@@ -852,7 +1524,12 @@
           "name": "List Assessments",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/assessments/"
           }
         },
@@ -861,8 +1538,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -876,8 +1559,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -890,7 +1579,12 @@
           "name": "List Questions",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/assessments/questions/"
           }
         }
