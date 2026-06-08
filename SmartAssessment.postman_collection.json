@@ -20,6 +20,25 @@
   ],
   "item": [
     {
+      "name": "DASHBOARD",
+      "item": [
+        {
+          "name": "Get Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/dashboard/",
+            "description": "Admin only. Returns: users (total/admin/teacher/student), programs, semesters (total/active/inactive), courses (total/active/inactive/theory/lab), course_assignments, PLO count, CLO count."
+          }
+        }
+      ]
+    },
+    {
       "name": "AUTH",
       "item": [
         {

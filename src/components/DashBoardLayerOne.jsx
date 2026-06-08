@@ -1,26 +1,371 @@
-import React from 'react'
-import SalesStatisticOne from './child/SalesStatisticOne';
-import TotalSubscriberOne from './child/TotalSubscriberOne';
-import UsersOverviewOne from './child/UsersOverviewOne';
-import LatestRegisteredOne from './child/LatestRegisteredOne';
-import TopPerformerOne from './child/TopPerformerOne';
-import TopCountries from './child/TopCountries';
-import GeneratedContent from './child/GeneratedContent';
-import UnitCountOne from './child/UnitCountOne';
+import React, { useState, useEffect } from "react";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { Link } from "react-router-dom";
+import { dashboardService } from "../api/dashboard.service";
+import { showError, getApiError } from "../utils/toast";
+
+// ─── helpers ────────────────────────────────────────────────────────────────
+
+const StatCard = ({ label, value, icon, gradient, iconBg, loading }) => (
+  <div className="col">
+    <div className={`card shadow-none border ${gradient} h-100`}>
+      <div className="card-body p-20">
+        <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div>
+            <p className="fw-medium text-primary-light mb-1">{label}</p>
+            {loading
+              ? <div className="placeholder-glow"><span className="placeholder col-4" style={{ height: 24 }} /></div>
+              : <h6 className="mb-0">{value ?? "—"}</h6>}
+          </div>
+          <div className={`w-50-px h-50-px ${iconBg} rounded-circle d-flex justify-content-center align-items-center`}>
+            <Icon icon={icon} className="text-white text-2xl mb-0" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const RoleCard = ({ role, count, icon, color, loading }) => (
+  <div className="col-sm-4">
+    <div className={`card border-0 shadow-none h-100`} style={{ background: `var(--${color}-50, #f8f9fa)` }}>
+      <div className="card-body p-20 text-center">
+        <div className={`w-56-px h-56-px bg-${color}-100 rounded-circle d-inline-flex align-items-center justify-content-center mb-12`}>
+          <Icon icon={icon} className={`text-${color}-600 text-2xl`} />
+        </div>
+        {loading
+          ? <div className="placeholder-glow"><span className="placeholder col-6 d-block mx-auto" style={{ height: 28 }} /></div>
+          : <h4 className="fw-bold mb-4">{count ?? 0}</h4>}
+        <p className={`text-${color}-600 fw-semibold text-sm mb-0`}>{role}</p>
+      </div>
+    </div>
+  </div>
+);
+
+const ProgressBar = ({ label, value, total, color }) => {
+  const pct = total > 0 ? Math.round((value / total) * 100) : 0;
+  return (
+    <div className="mb-16">
+      <div className="d-flex justify-content-between align-items-center mb-6">
+        <span className="text-sm fw-medium text-primary-light">{label}</span>
+        <span className="text-sm fw-semibold">{value} <span className="text-secondary-light fw-normal">({pct}%)</span></span>
+      </div>
+      <div className="progress radius-4" style={{ height: 8 }}>
+        <div
+          className={`progress-bar bg-${color}`}
+          style={{ width: `${pct}%`, transition: "width 0.6s ease" }}
+        />
+      </div>
+    </div>
+  );
+};
+
+// ─── Main dashboard ──────────────────────────────────────────────────────────
 
 const DashBoardLayerOne = () => {
+  const [stats,   setStats]   = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    return (
-        <>
-            {/* UnitCountOne */}
-            <UnitCountOne />
+  const userRole = localStorage.getItem("user_role");
+  const firstName = localStorage.getItem("user_first_name") || localStorage.getItem("username") || "there";
 
-            <section className="row gy-4 mt-1">
-            </section>
-        </>
+  useEffect(() => {
+    dashboardService
+      .getSummary()
+      .then((data) => {
+        const s = data?.result?.[0] ?? data?.result ?? data;
+        setStats(s);
+      })
+      .catch((err) => showError(getApiError(err)))
+      .finally(() => setLoading(false));
+  }, []);
 
+  // Derived values — handles different key names the backend might use
+  const totalUsers    = stats?.total_users    ?? stats?.users_total    ?? 0;
+  const totalAdmins   = stats?.total_admins   ?? stats?.admin_count    ?? stats?.admins   ?? 0;
+  const totalTeachers = stats?.total_teachers ?? stats?.teacher_count  ?? stats?.teachers ?? 0;
+  const totalStudents = stats?.total_students ?? stats?.student_count  ?? stats?.students ?? 0;
 
-    )
-}
+  const totalPrograms   = stats?.total_programs   ?? stats?.programs_total   ?? 0;
+  const totalCourses    = stats?.total_courses    ?? stats?.courses_total    ?? 0;
+  const activeCourses   = stats?.active_courses   ?? stats?.courses_active   ?? 0;
+  const inactiveCourses = stats?.inactive_courses ?? stats?.courses_inactive ?? 0;
 
-export default DashBoardLayerOne
+  const totalSemesters     = stats?.total_semesters     ?? stats?.semesters_total     ?? 0;
+  const activeSemesters    = stats?.active_semesters    ?? stats?.semesters_active    ?? 0;
+  const totalAssignments   = stats?.total_assignments   ?? stats?.course_assignments  ?? 0;
+  const totalPLOs          = stats?.total_plos          ?? stats?.plos_total          ?? 0;
+  const totalCLOs          = stats?.total_clos          ?? stats?.clos_total          ?? 0;
+
+  return (
+    <div>
+
+      {/* ── Welcome banner ── */}
+      <div className="card border-0 mb-24" style={{ background: "linear-gradient(135deg, #1a3a6e 0%, #4361ee 100%)" }}>
+        <div className="card-body p-24 d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div>
+            <h5 className="text-white mb-4">Welcome back, {firstName}! 👋</h5>
+            <p className="text-white mb-0" style={{ opacity: 0.85 }}>
+              Here's what's happening in your Smart Assessment system today.
+            </p>
+          </div>
+          <span className="badge px-16 py-8 radius-8 fw-semibold text-sm"
+            style={{ background: "rgba(255,255,255,0.2)", color: "#fff" }}>
+            <Icon icon="solar:shield-keyhole-outline" className="me-4" />
+            {userRole}
+          </span>
+        </div>
+      </div>
+
+      {/* ── Top stat cards ── */}
+      <div className="row row-cols-xxxl-5 row-cols-lg-3 row-cols-sm-2 row-cols-1 gy-4 mb-24">
+        <StatCard label="Total Users"       value={totalUsers}    icon="gridicons:multiple-users"         gradient="bg-gradient-start-1" iconBg="bg-cyan"          loading={loading} />
+        <StatCard label="Total Programs"    value={totalPrograms} icon="solar:book-outline"               gradient="bg-gradient-start-2" iconBg="bg-purple"        loading={loading} />
+        <StatCard label="Total Courses"     value={totalCourses}  icon="solar:notebook-outline"           gradient="bg-gradient-start-3" iconBg="bg-info"          loading={loading} />
+        <StatCard label="Active Courses"    value={activeCourses} icon="mingcute:play-circle-line"        gradient="bg-gradient-start-4" iconBg="bg-success-main"  loading={loading} />
+        <StatCard label="Inactive Courses"  value={inactiveCourses} icon="mingcute:pause-circle-line"    gradient="bg-gradient-start-5" iconBg="bg-red"           loading={loading} />
+      </div>
+
+      {/* ── Second row: Users breakdown + Course status + Semesters ── */}
+      <div className="row gy-4 mb-24">
+
+        {/* Users by Role */}
+        <div className="col-xl-5 col-lg-6">
+          <div className="card h-100">
+            <div className="card-header d-flex align-items-center justify-content-between">
+              <h6 className="card-title mb-0">Users by Role</h6>
+              {userRole === "ADMIN" && (
+                <Link to="/users" className="text-primary-600 text-sm fw-semibold">
+                  View All <Icon icon="ep:arrow-right" className="ms-4" />
+                </Link>
+              )}
+            </div>
+            <div className="card-body">
+              <div className="row g-3 mb-20">
+                <RoleCard role="Admins"   count={totalAdmins}   icon="solar:shield-user-outline"      color="danger"  loading={loading} />
+                <RoleCard role="Teachers" count={totalTeachers} icon="solar:graduation-cap-outline"   color="primary" loading={loading} />
+                <RoleCard role="Students" count={totalStudents} icon="solar:user-outline"              color="success" loading={loading} />
+              </div>
+
+              <div className="pt-16 border-top">
+                <ProgressBar label="Admins"   value={totalAdmins}   total={totalUsers} color="danger"       />
+                <ProgressBar label="Teachers" value={totalTeachers} total={totalUsers} color="primary-600"  />
+                <ProgressBar label="Students" value={totalStudents} total={totalUsers} color="success-main" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Course Status */}
+        <div className="col-xl-4 col-lg-6">
+          <div className="card h-100">
+            <div className="card-header d-flex align-items-center justify-content-between">
+              <h6 className="card-title mb-0">Course Status</h6>
+              {userRole === "ADMIN" && (
+                <Link to="/courses" className="text-primary-600 text-sm fw-semibold">
+                  View All <Icon icon="ep:arrow-right" className="ms-4" />
+                </Link>
+              )}
+            </div>
+            <div className="card-body d-flex flex-column justify-content-center">
+              {/* Donut-style ring using conic-gradient */}
+              {!loading && totalCourses > 0 && (
+                <div className="text-center mb-20">
+                  <div
+                    className="d-inline-flex align-items-center justify-content-center rounded-circle"
+                    style={{
+                      width: 120, height: 120,
+                      background: `conic-gradient(
+                        #22c55e 0% ${(activeCourses / totalCourses) * 100}%,
+                        #ef4444 ${(activeCourses / totalCourses) * 100}% 100%
+                      )`,
+                    }}
+                  >
+                    <div className="rounded-circle bg-white d-flex flex-column align-items-center justify-content-center"
+                      style={{ width: 80, height: 80 }}>
+                      <span className="fw-bold text-lg">{totalCourses}</span>
+                      <span className="text-secondary-light" style={{ fontSize: 10 }}>Total</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <ProgressBar label="Active"   value={activeCourses}   total={totalCourses} color="success-main" />
+              <ProgressBar label="Inactive" value={inactiveCourses} total={totalCourses} color="danger"       />
+
+              <div className="row g-3 mt-4">
+                <div className="col-6">
+                  <div className="p-12 bg-success-focus radius-8 text-center">
+                    {loading
+                      ? <div className="placeholder-glow"><span className="placeholder col-6 d-block mx-auto" /></div>
+                      : <h5 className="text-success-main fw-bold mb-4">{activeCourses}</h5>}
+                    <p className="text-secondary-light text-sm mb-0">Active</p>
+                  </div>
+                </div>
+                <div className="col-6">
+                  <div className="p-12 bg-danger-focus radius-8 text-center">
+                    {loading
+                      ? <div className="placeholder-glow"><span className="placeholder col-6 d-block mx-auto" /></div>
+                      : <h5 className="text-danger-main fw-bold mb-4">{inactiveCourses}</h5>}
+                    <p className="text-secondary-light text-sm mb-0">Inactive</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Links */}
+        <div className="col-xl-3 col-lg-12">
+          <div className="card h-100">
+            <div className="card-header">
+              <h6 className="card-title mb-0">Quick Links</h6>
+            </div>
+            <div className="card-body p-16">
+              {[
+                { to: "/programs",          icon: "solar:book-outline",                    label: "Programs",          color: "primary" },
+                { to: "/semesters",         icon: "solar:calendar-outline",               label: "Semesters",         color: "info"    },
+                { to: "/courses",           icon: "solar:notebook-outline",               label: "Courses",           color: "success" },
+                { to: "/course-assignments",icon: "solar:bookmark-square-minimalistic-outline", label: "Assignments",  color: "warning" },
+                ...(userRole === "ADMIN" ? [
+                  { to: "/users",           icon: "solar:users-group-rounded-outline",     label: "Users",             color: "danger"  },
+                  { to: "/plos",            icon: "solar:diploma-outline",                 label: "PLOs",              color: "purple"  },
+                  { to: "/clos",            icon: "solar:clipboard-list-outline",          label: "CLOs",              color: "cyan"    },
+                  { to: "/clo-plo-generator", icon: "solar:magic-stick-3-outline",         label: "CLO-PLO Generator", color: "primary" },
+                ] : []),
+              ].map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className="d-flex align-items-center gap-12 p-10 radius-8 mb-8 text-decoration-none"
+                  style={{ transition: "background 0.15s" }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = "#f5f5f5"}
+                  onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
+                >
+                  <div className={`w-32-px h-32-px bg-${link.color}-100 rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0`}>
+                    <Icon icon={link.icon} className={`text-${link.color}-600 text-sm`} />
+                  </div>
+                  <span className="text-sm fw-medium text-primary-light">{link.label}</span>
+                  <Icon icon="ep:arrow-right" className="ms-auto text-secondary-light text-xs" />
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Third row: extra stats ── */}
+      <div className="row gy-4">
+
+        {/* Semesters */}
+        <div className="col-md-4">
+          <div className="card h-100">
+            <div className="card-header d-flex align-items-center justify-content-between">
+              <h6 className="card-title mb-0">Semesters</h6>
+              <Link to="/semesters" className="text-primary-600 text-sm fw-semibold">
+                View <Icon icon="ep:arrow-right" className="ms-4" />
+              </Link>
+            </div>
+            <div className="card-body">
+              <div className="d-flex align-items-center gap-16 mb-16">
+                <div className="w-56-px h-56-px bg-primary-100 rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0">
+                  <Icon icon="solar:calendar-outline" className="text-primary-600 text-2xl" />
+                </div>
+                <div>
+                  {loading
+                    ? <div className="placeholder-glow"><span className="placeholder col-8 d-block" style={{ height: 28 }} /></div>
+                    : <h4 className="fw-bold mb-4">{totalSemesters}</h4>}
+                  <p className="text-secondary-light text-sm mb-0">Total Semesters</p>
+                </div>
+              </div>
+              <ProgressBar label="Active Semesters" value={activeSemesters} total={totalSemesters} color="primary-600" />
+              <ProgressBar label="Inactive Semesters" value={totalSemesters - activeSemesters} total={totalSemesters} color="secondary" />
+            </div>
+          </div>
+        </div>
+
+        {/* Course Assignments */}
+        <div className="col-md-4">
+          <div className="card h-100">
+            <div className="card-header d-flex align-items-center justify-content-between">
+              <h6 className="card-title mb-0">Course Assignments</h6>
+              <Link to="/course-assignments" className="text-primary-600 text-sm fw-semibold">
+                View <Icon icon="ep:arrow-right" className="ms-4" />
+              </Link>
+            </div>
+            <div className="card-body d-flex flex-column align-items-center justify-content-center py-32">
+              <div className="w-72-px h-72-px bg-warning-focus rounded-circle d-inline-flex align-items-center justify-content-center mb-16">
+                <Icon icon="solar:bookmark-square-minimalistic-outline" className="text-warning-main text-3xl" />
+              </div>
+              {loading
+                ? <div className="placeholder-glow"><span className="placeholder col-8 d-block" style={{ height: 36 }} /></div>
+                : <h3 className="fw-bold mb-4">{totalAssignments}</h3>}
+              <p className="text-secondary-light text-sm mb-0">Total Assignments</p>
+            </div>
+          </div>
+        </div>
+
+        {/* PLOs & CLOs — admin only */}
+        {userRole === "ADMIN" && (
+          <div className="col-md-4">
+            <div className="card h-100">
+              <div className="card-header">
+                <h6 className="card-title mb-0">Learning Outcomes</h6>
+              </div>
+              <div className="card-body">
+                <div className="d-flex align-items-center gap-16 p-16 bg-primary-50 radius-8 mb-12">
+                  <div className="w-48-px h-48-px bg-primary-100 rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0">
+                    <Icon icon="solar:diploma-outline" className="text-primary-600 text-xl" />
+                  </div>
+                  <div className="flex-grow-1">
+                    <p className="text-secondary-light text-sm mb-2">Program Learning Outcomes</p>
+                    {loading
+                      ? <div className="placeholder-glow"><span className="placeholder col-6 d-block" style={{ height: 24 }} /></div>
+                      : <h5 className="fw-bold mb-0">{totalPLOs}</h5>}
+                  </div>
+                  <Link to="/plos" className="btn btn-sm btn-outline-primary radius-8">View</Link>
+                </div>
+
+                <div className="d-flex align-items-center gap-16 p-16 bg-info-focus radius-8">
+                  <div className="w-48-px h-48-px bg-info-100 rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0">
+                    <Icon icon="solar:clipboard-list-outline" className="text-info-main text-xl" />
+                  </div>
+                  <div className="flex-grow-1">
+                    <p className="text-secondary-light text-sm mb-2">Course Learning Outcomes</p>
+                    {loading
+                      ? <div className="placeholder-glow"><span className="placeholder col-6 d-block" style={{ height: 24 }} /></div>
+                      : <h5 className="fw-bold mb-0">{totalCLOs}</h5>}
+                  </div>
+                  <Link to="/clos" className="btn btn-sm btn-outline-info radius-8">View</Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* For non-admin, show a 4th summary card */}
+        {userRole !== "ADMIN" && (
+          <div className="col-md-4">
+            <div className="card h-100">
+              <div className="card-header">
+                <h6 className="card-title mb-0">My Courses</h6>
+              </div>
+              <div className="card-body d-flex flex-column align-items-center justify-content-center py-32">
+                <div className="w-72-px h-72-px bg-success-focus rounded-circle d-inline-flex align-items-center justify-content-center mb-16">
+                  <Icon icon="solar:notebook-outline" className="text-success-main text-3xl" />
+                </div>
+                <p className="text-secondary-light text-sm text-center mb-16">View courses assigned to you</p>
+                <Link to="/my-courses" className="btn btn-sm btn-primary radius-8">
+                  My Courses <Icon icon="ep:arrow-right" className="ms-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+};
+
+export default DashBoardLayerOne;
