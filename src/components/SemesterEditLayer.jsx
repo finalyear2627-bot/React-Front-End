@@ -8,9 +8,12 @@ const SemesterEditLayer = () => {
   const { id }    = useParams();
   const navigate  = useNavigate();
   const [formData, setFormData] = useState({
-    name:       "",
-    program:    "",
-    study_year: "",
+    name:            "",
+    program:         "",
+    study_year:      "",
+    semester_number: "",
+    start_date:      "",
+    end_date:        "",
   });
   const [programs,   setPrograms]   = useState([]);
   const [loading,    setLoading]    = useState(false);
@@ -24,9 +27,12 @@ const SemesterEditLayer = () => {
       .then(([semData, progData]) => {
         const sem = semData?.result?.[0] ?? semData?.result ?? semData;
         setFormData({
-          name:       sem.name       || "",
-          program:    String(sem.program || ""),
-          study_year: String(sem.study_year || ""),
+          name:            sem.name            || "",
+          program:         String(sem.program  || ""),
+          study_year:      String(sem.study_year || ""),
+          semester_number: String(sem.semester_number || ""),
+          start_date:      sem.start_date || "",
+          end_date:        sem.end_date   || "",
         });
         setPrograms(Array.isArray(progData) ? progData : progData.result || progData.results || []);
       })
@@ -44,9 +50,12 @@ const SemesterEditLayer = () => {
     setLoading(true);
     try {
       const payload = {
-        name:       formData.name.trim(),
-        program:    parseInt(formData.program, 10),
-        study_year: parseInt(formData.study_year, 10),
+        name:            formData.name.trim(),
+        program:         parseInt(formData.program, 10),
+        study_year:      formData.study_year.trim(),
+        semester_number: parseInt(formData.semester_number, 10),
+        ...(formData.start_date && { start_date: formData.start_date }),
+        ...(formData.end_date   && { end_date:   formData.end_date   }),
       };
       const res = await semesterService.update(id, payload);
       if (res?.status?.code !== 0) { showError(res?.status?.message || "Update failed"); return; }
@@ -77,7 +86,7 @@ const SemesterEditLayer = () => {
               <div className="card-body">
                 <form onSubmit={handleSubmit}>
 
-                  {/* Name */}
+                  {/* Semester Name */}
                   <div className="mb-20">
                     <label className="form-label fw-semibold text-primary-light text-sm mb-8">
                       Semester Name <span className="text-danger-600">*</span>
@@ -112,23 +121,67 @@ const SemesterEditLayer = () => {
                     </select>
                   </div>
 
-                  {/* Study Year */}
-                  <div className="mb-20">
-                    <label className="form-label fw-semibold text-primary-light text-sm mb-8">
-                      Study Year <span className="text-danger-600">*</span>
-                    </label>
-                    <select
-                      className="form-control radius-8"
-                      name="study_year"
-                      value={formData.study_year}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="">-- Select Year --</option>
-                      {[1, 2, 3, 4].map((y) => (
-                        <option key={y} value={y}>Year {y}</option>
-                      ))}
-                    </select>
+                  {/* Study Year + Semester Number side by side */}
+                  <div className="row g-3 mb-20">
+                    <div className="col-sm-6">
+                      <label className="form-label fw-semibold text-primary-light text-sm mb-8">
+                        Study Year <span className="text-danger-600">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control radius-8"
+                        name="study_year"
+                        placeholder="e.g., 2024-2025"
+                        value={formData.study_year}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                    <div className="col-sm-6">
+                      <label className="form-label fw-semibold text-primary-light text-sm mb-8">
+                        Semester Number <span className="text-danger-600">*</span>
+                      </label>
+                      <select
+                        className="form-control radius-8"
+                        name="semester_number"
+                        value={formData.semester_number}
+                        onChange={handleChange}
+                        required
+                      >
+                        <option value="">-- Select --</option>
+                        {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                          <option key={n} value={n}>Semester {n}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Start Date + End Date */}
+                  <div className="row g-3 mb-20">
+                    <div className="col-sm-6">
+                      <label className="form-label fw-semibold text-primary-light text-sm mb-8">
+                        Start Date
+                      </label>
+                      <input
+                        type="date"
+                        className="form-control radius-8"
+                        name="start_date"
+                        value={formData.start_date}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="col-sm-6">
+                      <label className="form-label fw-semibold text-primary-light text-sm mb-8">
+                        End Date
+                      </label>
+                      <input
+                        type="date"
+                        className="form-control radius-8"
+                        name="end_date"
+                        value={formData.end_date}
+                        onChange={handleChange}
+                      />
+                    </div>
                   </div>
 
                   <div className="d-flex gap-3 pt-20">

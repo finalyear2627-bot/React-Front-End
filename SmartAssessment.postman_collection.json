@@ -1540,72 +1540,111 @@
       "name": "ASSESSMENTS",
       "item": [
         {
-          "name": "List Assessments",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
+          "name": "GENERATED PAPERS",
+          "item": [
+            {
+              "name": "Generate Assessment Paper",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{base_url}}/api/assessments/generated-papers/generate/",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"theory_course_id\": 1,\n  \"lab_course_id\": 2,\n  \"topic\": \"Object Oriented Programming - Classes and Objects\",\n  \"clo_ids\": [\n    1,\n    2,\n    3,\n    4\n  ],\n  \"plo_ids\": [\n    1,\n    2\n  ]\n}"
+                },
+                "description": "Requires both theory and lab course. clo_ids must include CLOs from BOTH courses. Returns download_url for the PDF."
               }
-            ],
-            "url": "{{base_url}}/api/assessments/"
-          }
-        },
-        {
-          "name": "Create Assessment",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"Midterm Exam\",\n  \"total_marks\": 50\n}"
             },
-            "url": "{{base_url}}/api/assessments/"
-          }
-        },
-        {
-          "name": "Generate Assessment PDF",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+            {
+              "name": "List Generated Papers",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": "{{base_url}}/api/assessments/generated-papers/"
               }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"Midterm Exam\",\n  \"course\": \"CMC111\",\n  \"questions\": []\n}"
             },
-            "url": "{{base_url}}/api/assessments/generate-pdf/"
-          }
-        },
-        {
-          "name": "List Questions",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
+            {
+              "name": "List Papers by Course",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": "{{base_url}}/api/assessments/generated-papers/?course=1"
               }
-            ],
-            "url": "{{base_url}}/api/assessments/questions/"
-          }
+            },
+            {
+              "name": "List Completed Papers",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": "{{base_url}}/api/assessments/generated-papers/?status=COMPLETED"
+              }
+            },
+            {
+              "name": "Get Generated Paper",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": "{{base_url}}/api/assessments/generated-papers/1/"
+              }
+            },
+            {
+              "name": "Download PDF",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": "{{base_url}}/api/assessments/generated-papers/1/download/",
+                "description": "Returns the PDF as a file download (application/pdf). Works for any authenticated user."
+              }
+            },
+            {
+              "name": "Delete Generated Paper",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": "{{base_url}}/api/assessments/generated-papers/1/",
+                "description": "Deletes DB record AND removes the PDF file from disk."
+              }
+            }
+          ]
         }
       ]
     }

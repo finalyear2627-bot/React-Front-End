@@ -271,6 +271,28 @@ const MasterLayout = ({ children }) => {
               </li>
             )}
 
+            {/* Assessments — admin + teacher */}
+            {["ADMIN", "TEACHER"].includes(localStorage.getItem("user_role")) && (
+              <li className='dropdown'>
+                <Link to='#'>
+                  <Icon icon='solar:document-add-outline' className='menu-icon' />
+                  <span>Assessments</span>
+                </Link>
+                <ul className='sidebar-submenu'>
+                  <li>
+                    <NavLink to='/generated-papers' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Papers
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to='/generate-paper' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Generate Paper
+                    </NavLink>
+                  </li>
+                </ul>
+              </li>
+            )}
+
             {/* PLO — admin only */}
             {localStorage.getItem("user_role") === "ADMIN" && (
               <li className='dropdown'>

@@ -70,6 +70,7 @@ const DashBoardLayerOne = () => {
   const firstName = localStorage.getItem("user_first_name") || localStorage.getItem("username") || "there";
 
   useEffect(() => {
+    if (userRole !== "ADMIN") { setLoading(false); return; }
     dashboardService
       .getSummary()
       .then((data) => {
@@ -78,22 +79,23 @@ const DashBoardLayerOne = () => {
       })
       .catch((err) => showError(getApiError(err)))
       .finally(() => setLoading(false));
-  }, []);
+  }, [userRole]);
 
   // Helper: returns the value only if it's a number, otherwise null (so ?? chains work correctly)
   const n = (v) => (typeof v === "number" ? v : null);
 
   // Handle both flat format { total_users: 10 } and nested format { users: { total: 10, admin: 2 } }
-  const usersObj   = stats?.users   && typeof stats.users   === "object" ? stats.users   : null;
-  const semObj     = stats?.semesters && typeof stats.semesters === "object" ? stats.semesters : null;
-  const coursesObj = stats?.courses && typeof stats.courses === "object" ? stats.courses : null;
+  const usersObj    = stats?.users     && typeof stats.users     === "object" ? stats.users     : null;
+  const semObj      = stats?.semesters && typeof stats.semesters === "object" ? stats.semesters : null;
+  const coursesObj  = stats?.courses   && typeof stats.courses   === "object" ? stats.courses   : null;
+  const programsObj = stats?.programs  && typeof stats.programs  === "object" ? stats.programs  : null;
 
   const totalUsers    = n(usersObj?.total)    ?? n(stats?.total_users)    ?? n(stats?.users_total)    ?? 0;
   const totalAdmins   = n(usersObj?.admin)    ?? n(stats?.total_admins)   ?? n(stats?.admin_count)    ?? n(stats?.admins)   ?? 0;
   const totalTeachers = n(usersObj?.teacher)  ?? n(stats?.total_teachers) ?? n(stats?.teacher_count)  ?? n(stats?.teachers) ?? 0;
   const totalStudents = n(usersObj?.student)  ?? n(stats?.total_students) ?? n(stats?.student_count)  ?? n(stats?.students) ?? 0;
 
-  const totalPrograms   = n(stats?.programs)      ?? n(stats?.total_programs)   ?? n(stats?.programs_total)   ?? 0;
+  const totalPrograms = n(programsObj?.total) ?? n(stats?.programs) ?? n(stats?.total_programs) ?? n(stats?.programs_total) ?? 0;
   const totalCourses    = n(coursesObj?.total)    ?? n(stats?.total_courses)    ?? n(stats?.courses_total)    ?? 0;
   const activeCourses   = n(coursesObj?.active)   ?? n(stats?.active_courses)   ?? n(stats?.courses_active)   ?? 0;
   const inactiveCourses = n(coursesObj?.inactive) ?? n(stats?.inactive_courses) ?? n(stats?.courses_inactive) ?? 0;
@@ -104,6 +106,61 @@ const DashBoardLayerOne = () => {
   const totalPLOs        = n(stats?.plo_count) ?? n(stats?.total_plos) ?? n(stats?.plos_total) ?? 0;
   const totalCLOs        = n(stats?.clo_count) ?? n(stats?.total_clos) ?? n(stats?.clos_total) ?? 0;
 
+  // ── Non-admin dashboard ─────────────────────────────────────────────────────
+  if (userRole !== "ADMIN") {
+    const roleColor  = userRole === "TEACHER" ? "#7c3aed" : "#0ea5e9";
+    const roleLinks  = [
+      { to: "/my-courses",          icon: "solar:notebook-outline",                        label: "My Courses",          desc: "View courses assigned to you"         },
+      { to: "/course-assignments",  icon: "solar:bookmark-square-minimalistic-outline",    label: "Course Assignments",  desc: "See all course assignments"            },
+      { to: "/courses",             icon: "solar:notebook-outline",                        label: "All Courses",         desc: "Browse available courses"             },
+      { to: "/programs",            icon: "solar:book-outline",                            label: "Programs",            desc: "View programs"                        },
+      { to: "/semesters",           icon: "solar:calendar-outline",                        label: "Semesters",           desc: "View semesters"                       },
+      { to: "/view-profile",        icon: "solar:user-outline",                            label: "My Profile",          desc: "Update your profile"                  },
+    ];
+    return (
+      <div>
+        {/* Welcome banner */}
+        <div className="card border-0 mb-24" style={{ background: `linear-gradient(135deg, #1a3a6e 0%, ${roleColor} 100%)` }}>
+          <div className="card-body p-24 d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div>
+              <h5 className="text-white mb-4">Welcome back, {firstName}!</h5>
+              <p className="text-white mb-0" style={{ opacity: 0.85 }}>Smart Assessment System</p>
+            </div>
+            <span className="badge px-16 py-8 radius-8 fw-semibold text-sm"
+              style={{ background: "rgba(255,255,255,0.2)", color: "#fff" }}>
+              <Icon icon="solar:shield-keyhole-outline" className="me-4" />
+              {userRole}
+            </span>
+          </div>
+        </div>
+
+        {/* Quick access cards */}
+        <div className="row gy-4">
+          {roleLinks.map((link) => (
+            <div key={link.to} className="col-xl-4 col-md-6">
+              <Link to={link.to} className="card h-100 text-decoration-none border"
+                style={{ transition: "box-shadow 0.2s" }}
+                onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.1)"}
+                onMouseLeave={(e) => e.currentTarget.style.boxShadow = "none"}>
+                <div className="card-body p-20 d-flex align-items-center gap-16">
+                  <div className="w-56-px h-56-px bg-primary-100 rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0">
+                    <Icon icon={link.icon} className="text-primary-600 text-2xl" />
+                  </div>
+                  <div>
+                    <h6 className="fw-semibold mb-4 text-primary-light">{link.label}</h6>
+                    <p className="text-secondary-light text-sm mb-0">{link.desc}</p>
+                  </div>
+                  <Icon icon="ep:arrow-right" className="ms-auto text-secondary-light" />
+                </div>
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Admin dashboard ──────────────────────────────────────────────────────────
   return (
     <div>
 

@@ -49,6 +49,9 @@ import CLOBulkUploadPage from "./pages/CLOBulkUploadPage";
 import CLOPLOStatementPage from "./pages/CLOPLOStatementPage";
 import CLOPLOGeneratorPage from "./pages/CLOPLOGeneratorPage";
 
+import GeneratedPaperListPage from "./pages/GeneratedPaperListPage";
+import GeneratedPaperGeneratePage from "./pages/GeneratedPaperGeneratePage";
+
 function App() {
   return (
     <BrowserRouter>
@@ -104,6 +107,10 @@ function App() {
         <Route exact path='/clo-bulk-upload' element={<ProtectedRoute><CLOBulkUploadPage /></ProtectedRoute>} />
         <Route exact path='/clo-plo-statement/:courseId' element={<ProtectedRoute><CLOPLOStatementPage /></ProtectedRoute>} />
         <Route exact path='/clo-plo-generator' element={<ProtectedRoute><CLOPLOGeneratorPage /></ProtectedRoute>} />
+
+        {/* Assessment / Generated Papers Routes — ADMIN + TEACHER */}
+        <Route exact path='/generated-papers' element={<ProtectedRoute><GeneratedPaperListPage /></ProtectedRoute>} />
+        <Route exact path='/generate-paper'   element={<ProtectedRoute><GeneratedPaperGeneratePage /></ProtectedRoute>} />
 
         {/* Profile Routes */}
         <Route exact path='/view-profile' element={<ProtectedRoute><ViewProfilePage /></ProtectedRoute>} />
