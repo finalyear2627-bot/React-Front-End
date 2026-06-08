@@ -5,18 +5,10 @@ import DashBoardLayerOne from "../components/DashBoardLayerOne";
 
 const HomePageOne = () => {
   return (
-    <>
-      {/* MasterLayout */}
-      <MasterLayout>
-        {/* Breadcrumb */}
-        <Breadcrumb title="AI" />
-
-
-        {/* DashBoardLayerOne */}
-        <DashBoardLayerOne />
-
-      </MasterLayout>
-    </>
+    <MasterLayout>
+      <Breadcrumb title="Dashboard" />
+      <DashBoardLayerOne />
+    </MasterLayout>
   );
 };
 

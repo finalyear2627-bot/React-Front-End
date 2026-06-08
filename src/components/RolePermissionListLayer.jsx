@@ -6,8 +6,35 @@ import { MODULES } from "../utils/permissions";
 
 const ROLES = ["ADMIN", "TEACHER", "STUDENT"];
 
+// Recommended defaults per role (aligned with backend ViewSet permissions)
+const ROLE_DEFAULTS = {
+  TEACHER: {
+    PROGRAMS:           { can_view: true,  can_create: false, can_edit: false, can_delete: false },
+    SEMESTERS:          { can_view: true,  can_create: false, can_edit: false, can_delete: false },
+    COURSES:            { can_view: true,  can_create: false, can_edit: false, can_delete: false },
+    PLO:                { can_view: true,  can_create: false, can_edit: false, can_delete: false },
+    CLO:                { can_view: true,  can_create: false, can_edit: false, can_delete: false },
+    USERS:              { can_view: false, can_create: false, can_edit: false, can_delete: false },
+    ASSESSMENTS:        { can_view: true,  can_create: true,  can_edit: true,  can_delete: false },
+    COURSE_ASSIGNMENTS: { can_view: true,  can_create: false, can_edit: false, can_delete: false },
+    REPORTS:            { can_view: true,  can_create: false, can_edit: false, can_delete: false },
+  },
+  STUDENT: {
+    PROGRAMS:           { can_view: true,  can_create: false, can_edit: false, can_delete: false },
+    SEMESTERS:          { can_view: true,  can_create: false, can_edit: false, can_delete: false },
+    COURSES:            { can_view: true,  can_create: false, can_edit: false, can_delete: false },
+    PLO:                { can_view: false, can_create: false, can_edit: false, can_delete: false },
+    CLO:                { can_view: false, can_create: false, can_edit: false, can_delete: false },
+    USERS:              { can_view: false, can_create: false, can_edit: false, can_delete: false },
+    ASSESSMENTS:        { can_view: false, can_create: false, can_edit: false, can_delete: false },
+    COURSE_ASSIGNMENTS: { can_view: true,  can_create: false, can_edit: false, can_delete: false },
+    REPORTS:            { can_view: false, can_create: false, can_edit: false, can_delete: false },
+  },
+};
+
 const MODULE_LABEL = {
   PROGRAMS:           "Programs",
+  SEMESTERS:          "Semesters",
   COURSES:            "Courses",
   PLO:                "PLO",
   CLO:                "CLO",
@@ -19,6 +46,7 @@ const MODULE_LABEL = {
 
 const MODULE_ICON = {
   PROGRAMS:           "solar:book-outline",
+  SEMESTERS:          "solar:calendar-outline",
   COURSES:            "solar:notebook-outline",
   PLO:                "solar:diploma-outline",
   CLO:                "solar:clipboard-list-outline",
@@ -93,6 +121,20 @@ const RolePermissionListLayer = () => {
     setDirty(true);
   };
 
+  const loadDefaults = () => {
+    if (isAdmin) return;
+    const defaults = ROLE_DEFAULTS[activeRole];
+    if (!defaults) return;
+    setMatrix((prev) => {
+      const next = { ...prev };
+      MODULES.forEach((m) => {
+        next[m] = { ...emptyRow(m), ...(defaults[m] || {}) };
+      });
+      return next;
+    });
+    setDirty(true);
+  };
+
   const setAll = (field, value) => {
     if (isAdmin) return;
     setMatrix((prev) => {
@@ -133,11 +175,25 @@ const RolePermissionListLayer = () => {
     <div className="card basic-data-table">
       <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
         <h5 className="card-title mb-0">Role Permissions</h5>
-        {!isAdmin && dirty && (
-          <button className="btn btn-primary radius-8 d-inline-flex align-items-center gap-1" onClick={handleSave} disabled={saving}>
-            <Icon icon={saving ? "svg-spinners:180-ring" : "material-symbols:save-outline"} className="text-xl" />
-            {saving ? "Saving…" : "Save Changes"}
-          </button>
+        {!isAdmin && (
+          <div className="d-flex align-items-center gap-2">
+            {ROLE_DEFAULTS[activeRole] && (
+              <button
+                className="btn btn-sm btn-outline-info radius-8 d-inline-flex align-items-center gap-1"
+                onClick={loadDefaults}
+                title="Fill matrix with recommended defaults for this role"
+              >
+                <Icon icon="solar:magic-stick-3-outline" className="text-sm" />
+                Load Defaults
+              </button>
+            )}
+            {dirty && (
+              <button className="btn btn-primary radius-8 d-inline-flex align-items-center gap-1" onClick={handleSave} disabled={saving}>
+                <Icon icon={saving ? "svg-spinners:180-ring" : "material-symbols:save-outline"} className="text-xl" />
+                {saving ? "Saving…" : "Save Changes"}
+              </button>
+            )}
+          </div>
         )}
       </div>
 

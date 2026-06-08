@@ -283,6 +283,13 @@ const CourseListLayer = () => {
                           title="View">
                           <Icon icon="iconamoon:eye-light" />
                         </Link>
+                        {localStorage.getItem("user_role") === "ADMIN" && (
+                          <Link to={`/clo-plo-statement/${course.id}`}
+                            className="w-32-px h-32-px me-8 bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center"
+                            title="CLO-PLO Statement">
+                            <Icon icon="solar:clipboard-list-outline" />
+                          </Link>
+                        )}
                         <Link to={`/course-edit/${course.id}`}
                           className="w-32-px h-32-px me-8 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center"
                           title="Edit">

@@ -101,6 +101,102 @@ export const downloadExcelTemplate = () => {
   document.body.removeChild(link);
 };
 
+// ─── PLO template ───────────────────────────────────────────────────────────
+
+export const downloadPLOTemplate = () => {
+  const headers = ["program_code", "plo_number", "description"];
+  const sampleData = [
+    ["BSCS", "1", "Apply knowledge of computing to solve real-world problems"],
+    ["BSCS", "2", "Design and implement software systems meeting specified requirements"],
+    ["BSCS", "3", "Demonstrate effective communication skills in technical contexts"],
+  ];
+  let csv = headers.join(",") + "\n";
+  sampleData.forEach((r) => { csv += r.map((c) => `"${c}"`).join(",") + "\n"; });
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.setAttribute("href", URL.createObjectURL(blob));
+  link.setAttribute("download", "PLOs_Template.csv");
+  link.style.visibility = "hidden";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+// ─── CLO template ───────────────────────────────────────────────────────────
+
+export const downloadCLOTemplate = () => {
+  const headers = ["course_code", "clo_number", "description", "mapped_plos"];
+  const sampleData = [
+    ["CMC111",   "1", "Write syntactically correct programs in a high-level language", "PLO-1,PLO-2"],
+    ["CMC111",   "2", "Trace and debug logic errors in small programs",                "PLO-1"],
+    ["CMC111",   "3", "Describe basic programming constructs clearly in writing",       "PLO-3"],
+    ["CMC111-L", "1", "Implement programs using arrays and functions in the lab",      "PLO-1,PLO-2"],
+  ];
+  let csv = headers.join(",") + "\n";
+  sampleData.forEach((r) => { csv += r.map((c) => `"${c}"`).join(",") + "\n"; });
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.setAttribute("href", URL.createObjectURL(blob));
+  link.setAttribute("download", "CLOs_Template.csv");
+  link.style.visibility = "hidden";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+// ─── CLO-PLO Statement Word export ──────────────────────────────────────────
+
+export const exportCLOPLOStatementWord = (courseName, rows) => {
+  const tableRows = rows
+    .map(
+      (r) => `
+      <tr>
+        <td style="border:1px solid #ccc;padding:6px 10px;font-weight:600">CLO-${r.clo_number || r.clo}</td>
+        <td style="border:1px solid #ccc;padding:6px 10px">${r.description || r.clo_description || ""}</td>
+        <td style="border:1px solid #ccc;padding:6px 10px;text-align:center">
+          ${(r.mapped_plos || []).join(", ")}
+        </td>
+      </tr>`
+    )
+    .join("");
+
+  const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office'
+    xmlns:w='urn:schemas-microsoft-com:office:word'
+    xmlns='http://www.w3.org/TR/REC-html40'>
+    <head><meta charset='utf-8'><title>CLO-PLO Statement</title>
+    <style>
+      body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; margin: 2cm; }
+      h1   { font-size: 16pt; color: #1a3a6e; }
+      h2   { font-size: 13pt; color: #333; margin-top: 18pt; }
+      table { border-collapse: collapse; width: 100%; }
+      th { background: #1a3a6e; color: #fff; padding: 8px 10px; border: 1px solid #1a3a6e; text-align: left; }
+    </style></head>
+    <body>
+      <h1>CLO-PLO Statement</h1>
+      <h2>Course: ${courseName}</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:12%">CLO</th>
+            <th style="width:66%">Description</th>
+            <th style="width:22%;text-align:center">Mapped PLOs</th>
+          </tr>
+        </thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    </body>
+  </html>`;
+
+  const blob = new Blob(["﻿", html], { type: "application/msword" });
+  const link = document.createElement("a");
+  link.setAttribute("href", URL.createObjectURL(blob));
+  link.setAttribute("download", `CLO_PLO_Statement_${courseName.replace(/\s+/g, "_")}.doc`);
+  link.style.visibility = "hidden";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 export const parseExcelFile = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();

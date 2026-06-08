@@ -1,17 +1,22 @@
-const MODULES = ["PROGRAMS", "COURSES", "PLO", "CLO", "USERS", "ASSESSMENTS", "COURSE_ASSIGNMENTS", "REPORTS"];
+const MODULES = ["PROGRAMS", "SEMESTERS", "COURSES", "PLO", "CLO", "USERS", "ASSESSMENTS", "COURSE_ASSIGNMENTS", "REPORTS"];
 
 export { MODULES };
+
+// Default view modules when no permissions have been configured yet for a role
+const TEACHER_DEFAULT_VIEW  = ["PROGRAMS", "SEMESTERS", "COURSES", "PLO", "CLO", "ASSESSMENTS", "COURSE_ASSIGNMENTS", "REPORTS"];
+const TEACHER_DEFAULT_CREATE = ["ASSESSMENTS"];
+const TEACHER_DEFAULT_EDIT   = ["ASSESSMENTS"];
+const STUDENT_DEFAULT_VIEW   = ["PROGRAMS", "SEMESTERS", "COURSES", "COURSE_ASSIGNMENTS"];
 
 // --- storage helpers ---
 
 export const savePermissions = (permissionsArray) => {
-  // Store as { MODULE: { can_view, can_create, can_edit, can_delete, id? } }
   const map = {};
   MODULES.forEach((m) => {
     map[m] = { can_view: false, can_create: false, can_edit: false, can_delete: false };
   });
   (permissionsArray || []).forEach((p) => {
-    if (p.module) map[p.module] = p;
+    if (p.module) map[p.module] = { ...map[p.module], ...p };
   });
   localStorage.setItem("role_permissions", JSON.stringify(map));
 };
@@ -23,16 +28,54 @@ const getMap = () => {
   catch { return {}; }
 };
 
-// ADMIN bypasses all checks
-const isAdmin = () => localStorage.getItem("user_role") === "ADMIN";
+const isAdmin   = () => localStorage.getItem("user_role") === "ADMIN";
+const isTeacher = () => localStorage.getItem("user_role") === "TEACHER";
+const isStudent = () => localStorage.getItem("user_role") === "STUDENT";
 
-export const canView   = (module) => isAdmin() || getMap()[module]?.can_view   === true;
-export const canCreate = (module) => isAdmin() || getMap()[module]?.can_create === true;
-export const canEdit   = (module) => isAdmin() || getMap()[module]?.can_edit   === true;
-export const canDelete = (module) => isAdmin() || getMap()[module]?.can_delete === true;
+// Returns true if at least one module has an explicit permission saved
+const hasConfiguredPermissions = (map) =>
+  Object.values(map).some((p) => p.can_view === true || p.can_create === true);
+
+export const canView = (module) => {
+  if (isAdmin()) return true;
+  const map = getMap();
+  if (!hasConfiguredPermissions(map)) {
+    if (isTeacher()) return TEACHER_DEFAULT_VIEW.includes(module);
+    if (isStudent()) return STUDENT_DEFAULT_VIEW.includes(module);
+  }
+  return map[module]?.can_view === true;
+};
+
+export const canCreate = (module) => {
+  if (isAdmin()) return true;
+  const map = getMap();
+  if (!hasConfiguredPermissions(map)) {
+    if (isTeacher()) return TEACHER_DEFAULT_CREATE.includes(module);
+    return false;
+  }
+  return map[module]?.can_create === true;
+};
+
+export const canEdit = (module) => {
+  if (isAdmin()) return true;
+  const map = getMap();
+  if (!hasConfiguredPermissions(map)) {
+    if (isTeacher()) return TEACHER_DEFAULT_EDIT.includes(module);
+    return false;
+  }
+  return map[module]?.can_edit === true;
+};
+
+export const canDelete = (module) => {
+  if (isAdmin()) return true;
+  const map = getMap();
+  if (!hasConfiguredPermissions(map)) return false;
+  return map[module]?.can_delete === true;
+};
 
 // Returns the full permission object for one module
-export const getModulePerms = (module) => getMap()[module] || { can_view: false, can_create: false, can_edit: false, can_delete: false };
+export const getModulePerms = (module) =>
+  getMap()[module] || { can_view: false, can_create: false, can_edit: false, can_delete: false };
 
 // Returns the full map
 export const getAllPerms = () => getMap();

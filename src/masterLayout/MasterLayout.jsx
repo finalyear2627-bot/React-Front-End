@@ -12,6 +12,8 @@ const MasterLayout = ({ children }) => {
   let [mobileMenu, setMobileMenu] = useState(false);
   const location = useLocation(); // Hook to get the current route
   const navigate = useNavigate();
+  const userRole = localStorage.getItem("user_role");
+  const isTeacher = userRole === "TEACHER";
 
   const handleLogout = async () => {
     await authService.logout();
@@ -170,6 +172,30 @@ const MasterLayout = ({ children }) => {
               </li>
             )}
 
+            {/* Semesters */}
+            {canView("SEMESTERS") && (
+              <li className='dropdown'>
+                <Link to='#'>
+                  <Icon icon='solar:calendar-outline' className='menu-icon' />
+                  <span>Semesters</span>
+                </Link>
+                <ul className='sidebar-submenu'>
+                  <li>
+                    <NavLink to='/semesters' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> List Semesters
+                    </NavLink>
+                  </li>
+                  {canCreate("SEMESTERS") && (
+                    <li>
+                      <NavLink to='/semester-add' className={(n) => n.isActive ? "active-page" : ""}>
+                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Add Semester
+                      </NavLink>
+                    </li>
+                  )}
+                </ul>
+              </li>
+            )}
+
             {/* Courses */}
             {canView("COURSES") && (
               <li className='dropdown'>
@@ -243,6 +269,87 @@ const MasterLayout = ({ children }) => {
                       </NavLink>
                     </li>
                   )}
+                </ul>
+              </li>
+            )}
+
+            {/* Assessments — admin + teacher */}
+            {["ADMIN", "TEACHER"].includes(localStorage.getItem("user_role")) && (
+              <li className='dropdown'>
+                <Link to='#'>
+                  <Icon icon='solar:document-add-outline' className='menu-icon' />
+                  <span>Assessments</span>
+                </Link>
+                <ul className='sidebar-submenu'>
+                  <li>
+                    <NavLink to='/generated-papers' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Papers
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to='/generate-paper' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Generate Paper
+                    </NavLink>
+                  </li>
+                </ul>
+              </li>
+            )}
+
+            {/* PLO — admin only */}
+            {localStorage.getItem("user_role") === "ADMIN" && (
+              <li className='dropdown'>
+                <Link to='#'>
+                  <Icon icon='solar:diploma-outline' className='menu-icon' />
+                  <span>PLOs</span>
+                </Link>
+                <ul className='sidebar-submenu'>
+                  <li>
+                    <NavLink to='/plos' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> List PLOs
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to='/plo-add' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Add PLO
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to='/plo-bulk-upload' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-warning-main w-auto' /> Bulk Upload PLOs
+                    </NavLink>
+                  </li>
+                </ul>
+              </li>
+            )}
+
+            {/* CLO — admin only */}
+            {localStorage.getItem("user_role") === "ADMIN" && (
+              <li className='dropdown'>
+                <Link to='#'>
+                  <Icon icon='solar:clipboard-list-outline' className='menu-icon' />
+                  <span>CLOs</span>
+                </Link>
+                <ul className='sidebar-submenu'>
+                  <li>
+                    <NavLink to='/clos' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> List CLOs
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to='/clo-add' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Add CLO
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to='/clo-bulk-upload' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-warning-main w-auto' /> Bulk Upload CLOs
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to='/clo-plo-generator' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-purple w-auto' /> Generate CLO-PLO
+                    </NavLink>
+                  </li>
                 </ul>
               </li>
             )}

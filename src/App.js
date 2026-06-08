@@ -32,6 +32,26 @@ import CourseAssignmentListPage from "./pages/CourseAssignmentListPage";
 import CourseAssignmentAddPage from "./pages/CourseAssignmentAddPage";
 import MyCoursesPage from "./pages/MyCoursesPage";
 
+import SemesterListPage from "./pages/SemesterListPage";
+import SemesterAddPage from "./pages/SemesterAddPage";
+import SemesterEditPage from "./pages/SemesterEditPage";
+import SemesterViewPage from "./pages/SemesterViewPage";
+
+import PLOListPage from "./pages/PLOListPage";
+import PLOAddPage from "./pages/PLOAddPage";
+import PLOEditPage from "./pages/PLOEditPage";
+import PLOBulkUploadPage from "./pages/PLOBulkUploadPage";
+
+import CLOListPage from "./pages/CLOListPage";
+import CLOAddPage from "./pages/CLOAddPage";
+import CLOEditPage from "./pages/CLOEditPage";
+import CLOBulkUploadPage from "./pages/CLOBulkUploadPage";
+import CLOPLOStatementPage from "./pages/CLOPLOStatementPage";
+import CLOPLOGeneratorPage from "./pages/CLOPLOGeneratorPage";
+
+import GeneratedPaperListPage from "./pages/GeneratedPaperListPage";
+import GeneratedPaperGeneratePage from "./pages/GeneratedPaperGeneratePage";
+
 function App() {
   return (
     <BrowserRouter>
@@ -67,6 +87,30 @@ function App() {
         <Route exact path='/course-assignments' element={<ProtectedRoute><CourseAssignmentListPage /></ProtectedRoute>} />
         <Route exact path='/course-assignment-add' element={<ProtectedRoute><CourseAssignmentAddPage /></ProtectedRoute>} />
         <Route exact path='/my-courses' element={<ProtectedRoute><MyCoursesPage /></ProtectedRoute>} />
+
+        {/* Semester Routes */}
+        <Route exact path='/semesters' element={<ProtectedRoute><SemesterListPage /></ProtectedRoute>} />
+        <Route exact path='/semester-add' element={<ProtectedRoute><SemesterAddPage /></ProtectedRoute>} />
+        <Route exact path='/semester-edit/:id' element={<ProtectedRoute><SemesterEditPage /></ProtectedRoute>} />
+        <Route exact path='/semester-view/:id' element={<ProtectedRoute><SemesterViewPage /></ProtectedRoute>} />
+
+        {/* PLO Routes — admin only */}
+        <Route exact path='/plos' element={<ProtectedRoute><PLOListPage /></ProtectedRoute>} />
+        <Route exact path='/plo-add' element={<ProtectedRoute><PLOAddPage /></ProtectedRoute>} />
+        <Route exact path='/plo-edit/:id' element={<ProtectedRoute><PLOEditPage /></ProtectedRoute>} />
+        <Route exact path='/plo-bulk-upload' element={<ProtectedRoute><PLOBulkUploadPage /></ProtectedRoute>} />
+
+        {/* CLO Routes — admin only */}
+        <Route exact path='/clos' element={<ProtectedRoute><CLOListPage /></ProtectedRoute>} />
+        <Route exact path='/clo-add' element={<ProtectedRoute><CLOAddPage /></ProtectedRoute>} />
+        <Route exact path='/clo-edit/:id' element={<ProtectedRoute><CLOEditPage /></ProtectedRoute>} />
+        <Route exact path='/clo-bulk-upload' element={<ProtectedRoute><CLOBulkUploadPage /></ProtectedRoute>} />
+        <Route exact path='/clo-plo-statement/:courseId' element={<ProtectedRoute><CLOPLOStatementPage /></ProtectedRoute>} />
+        <Route exact path='/clo-plo-generator' element={<ProtectedRoute><CLOPLOGeneratorPage /></ProtectedRoute>} />
+
+        {/* Assessment / Generated Papers Routes — ADMIN + TEACHER */}
+        <Route exact path='/generated-papers' element={<ProtectedRoute><GeneratedPaperListPage /></ProtectedRoute>} />
+        <Route exact path='/generate-paper'   element={<ProtectedRoute><GeneratedPaperGeneratePage /></ProtectedRoute>} />
 
         {/* Profile Routes */}
         <Route exact path='/view-profile' element={<ProtectedRoute><ViewProfilePage /></ProtectedRoute>} />
