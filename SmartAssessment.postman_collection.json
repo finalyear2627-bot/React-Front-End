@@ -236,6 +236,33 @@
             },
             "url": "{{base_url}}/api/accounts/change-password/"
           }
+        },
+        {
+          "name": "Get My Permissions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/accounts/my-permissions/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "accounts",
+                "my-permissions",
+                ""
+              ]
+            },
+            "description": "Returns all module permissions for the currently logged-in user. Admins get full access on all modules."
+          },
+          "response": []
         }
       ]
     },
@@ -1543,7 +1570,7 @@
           "name": "GENERATED PAPERS",
           "item": [
             {
-              "name": "Generate Assessment Paper",
+              "name": "Generate Examination Paper (Admin/Teacher)",
               "request": {
                 "method": "POST",
                 "header": [
@@ -1559,13 +1586,55 @@
                 "url": "{{base_url}}/api/assessments/generated-papers/generate/",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"theory_course_id\": 1,\n  \"lab_course_id\": 2,\n  \"topic\": \"Object Oriented Programming - Classes and Objects\",\n  \"clo_ids\": [\n    1,\n    2,\n    3,\n    4\n  ],\n  \"plo_ids\": [\n    1,\n    2\n  ]\n}"
+                  "raw": "{\n  \"theory_course_id\": 1,\n  \"lab_course_id\": 2,\n  \"topic\": \"Object Oriented Programming - Classes and Objects\",\n  \"clo_ids\": [\n    1,\n    2,\n    3,\n    4\n  ],\n  \"plo_ids\": [\n    1,\n    2\n  ],\n  \"assessment_type\": \"PAPER\"\n}"
                 },
-                "description": "Requires both theory and lab course. clo_ids must include CLOs from BOTH courses. Returns download_url for the PDF."
+                "description": "assessment_type: PAPER | ASSIGNMENT | QUIZ. Teacher can only use their assigned courses. Admin can use any course."
               }
             },
             {
-              "name": "List Generated Papers",
+              "name": "Generate Assignment (Admin/Teacher)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{base_url}}/api/assessments/generated-papers/generate/",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"theory_course_id\": 1,\n  \"lab_course_id\": 2,\n  \"topic\": \"Object Oriented Programming - Classes and Objects\",\n  \"clo_ids\": [\n    1,\n    2,\n    3,\n    4\n  ],\n  \"plo_ids\": [\n    1,\n    2\n  ],\n  \"assessment_type\": \"ASSIGNMENT\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Generate Quiz (Admin/Teacher)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{base_url}}/api/assessments/generated-papers/generate/",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"theory_course_id\": 1,\n  \"lab_course_id\": 2,\n  \"topic\": \"Object Oriented Programming - Classes and Objects\",\n  \"clo_ids\": [\n    1,\n    2,\n    3,\n    4\n  ],\n  \"plo_ids\": [\n    1,\n    2\n  ],\n  \"assessment_type\": \"QUIZ\"\n}"
+                }
+              }
+            },
+            {
+              "name": "List All Generated (Admin)",
               "request": {
                 "method": "GET",
                 "header": [
@@ -1574,11 +1643,25 @@
                     "value": "Bearer {{access_token}}"
                   }
                 ],
-                "url": "{{base_url}}/api/assessments/generated-papers/"
+                "url": "{{base_url}}/api/assessments/generated-papers/",
+                "description": "Admin sees all. Teacher sees only papers for their assigned courses."
               }
             },
             {
-              "name": "List Papers by Course",
+              "name": "Filter by Type - Papers only",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": "{{base_url}}/api/assessments/generated-papers/?assessment_type=PAPER"
+              }
+            },
+            {
+              "name": "Filter by Course",
               "request": {
                 "method": "GET",
                 "header": [
@@ -1591,20 +1674,7 @@
               }
             },
             {
-              "name": "List Completed Papers",
-              "request": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "Bearer {{access_token}}"
-                  }
-                ],
-                "url": "{{base_url}}/api/assessments/generated-papers/?status=COMPLETED"
-              }
-            },
-            {
-              "name": "Get Generated Paper",
+              "name": "Get Single Assessment",
               "request": {
                 "method": "GET",
                 "header": [
@@ -1627,11 +1697,11 @@
                   }
                 ],
                 "url": "{{base_url}}/api/assessments/generated-papers/1/download/",
-                "description": "Returns the PDF as a file download (application/pdf). Works for any authenticated user."
+                "description": "Returns PDF as file download. Admin + Teacher (their courses) only."
               }
             },
             {
-              "name": "Delete Generated Paper",
+              "name": "Delete Assessment (Admin only)",
               "request": {
                 "method": "DELETE",
                 "header": [
@@ -1641,7 +1711,7 @@
                   }
                 ],
                 "url": "{{base_url}}/api/assessments/generated-papers/1/",
-                "description": "Deletes DB record AND removes the PDF file from disk."
+                "description": "Deletes DB record and removes PDF file from disk. Admin only."
               }
             }
           ]

@@ -12,6 +12,8 @@ const MasterLayout = ({ children }) => {
   let [mobileMenu, setMobileMenu] = useState(false);
   const location = useLocation(); // Hook to get the current route
   const navigate = useNavigate();
+  const userRole = localStorage.getItem("user_role");
+  const isTeacher = userRole === "TEACHER";
 
   const handleLogout = async () => {
     await authService.logout();
