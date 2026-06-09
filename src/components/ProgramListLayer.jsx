@@ -62,7 +62,7 @@ const ProgramListLayer = () => {
               Bulk Upload
             </Link>
           )}
-          {userRole !== "STUDENT" && (
+          {userRole === "ADMIN" && (
             <Link
               to="/program-add"
               className="btn btn-sm btn-primary-600 radius-8 d-inline-flex align-items-center gap-1"
@@ -84,7 +84,7 @@ const ProgramListLayer = () => {
         {programs.length === 0 ? (
           <div className="text-center py-40">
             <p className="text-secondary-light">No programs found</p>
-            {userRole !== "STUDENT" && (
+            {userRole === "ADMIN" && (
               <Link to="/program-add" className="btn btn-sm btn-primary mt-16">
                 Create First Program
               </Link>

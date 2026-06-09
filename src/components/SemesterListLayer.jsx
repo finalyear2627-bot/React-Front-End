@@ -93,7 +93,7 @@ const SemesterListLayer = () => {
       {/* Header */}
       <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
         <h5 className="card-title mb-0">Semesters</h5>
-        {userRole !== "STUDENT" && (
+        {userRole === "ADMIN" && (
           <Link
             to="/semester-add"
             className="btn btn-sm btn-primary-600 radius-8 d-inline-flex align-items-center gap-1"
@@ -189,7 +189,7 @@ const SemesterListLayer = () => {
             </p>
             {hasFilter
               ? <button className="btn btn-sm btn-outline-secondary mt-16" onClick={resetFilters}>Clear Filters</button>
-              : userRole !== "STUDENT" && <Link to="/semester-add" className="btn btn-sm btn-primary mt-16">Create First Semester</Link>
+              : userRole === "ADMIN" && <Link to="/semester-add" className="btn btn-sm btn-primary mt-16">Create First Semester</Link>
             }
           </div>
         ) : (

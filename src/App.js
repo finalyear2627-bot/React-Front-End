@@ -63,14 +63,14 @@ function App() {
 
         {/* Program Routes */}
         <Route exact path='/programs' element={<ProtectedRoute><ProgramListPage /></ProtectedRoute>} />
-        <Route exact path='/program-add' element={<ProtectedRoute allowedRoles={["ADMIN","TEACHER"]}><ProgramAddPage /></ProtectedRoute>} />
+        <Route exact path='/program-add' element={<ProtectedRoute allowedRoles={["ADMIN"]}><ProgramAddPage /></ProtectedRoute>} />
         <Route exact path='/program-edit/:id' element={<ProtectedRoute allowedRoles={["ADMIN","TEACHER"]}><ProgramEditPage /></ProtectedRoute>} />
         <Route exact path='/program-view/:id' element={<ProtectedRoute><ProgramViewPage /></ProtectedRoute>} />
         <Route exact path='/program-bulk-upload' element={<ProtectedRoute allowedRoles={["ADMIN"]}><ProgramBulkUploadPage /></ProtectedRoute>} />
 
         {/* Course Routes */}
         <Route exact path='/courses' element={<ProtectedRoute><CourseListPage /></ProtectedRoute>} />
-        <Route exact path='/course-add' element={<ProtectedRoute allowedRoles={["ADMIN","TEACHER"]}><CourseAddPage /></ProtectedRoute>} />
+        <Route exact path='/course-add' element={<ProtectedRoute allowedRoles={["ADMIN"]}><CourseAddPage /></ProtectedRoute>} />
         <Route exact path='/course-edit/:id' element={<ProtectedRoute allowedRoles={["ADMIN","TEACHER"]}><CourseEditPage /></ProtectedRoute>} />
         <Route exact path='/course-view/:id' element={<ProtectedRoute><CourseViewPage /></ProtectedRoute>} />
         <Route exact path='/course-bulk-upload' element={<ProtectedRoute allowedRoles={["ADMIN"]}><CourseBulkUploadPage /></ProtectedRoute>} />
@@ -90,7 +90,7 @@ function App() {
 
         {/* Semester Routes — admin + teacher only */}
         <Route exact path='/semesters' element={<ProtectedRoute allowedRoles={["ADMIN","TEACHER"]}><SemesterListPage /></ProtectedRoute>} />
-        <Route exact path='/semester-add' element={<ProtectedRoute allowedRoles={["ADMIN","TEACHER"]}><SemesterAddPage /></ProtectedRoute>} />
+        <Route exact path='/semester-add' element={<ProtectedRoute allowedRoles={["ADMIN"]}><SemesterAddPage /></ProtectedRoute>} />
         <Route exact path='/semester-edit/:id' element={<ProtectedRoute allowedRoles={["ADMIN","TEACHER"]}><SemesterEditPage /></ProtectedRoute>} />
         <Route exact path='/semester-view/:id' element={<ProtectedRoute allowedRoles={["ADMIN","TEACHER"]}><SemesterViewPage /></ProtectedRoute>} />
 

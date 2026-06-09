@@ -106,7 +106,7 @@ const CourseListLayer = () => {
               Bulk Upload
             </Link>
           )}
-          {userRole !== "STUDENT" && (
+          {userRole === "ADMIN" && (
             <Link to="/course-add" className="btn btn-sm btn-primary-600 radius-8 d-inline-flex align-items-center gap-1">
               <Icon icon="ic:round-plus" className="text-xl" />
               Add Course
@@ -233,7 +233,7 @@ const CourseListLayer = () => {
             </p>
             {hasFilter
               ? <button className="btn btn-sm btn-outline-secondary mt-16" onClick={resetFilters}>Clear Filters</button>
-              : userRole !== "STUDENT" && <Link to="/course-add" className="btn btn-sm btn-primary mt-16">Create First Course</Link>
+              : userRole === "ADMIN" && <Link to="/course-add" className="btn btn-sm btn-primary mt-16">Create First Course</Link>
             }
           </div>
         ) : (

@@ -164,7 +164,7 @@ const MasterLayout = ({ children }) => {
                       <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> List Programs
                     </NavLink>
                   </li>
-                  {canCreate("PROGRAMS") && (
+                  {userRole === "ADMIN" && (
                     <li>
                       <NavLink to='/program-add' className={(n) => n.isActive ? "active-page" : ""}>
                         <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Add Program
@@ -188,7 +188,7 @@ const MasterLayout = ({ children }) => {
                       <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> List Semesters
                     </NavLink>
                   </li>
-                  {canCreate("SEMESTERS") && (
+                  {userRole === "ADMIN" && (
                     <li>
                       <NavLink to='/semester-add' className={(n) => n.isActive ? "active-page" : ""}>
                         <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Add Semester
@@ -212,7 +212,7 @@ const MasterLayout = ({ children }) => {
                       <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> List Courses
                     </NavLink>
                   </li>
-                  {canCreate("COURSES") && (
+                  {userRole === "ADMIN" && (
                     <li>
                       <NavLink to='/course-add' className={(n) => n.isActive ? "active-page" : ""}>
                         <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Add Course
