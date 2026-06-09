@@ -671,7 +671,8 @@
                 "value": "Bearer {{access_token}}"
               }
             ],
-            "url": "{{base_url}}/api/academics/course-assignments/"
+            "url": "{{base_url}}/api/academics/course-assignments/",
+            "description": "Returns all course assignments. Response now includes program_id, program_code, program_name, semester_id, semester_name for each assignment."
           }
         },
         {
@@ -1387,8 +1388,36 @@
               }
             ],
             "url": "{{base_url}}/api/academics/plos/bulk-import/",
-            "description": "Multipart form: file (CSV/XLSX). Columns: program_code, plo_number, description"
+            "description": "Multipart form: file (CSV/XLSX). Columns: program_id (integer), plo_number, description"
           }
+        },
+        {
+          "name": "Clear All PLOs (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/academics/plos/clear-all/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "academics",
+                "plos",
+                "clear-all",
+                ""
+              ]
+            },
+            "description": "Permanently deletes ALL PLOs from the database. Use before re-importing."
+          },
+          "response": []
         }
       ]
     },
@@ -1560,6 +1589,34 @@
             "url": "{{base_url}}/api/academics/clos/bulk-import/",
             "description": "Multipart form: file (CSV/XLSX). Columns: course_code, clo_number, description, mapped_plos (e.g. \"1,2,3\" or \"PLO-1,PLO-2\"). Skips inactive course rows."
           }
+        },
+        {
+          "name": "Clear All CLOs (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/academics/clos/clear-all/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "academics",
+                "clos",
+                "clear-all",
+                ""
+              ]
+            },
+            "description": "Permanently deletes ALL CLOs (and their PLO mappings) from the database. Use before re-importing."
+          },
+          "response": []
         }
       ]
     },
@@ -1715,6 +1772,314 @@
               }
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "GENERATED QUIZZES",
+      "item": [
+        {
+          "name": "Generate Quiz (Teacher Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course_id\": 1,\n  \"topic\": \"Pointers and Memory Management\",\n  \"clo_ids\": [\n    1,\n    2\n  ],\n  \"plo_ids\": [\n    1\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/assessments/generated-quizzes/generate/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "assessments",
+                "generated-quizzes",
+                "generate",
+                ""
+              ]
+            },
+            "description": "Generate a quiz PDF for a single assigned course. Teacher only."
+          },
+          "response": []
+        },
+        {
+          "name": "List Generated Quizzes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/assessments/generated-quizzes/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "assessments",
+                "generated-quizzes",
+                ""
+              ]
+            },
+            "description": "Admin sees all quizzes. Teacher sees only quizzes for their assigned courses."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Quiz by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/assessments/generated-quizzes/{{quiz_id}}/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "assessments",
+                "generated-quizzes",
+                "{{quiz_id}}",
+                ""
+              ]
+            },
+            "description": "Retrieve a single generated quiz."
+          },
+          "response": []
+        },
+        {
+          "name": "Download Quiz PDF",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/assessments/generated-quizzes/{{quiz_id}}/download/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "assessments",
+                "generated-quizzes",
+                "{{quiz_id}}",
+                "download",
+                ""
+              ]
+            },
+            "description": "Download the generated quiz PDF."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Quiz (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/assessments/generated-quizzes/{{quiz_id}}/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "assessments",
+                "generated-quizzes",
+                "{{quiz_id}}",
+                ""
+              ]
+            },
+            "description": "Delete a generated quiz. Admin only."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "GENERATED ASSIGNMENTS",
+      "item": [
+        {
+          "name": "Generate Assignment (Teacher Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course_id\": 1,\n  \"topic\": \"Linked Lists and Dynamic Memory\",\n  \"clo_ids\": [\n    1,\n    2\n  ],\n  \"plo_ids\": [\n    1\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/assessments/generated-assignments/generate/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "assessments",
+                "generated-assignments",
+                "generate",
+                ""
+              ]
+            },
+            "description": "Generate an assignment PDF for a single assigned course. Teacher only."
+          },
+          "response": []
+        },
+        {
+          "name": "List Generated Assignments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/assessments/generated-assignments/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "assessments",
+                "generated-assignments",
+                ""
+              ]
+            },
+            "description": "Admin sees all assignments. Teacher sees only assignments for their assigned courses."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Assignment by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/assessments/generated-assignments/{{assignment_id}}/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "assessments",
+                "generated-assignments",
+                "{{assignment_id}}",
+                ""
+              ]
+            },
+            "description": "Retrieve a single generated assignment."
+          },
+          "response": []
+        },
+        {
+          "name": "Download Assignment PDF",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/assessments/generated-assignments/{{assignment_id}}/download/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "assessments",
+                "generated-assignments",
+                "{{assignment_id}}",
+                "download",
+                ""
+              ]
+            },
+            "description": "Download the generated assignment PDF."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Assignment (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/assessments/generated-assignments/{{assignment_id}}/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "assessments",
+                "generated-assignments",
+                "{{assignment_id}}",
+                ""
+              ]
+            },
+            "description": "Delete a generated assignment. Admin only."
+          },
+          "response": []
         }
       ]
     }

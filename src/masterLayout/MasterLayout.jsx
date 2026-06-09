@@ -4,21 +4,47 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import ThemeToggleButton from "../helper/ThemeToggleButton";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../api/auth.service";
-import { canView, canCreate } from "../utils/permissions";
+import { canView, canCreate, savePermissions } from "../utils/permissions";
+import axiosInstance from "../api/axiosInstance";
 
+// Refreshed once per full page load (module-level flag resets on F5 / hard reload)
+let _permRefreshedThisLoad = false;
 
 const MasterLayout = ({ children }) => {
   let [sidebarActive, seSidebarActive] = useState(false);
   let [mobileMenu, setMobileMenu] = useState(false);
-  const location = useLocation(); // Hook to get the current route
+  // bump this to force sidebar to re-read localStorage after permissions refresh
+  const [, setPermTick] = useState(0);
+  const location = useLocation();
   const navigate = useNavigate();
   const userRole = localStorage.getItem("user_role");
-  const isTeacher = userRole === "TEACHER";
 
   const handleLogout = async () => {
+    _permRefreshedThisLoad = false; // reset so next login fetches fresh permissions
     await authService.logout();
     navigate("/sign-in");
   };
+
+  // Refresh permissions from backend once per page load for non-admin users.
+  // This ensures sidebar reflects permission changes made by admin without requiring re-login.
+  useEffect(() => {
+    const role = localStorage.getItem("user_role");
+    if (!_permRefreshedThisLoad && role && role !== "ADMIN") {
+      _permRefreshedThisLoad = true;
+      axiosInstance
+        .get("/accounts/role-permissions/by-role/", { params: { role } })
+        .then((res) => {
+          const perms = res.data?.result || res.data?.results || [];
+          savePermissions(Array.isArray(perms) ? perms : []);
+          setPermTick((t) => t + 1); // trigger sidebar re-render with fresh permissions
+        })
+        .catch(() => {
+          _permRefreshedThisLoad = false; // allow retry on next mount if request failed
+        });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     const handleDropdownClick = (event) => {
       event.preventDefault();
@@ -280,7 +306,7 @@ const MasterLayout = ({ children }) => {
               </li>
             )}
 
-            {/* Assessments — all roles; Generate Paper: teacher only */}
+            {/* Assessments — all authenticated roles */}
             <li className='dropdown'>
               <Link to='#'>
                 <Icon icon='solar:document-add-outline' className='menu-icon' />
@@ -296,6 +322,30 @@ const MasterLayout = ({ children }) => {
                   <li>
                     <NavLink to='/generate-paper' className={(n) => n.isActive ? "active-page" : ""}>
                       <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Generate Paper
+                    </NavLink>
+                  </li>
+                )}
+                <li>
+                  <NavLink to='/generated-quizzes' className={(n) => n.isActive ? "active-page" : ""}>
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Quizzes
+                  </NavLink>
+                </li>
+                {userRole === "TEACHER" && (
+                  <li>
+                    <NavLink to='/generate-quiz' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Generate Quiz
+                    </NavLink>
+                  </li>
+                )}
+                <li>
+                  <NavLink to='/generated-assignments' className={(n) => n.isActive ? "active-page" : ""}>
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Assignments
+                  </NavLink>
+                </li>
+                {userRole === "TEACHER" && (
+                  <li>
+                    <NavLink to='/generate-assignment' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Generate Assignment
                     </NavLink>
                   </li>
                 )}

@@ -85,27 +85,35 @@ const MyCourseListLayer = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {paginated.map((a, idx) => (
+                  {paginated.map((a, idx) => {
+                    const c = a.course || {};
+                    // Use new direct fields from updated API; fall back to nested course object
+                    const semVal    = a.semester_name    || c.semester_name    || "—";
+                    const progName  = a.program_name     || c.program_name     || a.program_code || c.program_code || "—";
+                    const theoryHrs = c.credit_hours_theory ?? a.credit_hours_theory ?? "—";
+                    const labHrs    = c.credit_hours_lab    ?? a.credit_hours_lab    ?? "—";
+                    return (
                     <tr key={a.id || idx}>
                       <td>{(page - 1) * pageSize + idx + 1}</td>
-                      <td className="fw-medium">{a.course_code || a.course?.code || "N/A"}</td>
-                      <td>{a.course_name || a.course?.name || "N/A"}</td>
+                      <td className="fw-medium">{a.course_code || c.code || "—"}</td>
+                      <td>{a.course_name || c.name || "—"}</td>
                       <td>
-                        <span className={`badge radius-4 ${TYPE_BADGE[a.course_type || a.course?.course_type] || "bg-neutral-200 text-neutral-600"}`}>
-                          {a.course_type || a.course?.course_type || "N/A"}
+                        <span className={`badge radius-4 ${TYPE_BADGE[a.course_type || c.course_type] || "bg-neutral-200 text-neutral-600"}`}>
+                          {a.course_type || c.course_type || "—"}
                         </span>
                       </td>
-                      <td>{a.semester || a.course?.semester || "N/A"}</td>
-                      <td>{a.credit_hours_theory ?? a.course?.credit_hours_theory ?? "N/A"}</td>
-                      <td>{a.credit_hours_lab    ?? a.course?.credit_hours_lab    ?? "N/A"}</td>
-                      <td>{a.program_name || a.course?.program_name || a.course?.program || "N/A"}</td>
+                      <td>{semVal}</td>
+                      <td>{theoryHrs}</td>
+                      <td>{labHrs}</td>
+                      <td>{progName}</td>
                       <td>
                         <span className={`badge radius-4 ${a.is_active ? "bg-success-focus text-success-main" : "bg-danger-focus text-danger-main"}`}>
                           {a.is_active ? "Active" : "Inactive"}
                         </span>
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

@@ -30,4 +30,7 @@ export const ploService = {
       })
       .then((r) => r.data);
   },
+
+  clearAll: () =>
+    axiosInstance.delete(`${BASE}/clear-all/`).then((r) => r.data),
 };

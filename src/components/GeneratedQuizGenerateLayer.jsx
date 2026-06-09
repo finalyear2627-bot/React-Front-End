@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { generatedPaperService } from "../api/generatedPaper.service";
+import { generatedQuizService } from "../api/generatedQuiz.service";
 import { courseService } from "../api/course.service";
 import { courseAssignmentService } from "../api/courseAssignment.service";
 import { cloService } from "../api/clo.service";
@@ -37,138 +37,96 @@ const CheckGroup = ({ title, items, selected, onToggle, color = "primary", empty
   </div>
 );
 
-const GeneratedPaperGenerateLayer = () => {
+const GeneratedQuizGenerateLayer = () => {
   const navigate = useNavigate();
 
-  const [topic,           setTopic]           = useState("");
-  const [theoryCourseId,  setTheoryCourseId]  = useState("");
-  const [labCourseId,     setLabCourseId]     = useState("");
-  const [selectedCloIds,  setSelectedCloIds]  = useState([]);
-  const [selectedPloIds,  setSelectedPloIds]  = useState([]);
+  const [topic,          setTopic]          = useState("");
+  const [courseId,       setCourseId]       = useState("");
+  const [selectedCloIds, setSelectedCloIds] = useState([]);
+  const [selectedPloIds, setSelectedPloIds] = useState([]);
 
-  const [theoryCourses, setTheoryCourses] = useState([]);
-  const [labCourses,    setLabCourses]    = useState([]);
-  const [theoryClos,    setTheoryClos]    = useState([]);
-  const [labClos,       setLabClos]       = useState([]);
+  const [courses,       setCourses]       = useState([]);
+  const [clos,          setClos]          = useState([]);
   const [plos,          setPlos]          = useState([]);
 
   const [loadingCourses, setLoadingCourses] = useState(true);
-  const [loadingTClos,   setLoadingTClos]   = useState(false);
-  const [loadingLClos,   setLoadingLClos]   = useState(false);
+  const [loadingClos,    setLoadingClos]    = useState(false);
   const [loadingPlos,    setLoadingPlos]    = useState(true);
   const [submitting,     setSubmitting]     = useState(false);
 
-  // Normalize a course assignment into a plain course shape { id, code, name }
   const normAssignment = (a) => ({
     id:   a.course_id  || a.course?.id,
     code: a.course_code || a.course?.code || "",
     name: a.course_name || a.course?.name || "",
-    course_type: a.course_type || a.course?.course_type,
-    is_active: a.is_active,
   });
 
-  // Load courses + PLOs on mount — teachers use their assigned courses to avoid 403
+  // Load courses + PLOs on mount — teachers use assigned courses to avoid 403
   useEffect(() => {
     const role = localStorage.getItem("user_role");
-
     if (role === "TEACHER") {
-      Promise.all([
-        courseAssignmentService.getMyCourses({ course_type: "THEORY" }),
-        courseAssignmentService.getMyCourses({ course_type: "LAB" }),
-      ])
-        .then(([td, ld]) => {
-          const toList = (d) => (Array.isArray(d) ? d : d.result || d.results || []);
-          setTheoryCourses(toList(td).filter((a) => a.is_active !== false).map(normAssignment));
-          setLabCourses(toList(ld).filter((a) => a.is_active !== false).map(normAssignment));
+      courseAssignmentService.getMyCourses()
+        .then((d) => {
+          const list = Array.isArray(d) ? d : d.result || d.results || [];
+          setCourses(list.filter((a) => a.is_active !== false).map(normAssignment));
         })
         .catch(() => showError("Failed to load courses"))
         .finally(() => setLoadingCourses(false));
     } else {
-      courseService
-        .getAllCourses()
+      courseService.getAllCourses()
         .then((d) => {
           const all = Array.isArray(d) ? d : d.result || d.results || [];
-          const active = all.filter((c) => c.is_active);
-          setTheoryCourses(active.filter((c) => c.course_type === "THEORY"));
-          setLabCourses(active.filter((c) => c.course_type === "LAB"));
+          setCourses(all.filter((c) => c.is_active));
         })
         .catch(() => showError("Failed to load courses"))
         .finally(() => setLoadingCourses(false));
     }
 
-    ploService
-      .getAll()
+    ploService.getAll()
       .then((d) => setPlos(Array.isArray(d) ? d : d.result || d.results || []))
       .catch(() => showError("Failed to load PLOs"))
       .finally(() => setLoadingPlos(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Fetch CLOs when theory course changes
+  // Fetch CLOs when course changes
   useEffect(() => {
-    if (!theoryCourseId) { setTheoryClos([]); return; }
-    setLoadingTClos(true);
-    setSelectedCloIds((prev) => prev.filter((id) => labClos.some((c) => c.id === id)));
-    cloService
-      .getAll({ course: theoryCourseId })
-      .then((d) => setTheoryClos(Array.isArray(d) ? d : d.result || d.results || []))
-      .catch(() => showError("Failed to load theory CLOs"))
-      .finally(() => setLoadingTClos(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [theoryCourseId]);
-
-  // Fetch CLOs when lab course changes
-  useEffect(() => {
-    if (!labCourseId) { setLabClos([]); return; }
-    setLoadingLClos(true);
-    setSelectedCloIds((prev) => prev.filter((id) => theoryClos.some((c) => c.id === id)));
-    cloService
-      .getAll({ course: labCourseId })
-      .then((d) => setLabClos(Array.isArray(d) ? d : d.result || d.results || []))
-      .catch(() => showError("Failed to load lab CLOs"))
-      .finally(() => setLoadingLClos(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [labCourseId]);
+    if (!courseId) { setClos([]); return; }
+    setLoadingClos(true);
+    setSelectedCloIds([]);
+    cloService.getAll({ course: courseId })
+      .then((d) => setClos(Array.isArray(d) ? d : d.result || d.results || []))
+      .catch(() => showError("Failed to load CLOs"))
+      .finally(() => setLoadingClos(false));
+  }, [courseId]);
 
   const toggleClo = (id) =>
-    setSelectedCloIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
+    setSelectedCloIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
 
   const togglePlo = (id) =>
-    setSelectedPloIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-
-  const theorySelected = selectedCloIds.filter((id) => theoryClos.some((c) => c.id === id));
-  const labSelected    = selectedCloIds.filter((id) => labClos.some((c) => c.id === id));
+    setSelectedPloIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!theoryCourseId) { showError("Please select a theory course"); return; }
-    if (!labCourseId)    { showError("Please select a lab course"); return; }
-    if (theorySelected.length === 0) { showError("Select at least one CLO from the theory course"); return; }
-    if (labSelected.length === 0)    { showError("Select at least one CLO from the lab course"); return; }
+    if (!courseId)                   { showError("Please select a course"); return; }
+    if (selectedCloIds.length === 0) { showError("Select at least one CLO"); return; }
     if (selectedPloIds.length === 0) { showError("Select at least one PLO"); return; }
     if (!topic.trim())               { showError("Please enter a topic"); return; }
 
     setSubmitting(true);
     try {
       const payload = {
-        theory_course_id: parseInt(theoryCourseId, 10),
-        lab_course_id:    parseInt(labCourseId, 10),
-        topic:            topic.trim(),
-        clo_ids:          selectedCloIds,
-        plo_ids:          selectedPloIds,
+        course_id: parseInt(courseId, 10),
+        topic:     topic.trim(),
+        clo_ids:   selectedCloIds,
+        plo_ids:   selectedPloIds,
       };
-      const res = await generatedPaperService.generate(payload);
+      const res = await generatedQuizService.generate(payload);
       if (res?.status?.code !== 0) {
         showError(res?.status?.message || "Generation failed");
         return;
       }
-      showSuccess(res?.status?.message || "Paper generation started successfully");
-      navigate("/generated-papers");
+      showSuccess(res?.status?.message || "Quiz generation started successfully");
+      navigate("/generated-quizzes");
     } catch (err) {
       showError(getApiError(err));
     } finally {
@@ -188,106 +146,60 @@ const GeneratedPaperGenerateLayer = () => {
               {/* Topic */}
               <div className="mb-20">
                 <label className="form-label fw-semibold text-primary-light text-sm mb-8">
-                  Topic / Paper Title <span className="text-danger-600">*</span>
+                  Topic / Quiz Title <span className="text-danger-600">*</span>
                 </label>
                 <input
                   type="text"
                   className="form-control radius-8"
-                  placeholder="e.g., Object Oriented Programming - Classes and Objects"
+                  placeholder="e.g., Arrays and Pointers"
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
                   required
                 />
               </div>
 
-              {/* Theory Course */}
+              {/* Course */}
               <div className="mb-20">
                 <label className="form-label fw-semibold text-primary-light text-sm mb-8">
-                  Theory Course <span className="text-danger-600">*</span>
+                  Course <span className="text-danger-600">*</span>
                 </label>
                 {loadingCourses ? (
                   <div className="placeholder-glow"><span className="placeholder col-12 radius-8" style={{ height: 38 }} /></div>
                 ) : (
                   <select
                     className="form-control radius-8"
-                    value={theoryCourseId}
-                    onChange={(e) => { setTheoryCourseId(e.target.value); setSelectedCloIds([]); }}
+                    value={courseId}
+                    onChange={(e) => setCourseId(e.target.value)}
                     required
                   >
-                    <option value="">-- Select Theory Course --</option>
-                    {theoryCourses.map((c) => (
+                    <option value="">-- Select Course --</option>
+                    {courses.map((c) => (
                       <option key={c.id} value={c.id}>{c.code} — {c.name}</option>
                     ))}
                   </select>
                 )}
               </div>
 
-              {/* Theory CLOs */}
+              {/* CLOs */}
               <div className="mb-20">
                 <label className="form-label fw-semibold text-primary-light text-sm mb-8">
-                  Theory CLOs
-                  {theoryCourseId && (
+                  CLOs
+                  {courseId && (
                     <span className="ms-8 badge bg-info-focus text-info-main radius-4">
-                      {theorySelected.length} selected
+                      {selectedCloIds.length} selected
                     </span>
                   )}
                 </label>
-                {loadingTClos ? (
+                {loadingClos ? (
                   <div className="text-center py-20"><span className="spinner-border spinner-border-sm" /></div>
                 ) : (
                   <CheckGroup
-                    title="theory"
-                    items={theoryClos}
+                    title="clo"
+                    items={clos}
                     selected={selectedCloIds}
                     onToggle={toggleClo}
                     color="info"
-                    emptyMsg={theoryCourseId ? "No CLOs found for this course" : "Select a theory course first"}
-                  />
-                )}
-              </div>
-
-              {/* Lab Course */}
-              <div className="mb-20">
-                <label className="form-label fw-semibold text-primary-light text-sm mb-8">
-                  Lab Course <span className="text-danger-600">*</span>
-                </label>
-                {loadingCourses ? (
-                  <div className="placeholder-glow"><span className="placeholder col-12 radius-8" style={{ height: 38 }} /></div>
-                ) : (
-                  <select
-                    className="form-control radius-8"
-                    value={labCourseId}
-                    onChange={(e) => { setLabCourseId(e.target.value); setSelectedCloIds((prev) => prev.filter((id) => theoryClos.some((c) => c.id === id))); }}
-                    required
-                  >
-                    <option value="">-- Select Lab Course --</option>
-                    {labCourses.map((c) => (
-                      <option key={c.id} value={c.id}>{c.code} — {c.name}</option>
-                    ))}
-                  </select>
-                )}
-              </div>
-
-              {/* Lab CLOs */}
-              <div className="mb-20">
-                <label className="form-label fw-semibold text-primary-light text-sm mb-8">
-                  Lab CLOs
-                  {labCourseId && (
-                    <span className="ms-8 badge bg-warning-focus text-warning-main radius-4">
-                      {labSelected.length} selected
-                    </span>
-                  )}
-                </label>
-                {loadingLClos ? (
-                  <div className="text-center py-20"><span className="spinner-border spinner-border-sm" /></div>
-                ) : (
-                  <CheckGroup
-                    title="lab"
-                    items={labClos}
-                    selected={selectedCloIds}
-                    onToggle={toggleClo}
-                    color="warning"
-                    emptyMsg={labCourseId ? "No CLOs found for this course" : "Select a lab course first"}
+                    emptyMsg={courseId ? "No CLOs found for this course" : "Select a course first"}
                   />
                 )}
               </div>
@@ -312,7 +224,7 @@ const GeneratedPaperGenerateLayer = () => {
                   No PLOs found. Please add PLOs first.
                 </div>
               ) : (
-                <div className="border radius-8 p-12" style={{ maxHeight: 480, overflowY: "auto" }}>
+                <div className="border radius-8 p-12" style={{ maxHeight: 320, overflowY: "auto" }}>
                   {plos.map((plo) => {
                     const checked = selectedPloIds.includes(plo.id);
                     return (
@@ -339,20 +251,14 @@ const GeneratedPaperGenerateLayer = () => {
                 </div>
               )}
 
-              {/* Summary card */}
+              {/* Summary */}
               <div className="card border mt-20 mb-0">
                 <div className="card-body p-16">
                   <h6 className="fw-semibold mb-12 text-primary-light">Selection Summary</h6>
                   <div className="d-flex justify-content-between mb-8">
-                    <span className="text-sm text-secondary-light">Theory CLOs selected</span>
-                    <span className={`badge radius-4 ${theorySelected.length > 0 ? "bg-success-focus text-success-main" : "bg-danger-focus text-danger-main"}`}>
-                      {theorySelected.length} / {theoryClos.length}
-                    </span>
-                  </div>
-                  <div className="d-flex justify-content-between mb-8">
-                    <span className="text-sm text-secondary-light">Lab CLOs selected</span>
-                    <span className={`badge radius-4 ${labSelected.length > 0 ? "bg-success-focus text-success-main" : "bg-danger-focus text-danger-main"}`}>
-                      {labSelected.length} / {labClos.length}
+                    <span className="text-sm text-secondary-light">CLOs selected</span>
+                    <span className={`badge radius-4 ${selectedCloIds.length > 0 ? "bg-success-focus text-success-main" : "bg-danger-focus text-danger-main"}`}>
+                      {selectedCloIds.length} / {clos.length}
                     </span>
                   </div>
                   <div className="d-flex justify-content-between">
@@ -375,11 +281,11 @@ const GeneratedPaperGenerateLayer = () => {
             >
               {submitting
                 ? <><span className="spinner-border spinner-border-sm me-6" /> Generating…</>
-                : <><Icon icon="solar:magic-stick-3-outline" className="text-lg" /> Generate Paper</>}
+                : <><Icon icon="solar:magic-stick-3-outline" className="text-lg" /> Generate Quiz</>}
             </button>
             <button
               type="button"
-              onClick={() => navigate("/generated-papers")}
+              onClick={() => navigate("/generated-quizzes")}
               className="btn btn-outline-secondary radius-8 py-10 px-32"
             >
               Cancel
@@ -391,4 +297,4 @@ const GeneratedPaperGenerateLayer = () => {
   );
 };
 
-export default GeneratedPaperGenerateLayer;
+export default GeneratedQuizGenerateLayer;

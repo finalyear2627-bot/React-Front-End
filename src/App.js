@@ -51,6 +51,10 @@ import CLOPLOGeneratorPage from "./pages/CLOPLOGeneratorPage";
 
 import GeneratedPaperListPage from "./pages/GeneratedPaperListPage";
 import GeneratedPaperGeneratePage from "./pages/GeneratedPaperGeneratePage";
+import GeneratedQuizListPage from "./pages/GeneratedQuizListPage";
+import GeneratedQuizGeneratePage from "./pages/GeneratedQuizGeneratePage";
+import GeneratedAssignmentListPage from "./pages/GeneratedAssignmentListPage";
+import GeneratedAssignmentGeneratePage from "./pages/GeneratedAssignmentGeneratePage";
 
 function App() {
   return (
@@ -108,9 +112,13 @@ function App() {
         <Route exact path='/clo-plo-statement/:courseId' element={<ProtectedRoute allowedRoles={["ADMIN"]}><CLOPLOStatementPage /></ProtectedRoute>} />
         <Route exact path='/clo-plo-generator' element={<ProtectedRoute allowedRoles={["ADMIN"]}><CLOPLOGeneratorPage /></ProtectedRoute>} />
 
-        {/* Assessment Routes — generated-papers: all auth; generate-paper: teacher only */}
-        <Route exact path='/generated-papers' element={<ProtectedRoute><GeneratedPaperListPage /></ProtectedRoute>} />
-        <Route exact path='/generate-paper'   element={<ProtectedRoute allowedRoles={["TEACHER"]}><GeneratedPaperGeneratePage /></ProtectedRoute>} />
+        {/* Assessment Routes — list pages: all auth; generate pages: teacher only */}
+        <Route exact path='/generated-papers'      element={<ProtectedRoute><GeneratedPaperListPage /></ProtectedRoute>} />
+        <Route exact path='/generate-paper'        element={<ProtectedRoute allowedRoles={["TEACHER"]}><GeneratedPaperGeneratePage /></ProtectedRoute>} />
+        <Route exact path='/generated-quizzes'     element={<ProtectedRoute><GeneratedQuizListPage /></ProtectedRoute>} />
+        <Route exact path='/generate-quiz'         element={<ProtectedRoute allowedRoles={["TEACHER"]}><GeneratedQuizGeneratePage /></ProtectedRoute>} />
+        <Route exact path='/generated-assignments' element={<ProtectedRoute><GeneratedAssignmentListPage /></ProtectedRoute>} />
+        <Route exact path='/generate-assignment'   element={<ProtectedRoute allowedRoles={["TEACHER"]}><GeneratedAssignmentGeneratePage /></ProtectedRoute>} />
 
         {/* Profile Routes */}
         <Route exact path='/view-profile' element={<ProtectedRoute><ViewProfilePage /></ProtectedRoute>} />

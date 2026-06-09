@@ -230,31 +230,35 @@ const SemesterListLayer = () => {
                         >
                           <Icon icon="iconamoon:eye-light" />
                         </Link>
-                        <Link
-                          to={`/semester-edit/${sem.id}`}
-                          className="w-32-px h-32-px me-8 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center"
-                          title="Edit"
-                        >
-                          <Icon icon="lucide:edit" />
-                        </Link>
-                        <button
-                          onClick={() => handleToggle(sem)}
-                          disabled={togglingId === sem.id}
-                          className={`w-32-px h-32-px me-8 rounded-circle d-inline-flex align-items-center justify-content-center border-0 ${sem.is_active ? "bg-warning-focus text-warning-main" : "bg-success-focus text-success-main"}`}
-                          title={sem.is_active ? "Deactivate" : "Activate"}
-                        >
-                          {togglingId === sem.id
-                            ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
-                            : <Icon icon={sem.is_active ? "mingcute:pause-circle-line" : "mingcute:play-circle-line"} />
-                          }
-                        </button>
-                        <button
-                          onClick={() => handleDelete(sem.id)}
-                          className="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
-                          title="Delete"
-                        >
-                          <Icon icon="mingcute:delete-2-line" />
-                        </button>
+                        {userRole === "ADMIN" && (
+                          <>
+                            <Link
+                              to={`/semester-edit/${sem.id}`}
+                              className="w-32-px h-32-px me-8 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center"
+                              title="Edit"
+                            >
+                              <Icon icon="lucide:edit" />
+                            </Link>
+                            <button
+                              onClick={() => handleToggle(sem)}
+                              disabled={togglingId === sem.id}
+                              className={`w-32-px h-32-px me-8 rounded-circle d-inline-flex align-items-center justify-content-center border-0 ${sem.is_active ? "bg-warning-focus text-warning-main" : "bg-success-focus text-success-main"}`}
+                              title={sem.is_active ? "Deactivate" : "Activate"}
+                            >
+                              {togglingId === sem.id
+                                ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
+                                : <Icon icon={sem.is_active ? "mingcute:pause-circle-line" : "mingcute:play-circle-line"} />
+                              }
+                            </button>
+                            <button
+                              onClick={() => handleDelete(sem.id)}
+                              className="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
+                              title="Delete"
+                            >
+                              <Icon icon="mingcute:delete-2-line" />
+                            </button>
+                          </>
+                        )}
                       </td>
                     </tr>
                   ))}

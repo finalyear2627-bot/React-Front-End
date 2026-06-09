@@ -10,6 +10,7 @@ const PLOListLayer = () => {
   const [plos,          setPlos]         = useState([]);
   const [programs,      setPrograms]     = useState([]);
   const [loading,       setLoading]      = useState(true);
+  const [clearingAll,   setClearingAll]  = useState(false);
   const [filterProgram, setFilterProgram] = useState("");
   const [search,        setSearch]       = useState("");
   const [page,          setPage]         = useState(1);
@@ -49,6 +50,22 @@ const PLOListLayer = () => {
     }
   };
 
+  const handleClearAll = async () => {
+    if (!window.confirm(
+      "DELETE ALL PLOs?\n\nThis will permanently delete every PLO record and clear all CLO-PLO mappings from the junction table.\n\nThis action cannot be undone. Continue?"
+    )) return;
+    setClearingAll(true);
+    try {
+      const res = await ploService.clearAll();
+      showSuccess(res?.status?.message || "All PLOs deleted successfully");
+      setPlos([]);
+    } catch (err) {
+      showError(getApiError(err));
+    } finally {
+      setClearingAll(false);
+    }
+  };
+
   const filtered = plos.filter((p) => {
     if (!search) return true;
     const q = search.toLowerCase();
@@ -67,6 +84,16 @@ const PLOListLayer = () => {
       <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
         <h5 className="card-title mb-0">Program Learning Outcomes (PLOs)</h5>
         <div className="d-flex gap-2 flex-wrap">
+          <button
+            className="btn btn-sm btn-danger radius-8 d-inline-flex align-items-center gap-1"
+            onClick={handleClearAll}
+            disabled={clearingAll}
+            title="Delete all PLOs and clear all CLO-PLO mappings"
+          >
+            {clearingAll
+              ? <><span className="spinner-border spinner-border-sm me-4" /> Deleting…</>
+              : <><Icon icon="mingcute:delete-2-line" className="text-lg" /> Delete All PLOs</>}
+          </button>
           <Link to="/plo-bulk-upload" className="btn btn-sm btn-outline-primary radius-8 d-inline-flex align-items-center gap-1">
             <Icon icon="vscode-icons:file-type-excel" className="text-lg" /> Bulk Upload
           </Link>

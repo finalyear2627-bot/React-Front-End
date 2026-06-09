@@ -4,13 +4,16 @@ import { Link } from "react-router-dom";
 import { courseService } from "../api/course.service";
 import { showSuccess, showError, getApiError } from "../utils/toast";
 import TablePagination from "./TablePagination";
+import { canView } from "../utils/permissions";
 
 const CourseListLayer = () => {
   const userRole = localStorage.getItem("user_role");
+
   const [courses,    setCourses]    = useState([]);
   const [loading,    setLoading]    = useState(true);
   const [togglingId, setTogglingId] = useState(null);
   const [error,      setError]      = useState("");
+  const [permDenied, setPermDenied] = useState(false);
 
   // filters
   const [search,      setSearch]      = useState("");
@@ -30,8 +33,12 @@ const CourseListLayer = () => {
       setCourses(Array.isArray(data) ? data : data.result || data.results || []);
       setError("");
     } catch (err) {
-      showError(getApiError(err));
-      setError("Failed to load courses");
+      if (err?.response?.status === 403) {
+        setPermDenied(true);
+      } else {
+        showError(getApiError(err));
+        setError("Failed to load courses");
+      }
     } finally {
       setLoading(false);
     }
@@ -91,6 +98,17 @@ const CourseListLayer = () => {
   });
 
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
+
+  if (permDenied || !canView("COURSES")) {
+    return (
+      <div className="card">
+        <div className="card-body text-center py-40">
+          <Icon icon="solar:lock-outline" style={{ fontSize: 48 }} className="text-secondary-light mb-16" />
+          <p className="text-secondary-light mb-0">You don't have permission to view courses.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) return <div className="card"><div className="card-body">Loading...</div></div>;
 

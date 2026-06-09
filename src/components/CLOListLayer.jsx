@@ -10,6 +10,7 @@ const CLOListLayer = () => {
   const [clos,         setClos]         = useState([]);
   const [courses,      setCourses]      = useState([]);
   const [loading,      setLoading]      = useState(true);
+  const [clearingAll,  setClearingAll]  = useState(false);
   const [filterCourse, setFilterCourse] = useState("");
   const [search,       setSearch]       = useState("");
   const [page,         setPage]         = useState(1);
@@ -49,6 +50,22 @@ const CLOListLayer = () => {
     }
   };
 
+  const handleClearAll = async () => {
+    if (!window.confirm(
+      "DELETE ALL CLOs?\n\nThis will permanently delete every CLO record including all their PLO mapping entries from the junction table.\n\nThis action cannot be undone. Continue?"
+    )) return;
+    setClearingAll(true);
+    try {
+      const res = await cloService.clearAll();
+      showSuccess(res?.status?.message || "All CLOs deleted successfully");
+      setClos([]);
+    } catch (err) {
+      showError(getApiError(err));
+    } finally {
+      setClearingAll(false);
+    }
+  };
+
   const filtered = clos.filter((c) => {
     if (!search) return true;
     const q = search.toLowerCase();
@@ -62,6 +79,16 @@ const CLOListLayer = () => {
       <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
         <h5 className="card-title mb-0">Course Learning Outcomes (CLOs)</h5>
         <div className="d-flex gap-2 flex-wrap">
+          <button
+            className="btn btn-sm btn-danger radius-8 d-inline-flex align-items-center gap-1"
+            onClick={handleClearAll}
+            disabled={clearingAll}
+            title="Delete all CLOs and their PLO mappings"
+          >
+            {clearingAll
+              ? <><span className="spinner-border spinner-border-sm me-4" /> Deleting…</>
+              : <><Icon icon="mingcute:delete-2-line" className="text-lg" /> Delete All CLOs</>}
+          </button>
           <Link to="/clo-bulk-upload" className="btn btn-sm btn-outline-primary radius-8 d-inline-flex align-items-center gap-1">
             <Icon icon="vscode-icons:file-type-excel" className="text-lg" /> Bulk Upload
           </Link>
