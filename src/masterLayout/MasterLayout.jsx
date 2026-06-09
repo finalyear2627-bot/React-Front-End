@@ -175,8 +175,8 @@ const MasterLayout = ({ children }) => {
               </li>
             )}
 
-            {/* Semesters */}
-            {canView("SEMESTERS") && (
+            {/* Semesters — admin + teacher only */}
+            {canView("SEMESTERS") && userRole !== "STUDENT" && (
               <li className='dropdown'>
                 <Link to='#'>
                   <Icon icon='solar:calendar-outline' className='menu-icon' />
@@ -223,31 +223,35 @@ const MasterLayout = ({ children }) => {
               </li>
             )}
 
-            {/* Course Assignments */}
-            {canView("COURSE_ASSIGNMENTS") && (
+            {/* Course Assignments — Student sees nothing; Admin: All+Assign; Teacher: My Courses */}
+            {canView("COURSE_ASSIGNMENTS") && userRole !== "STUDENT" && (
               <li className='dropdown'>
                 <Link to='#'>
                   <Icon icon='solar:bookmark-square-minimalistic-outline' className='menu-icon' />
                   <span>Course Assignments</span>
                 </Link>
                 <ul className='sidebar-submenu'>
-                  <li>
-                    <NavLink to='/course-assignments' className={(n) => n.isActive ? "active-page" : ""}>
-                      <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> All Assignments
-                    </NavLink>
-                  </li>
-                  {canCreate("COURSE_ASSIGNMENTS") && (
+                  {userRole === "ADMIN" && (
+                    <>
+                      <li>
+                        <NavLink to='/course-assignments' className={(n) => n.isActive ? "active-page" : ""}>
+                          <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> All Assignments
+                        </NavLink>
+                      </li>
+                      <li>
+                        <NavLink to='/course-assignment-add' className={(n) => n.isActive ? "active-page" : ""}>
+                          <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Assign Course
+                        </NavLink>
+                      </li>
+                    </>
+                  )}
+                  {userRole === "TEACHER" && (
                     <li>
-                      <NavLink to='/course-assignment-add' className={(n) => n.isActive ? "active-page" : ""}>
-                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Assign Course
+                      <NavLink to='/my-courses' className={(n) => n.isActive ? "active-page" : ""}>
+                        <i className='ri-circle-fill circle-icon text-info-main w-auto' /> My Courses
                       </NavLink>
                     </li>
                   )}
-                  <li>
-                    <NavLink to='/my-courses' className={(n) => n.isActive ? "active-page" : ""}>
-                      <i className='ri-circle-fill circle-icon text-info-main w-auto' /> My Courses
-                    </NavLink>
-                  </li>
                 </ul>
               </li>
             )}
@@ -276,27 +280,27 @@ const MasterLayout = ({ children }) => {
               </li>
             )}
 
-            {/* Assessments — admin + teacher */}
-            {["ADMIN", "TEACHER"].includes(localStorage.getItem("user_role")) && (
-              <li className='dropdown'>
-                <Link to='#'>
-                  <Icon icon='solar:document-add-outline' className='menu-icon' />
-                  <span>Assessments</span>
-                </Link>
-                <ul className='sidebar-submenu'>
-                  <li>
-                    <NavLink to='/generated-papers' className={(n) => n.isActive ? "active-page" : ""}>
-                      <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Papers
-                    </NavLink>
-                  </li>
+            {/* Assessments — all roles; Generate Paper: teacher only */}
+            <li className='dropdown'>
+              <Link to='#'>
+                <Icon icon='solar:document-add-outline' className='menu-icon' />
+                <span>Assessments</span>
+              </Link>
+              <ul className='sidebar-submenu'>
+                <li>
+                  <NavLink to='/generated-papers' className={(n) => n.isActive ? "active-page" : ""}>
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Papers
+                  </NavLink>
+                </li>
+                {userRole === "TEACHER" && (
                   <li>
                     <NavLink to='/generate-paper' className={(n) => n.isActive ? "active-page" : ""}>
                       <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Generate Paper
                     </NavLink>
                   </li>
-                </ul>
-              </li>
-            )}
+                )}
+              </ul>
+            </li>
 
             {/* PLO — admin only */}
             {localStorage.getItem("user_role") === "ADMIN" && (

@@ -22,8 +22,7 @@ const AccessDeniedLayer = () => {
           <div className='max-w-700-px mx-auto mt-40'>
             <h3 className='mb-24 max-w-1000-px'>Access Denied</h3>
             <p className='text-neutral-500 max-w-700-px text-lg'>
-              You don't have authorization to get to this page. If it's not too
-              much trouble, contact your site executive to demand access.
+              You are not allowed to access this page. Please contact your administrator if you need access.
             </p>
             <Link
               to='/'

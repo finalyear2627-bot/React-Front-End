@@ -13,6 +13,7 @@ const STATUS_BADGE = {
 };
 
 const GeneratedPaperListLayer = () => {
+  const userRole = localStorage.getItem("user_role");
   const [papers,      setPapers]      = useState([]);
   const [loading,     setLoading]     = useState(true);
   const [downloading, setDownloading] = useState(null);
@@ -95,13 +96,15 @@ const GeneratedPaperListLayer = () => {
           >
             <Icon icon="material-symbols:refresh" />
           </button>
-          <Link
-            to="/generate-paper"
-            className="btn btn-sm btn-primary-600 radius-8 d-inline-flex align-items-center gap-1"
-          >
-            <Icon icon="ic:round-plus" className="text-xl" />
-            Generate Paper
-          </Link>
+          {userRole === "TEACHER" && (
+            <Link
+              to="/generate-paper"
+              className="btn btn-sm btn-primary-600 radius-8 d-inline-flex align-items-center gap-1"
+            >
+              <Icon icon="ic:round-plus" className="text-xl" />
+              Generate Paper
+            </Link>
+          )}
         </div>
       </div>
 
@@ -115,9 +118,11 @@ const GeneratedPaperListLayer = () => {
             <p className="text-secondary-light mb-16">
               {statusFilter ? `No ${statusFilter} papers found.` : "No assessment papers generated yet."}
             </p>
-            <Link to="/generate-paper" className="btn btn-sm btn-primary radius-8">
-              Generate First Paper
-            </Link>
+            {userRole === "TEACHER" && (
+              <Link to="/generate-paper" className="btn btn-sm btn-primary radius-8">
+                Generate First Paper
+              </Link>
+            )}
           </div>
         ) : (
           <>
@@ -187,17 +192,19 @@ const GeneratedPaperListLayer = () => {
                               : <Icon icon="solar:download-linear" />}
                           </button>
                         )}
-                        {/* Delete */}
-                        <button
-                          onClick={() => handleDelete(paper.id)}
-                          disabled={deletingId === paper.id}
-                          className="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
-                          title="Delete"
-                        >
-                          {deletingId === paper.id
-                            ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
-                            : <Icon icon="mingcute:delete-2-line" />}
-                        </button>
+                        {/* Delete — not for students */}
+                        {userRole !== "STUDENT" && (
+                          <button
+                            onClick={() => handleDelete(paper.id)}
+                            disabled={deletingId === paper.id}
+                            className="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
+                            title="Delete"
+                          >
+                            {deletingId === paper.id
+                              ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
+                              : <Icon icon="mingcute:delete-2-line" />}
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}

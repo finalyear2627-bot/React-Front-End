@@ -7,6 +7,7 @@ import TablePagination from "./TablePagination";
 
 const ProgramListLayer = () => {
   const navigate = useNavigate();
+  const userRole = localStorage.getItem("user_role");
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -52,20 +53,24 @@ const ProgramListLayer = () => {
       <div className="card-header d-flex justify-content-between align-items-center">
         <h5 className="card-title mb-0">Programs</h5>
         <div className="d-flex gap-8">
-          <Link
-            to="/program-bulk-upload"
-            className="btn btn-sm btn-outline-primary radius-8 d-inline-flex align-items-center gap-1"
-          >
-            <Icon icon="vscode-icons:file-type-excel" className="text-lg" />
-            Bulk Upload
-          </Link>
-          <Link
-            to="/program-add"
-            className="btn btn-sm btn-primary-600 radius-8 d-inline-flex align-items-center gap-1"
-          >
-            <Icon icon="ic:round-plus" className="text-xl" />
-            Add Program
-          </Link>
+          {userRole === "ADMIN" && (
+            <Link
+              to="/program-bulk-upload"
+              className="btn btn-sm btn-outline-primary radius-8 d-inline-flex align-items-center gap-1"
+            >
+              <Icon icon="vscode-icons:file-type-excel" className="text-lg" />
+              Bulk Upload
+            </Link>
+          )}
+          {userRole !== "STUDENT" && (
+            <Link
+              to="/program-add"
+              className="btn btn-sm btn-primary-600 radius-8 d-inline-flex align-items-center gap-1"
+            >
+              <Icon icon="ic:round-plus" className="text-xl" />
+              Add Program
+            </Link>
+          )}
         </div>
       </div>
 
@@ -79,9 +84,11 @@ const ProgramListLayer = () => {
         {programs.length === 0 ? (
           <div className="text-center py-40">
             <p className="text-secondary-light">No programs found</p>
-            <Link to="/program-add" className="btn btn-sm btn-primary mt-16">
-              Create First Program
-            </Link>
+            {userRole !== "STUDENT" && (
+              <Link to="/program-add" className="btn btn-sm btn-primary mt-16">
+                Create First Program
+              </Link>
+            )}
           </div>
         ) : (
           <>

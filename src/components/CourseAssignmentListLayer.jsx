@@ -12,6 +12,7 @@ const TYPE_BADGE = {
 };
 
 const CourseAssignmentListLayer = () => {
+  const userRole = localStorage.getItem("user_role");
   const [assignments, setAssignments] = useState([]);
   const [teachers, setTeachers]       = useState([]);
   const [loading, setLoading]         = useState(true);
@@ -87,53 +88,57 @@ const CourseAssignmentListLayer = () => {
     <div className="card basic-data-table">
       <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
         <h5 className="card-title mb-0">Course Assignments</h5>
-        <Link
-          to="/course-assignment-add"
-          className="btn btn-sm btn-primary-600 radius-8 d-inline-flex align-items-center gap-1"
-        >
-          <Icon icon="ic:round-plus" className="text-xl" />
-          Assign Course
-        </Link>
+        {userRole === "ADMIN" && (
+          <Link
+            to="/course-assignment-add"
+            className="btn btn-sm btn-primary-600 radius-8 d-inline-flex align-items-center gap-1"
+          >
+            <Icon icon="ic:round-plus" className="text-xl" />
+            Assign Course
+          </Link>
+        )}
       </div>
 
-      {/* Filters */}
-      <div className="card-body pb-0">
-        <div className="row g-3">
-          <div className="col-sm-4">
-            <select
-              className="form-control form-select radius-8"
-              value={filterTeacher}
-              onChange={(e) => { setFilterTeacher(e.target.value); setPage(1); }}
-            >
-              <option value="">All Teachers</option>
-              {teachers.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {`${t.first_name} ${t.last_name}`.trim() || t.username}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="col-sm-3">
-            <select
-              className="form-control form-select radius-8"
-              value={filterType}
-              onChange={(e) => { setFilterType(e.target.value); setPage(1); }}
-            >
-              <option value="">All Types</option>
-              <option value="THEORY">Theory</option>
-              <option value="LAB">Lab</option>
-            </select>
-          </div>
-          <div className="col-sm-2">
-            <button
-              className="btn btn-outline-secondary radius-8 w-100"
-              onClick={() => { setFilterTeacher(""); setFilterType(""); setPage(1); }}
-            >
-              Clear
-            </button>
+      {/* Filters — admin only */}
+      {userRole === "ADMIN" && (
+        <div className="card-body pb-0">
+          <div className="row g-3">
+            <div className="col-sm-4">
+              <select
+                className="form-control form-select radius-8"
+                value={filterTeacher}
+                onChange={(e) => { setFilterTeacher(e.target.value); setPage(1); }}
+              >
+                <option value="">All Teachers</option>
+                {teachers.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {`${t.first_name} ${t.last_name}`.trim() || t.username}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="col-sm-3">
+              <select
+                className="form-control form-select radius-8"
+                value={filterType}
+                onChange={(e) => { setFilterType(e.target.value); setPage(1); }}
+              >
+                <option value="">All Types</option>
+                <option value="THEORY">Theory</option>
+                <option value="LAB">Lab</option>
+              </select>
+            </div>
+            <div className="col-sm-2">
+              <button
+                className="btn btn-outline-secondary radius-8 w-100"
+                onClick={() => { setFilterTeacher(""); setFilterType(""); setPage(1); }}
+              >
+                Clear
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {error && <div className="card-body pb-0"><div className="alert alert-danger">{error}</div></div>}
 
@@ -143,7 +148,9 @@ const CourseAssignmentListLayer = () => {
         ) : assignments.length === 0 ? (
           <div className="text-center py-40">
             <p className="text-secondary-light">No assignments found</p>
-            <Link to="/course-assignment-add" className="btn btn-sm btn-primary mt-16">Assign First Course</Link>
+            {userRole === "ADMIN" && (
+              <Link to="/course-assignment-add" className="btn btn-sm btn-primary mt-16">Assign First Course</Link>
+            )}
           </div>
         ) : (
           <React.Fragment>

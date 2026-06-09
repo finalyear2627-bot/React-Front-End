@@ -5,6 +5,8 @@ import { authService } from "../api/auth.service";
 import { showSuccess, showError, getApiError } from "../utils/toast";
 
 const ViewProfileLayer = () => {
+  const userRole = localStorage.getItem("user_role");
+  const isStudent = userRole === "STUDENT";
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(
     searchParams.get("tab") === "password" ? "change-password" : "edit-profile"
@@ -211,16 +213,18 @@ const ViewProfileLayer = () => {
                     <div className="col-sm-12">
                       <div className="mb-20">
                         <label className="form-label fw-semibold text-primary-light text-sm mb-8">
-                          Email <span className="text-danger-600">*</span>
+                          Email {!isStudent && <span className="text-danger-600">*</span>}
+                          {isStudent && <span className="text-secondary-light text-xs ms-4">(read-only)</span>}
                         </label>
                         <input
                           type="email"
-                          className="form-control radius-8"
+                          className={`form-control radius-8 ${isStudent ? "bg-neutral-100" : ""}`}
                           name="email"
                           placeholder="Enter email address"
                           value={profile.email}
-                          onChange={handleProfileChange}
-                          required
+                          onChange={isStudent ? undefined : handleProfileChange}
+                          readOnly={isStudent}
+                          required={!isStudent}
                         />
                       </div>
                     </div>

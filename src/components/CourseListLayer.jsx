@@ -6,6 +6,7 @@ import { showSuccess, showError, getApiError } from "../utils/toast";
 import TablePagination from "./TablePagination";
 
 const CourseListLayer = () => {
+  const userRole = localStorage.getItem("user_role");
   const [courses,    setCourses]    = useState([]);
   const [loading,    setLoading]    = useState(true);
   const [togglingId, setTogglingId] = useState(null);
@@ -99,14 +100,18 @@ const CourseListLayer = () => {
       <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
         <h5 className="card-title mb-0">Courses</h5>
         <div className="d-flex align-items-center gap-2 flex-wrap">
-          <Link to="/course-bulk-upload" className="btn btn-sm btn-outline-primary radius-8 d-inline-flex align-items-center gap-1">
-            <Icon icon="vscode-icons:file-type-excel" className="text-lg" />
-            Bulk Upload
-          </Link>
-          <Link to="/course-add" className="btn btn-sm btn-primary-600 radius-8 d-inline-flex align-items-center gap-1">
-            <Icon icon="ic:round-plus" className="text-xl" />
-            Add Course
-          </Link>
+          {userRole === "ADMIN" && (
+            <Link to="/course-bulk-upload" className="btn btn-sm btn-outline-primary radius-8 d-inline-flex align-items-center gap-1">
+              <Icon icon="vscode-icons:file-type-excel" className="text-lg" />
+              Bulk Upload
+            </Link>
+          )}
+          {userRole !== "STUDENT" && (
+            <Link to="/course-add" className="btn btn-sm btn-primary-600 radius-8 d-inline-flex align-items-center gap-1">
+              <Icon icon="ic:round-plus" className="text-xl" />
+              Add Course
+            </Link>
+          )}
         </div>
       </div>
 
@@ -228,7 +233,7 @@ const CourseListLayer = () => {
             </p>
             {hasFilter
               ? <button className="btn btn-sm btn-outline-secondary mt-16" onClick={resetFilters}>Clear Filters</button>
-              : <Link to="/course-add" className="btn btn-sm btn-primary mt-16">Create First Course</Link>
+              : userRole !== "STUDENT" && <Link to="/course-add" className="btn btn-sm btn-primary mt-16">Create First Course</Link>
             }
           </div>
         ) : (

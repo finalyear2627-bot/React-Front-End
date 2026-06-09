@@ -63,54 +63,54 @@ function App() {
 
         {/* Program Routes */}
         <Route exact path='/programs' element={<ProtectedRoute><ProgramListPage /></ProtectedRoute>} />
-        <Route exact path='/program-add' element={<ProtectedRoute><ProgramAddPage /></ProtectedRoute>} />
-        <Route exact path='/program-edit/:id' element={<ProtectedRoute><ProgramEditPage /></ProtectedRoute>} />
+        <Route exact path='/program-add' element={<ProtectedRoute allowedRoles={["ADMIN","TEACHER"]}><ProgramAddPage /></ProtectedRoute>} />
+        <Route exact path='/program-edit/:id' element={<ProtectedRoute allowedRoles={["ADMIN","TEACHER"]}><ProgramEditPage /></ProtectedRoute>} />
         <Route exact path='/program-view/:id' element={<ProtectedRoute><ProgramViewPage /></ProtectedRoute>} />
-        <Route exact path='/program-bulk-upload' element={<ProtectedRoute><ProgramBulkUploadPage /></ProtectedRoute>} />
+        <Route exact path='/program-bulk-upload' element={<ProtectedRoute allowedRoles={["ADMIN"]}><ProgramBulkUploadPage /></ProtectedRoute>} />
 
         {/* Course Routes */}
         <Route exact path='/courses' element={<ProtectedRoute><CourseListPage /></ProtectedRoute>} />
-        <Route exact path='/course-add' element={<ProtectedRoute><CourseAddPage /></ProtectedRoute>} />
-        <Route exact path='/course-edit/:id' element={<ProtectedRoute><CourseEditPage /></ProtectedRoute>} />
+        <Route exact path='/course-add' element={<ProtectedRoute allowedRoles={["ADMIN","TEACHER"]}><CourseAddPage /></ProtectedRoute>} />
+        <Route exact path='/course-edit/:id' element={<ProtectedRoute allowedRoles={["ADMIN","TEACHER"]}><CourseEditPage /></ProtectedRoute>} />
         <Route exact path='/course-view/:id' element={<ProtectedRoute><CourseViewPage /></ProtectedRoute>} />
-        <Route exact path='/course-bulk-upload' element={<ProtectedRoute><CourseBulkUploadPage /></ProtectedRoute>} />
+        <Route exact path='/course-bulk-upload' element={<ProtectedRoute allowedRoles={["ADMIN"]}><CourseBulkUploadPage /></ProtectedRoute>} />
 
-        {/* User Routes */}
-        <Route exact path='/users' element={<ProtectedRoute><UserListPage /></ProtectedRoute>} />
-        <Route exact path='/user-add' element={<ProtectedRoute><UserAddPage /></ProtectedRoute>} />
-        <Route exact path='/user-edit/:id' element={<ProtectedRoute><UserEditPage /></ProtectedRoute>} />
+        {/* User Routes — admin only */}
+        <Route exact path='/users' element={<ProtectedRoute allowedRoles={["ADMIN"]}><UserListPage /></ProtectedRoute>} />
+        <Route exact path='/user-add' element={<ProtectedRoute allowedRoles={["ADMIN"]}><UserAddPage /></ProtectedRoute>} />
+        <Route exact path='/user-edit/:id' element={<ProtectedRoute allowedRoles={["ADMIN"]}><UserEditPage /></ProtectedRoute>} />
 
-        {/* Role Permission Routes */}
-        <Route exact path='/role-permissions' element={<ProtectedRoute><RolePermissionListPage /></ProtectedRoute>} />
+        {/* Role Permission Routes — admin only */}
+        <Route exact path='/role-permissions' element={<ProtectedRoute allowedRoles={["ADMIN"]}><RolePermissionListPage /></ProtectedRoute>} />
 
         {/* Course Assignment Routes */}
-        <Route exact path='/course-assignments' element={<ProtectedRoute><CourseAssignmentListPage /></ProtectedRoute>} />
-        <Route exact path='/course-assignment-add' element={<ProtectedRoute><CourseAssignmentAddPage /></ProtectedRoute>} />
-        <Route exact path='/my-courses' element={<ProtectedRoute><MyCoursesPage /></ProtectedRoute>} />
+        <Route exact path='/course-assignments' element={<ProtectedRoute allowedRoles={["ADMIN"]}><CourseAssignmentListPage /></ProtectedRoute>} />
+        <Route exact path='/course-assignment-add' element={<ProtectedRoute allowedRoles={["ADMIN"]}><CourseAssignmentAddPage /></ProtectedRoute>} />
+        <Route exact path='/my-courses' element={<ProtectedRoute allowedRoles={["TEACHER"]}><MyCoursesPage /></ProtectedRoute>} />
 
-        {/* Semester Routes */}
-        <Route exact path='/semesters' element={<ProtectedRoute><SemesterListPage /></ProtectedRoute>} />
-        <Route exact path='/semester-add' element={<ProtectedRoute><SemesterAddPage /></ProtectedRoute>} />
-        <Route exact path='/semester-edit/:id' element={<ProtectedRoute><SemesterEditPage /></ProtectedRoute>} />
-        <Route exact path='/semester-view/:id' element={<ProtectedRoute><SemesterViewPage /></ProtectedRoute>} />
+        {/* Semester Routes — admin + teacher only */}
+        <Route exact path='/semesters' element={<ProtectedRoute allowedRoles={["ADMIN","TEACHER"]}><SemesterListPage /></ProtectedRoute>} />
+        <Route exact path='/semester-add' element={<ProtectedRoute allowedRoles={["ADMIN","TEACHER"]}><SemesterAddPage /></ProtectedRoute>} />
+        <Route exact path='/semester-edit/:id' element={<ProtectedRoute allowedRoles={["ADMIN","TEACHER"]}><SemesterEditPage /></ProtectedRoute>} />
+        <Route exact path='/semester-view/:id' element={<ProtectedRoute allowedRoles={["ADMIN","TEACHER"]}><SemesterViewPage /></ProtectedRoute>} />
 
         {/* PLO Routes — admin only */}
-        <Route exact path='/plos' element={<ProtectedRoute><PLOListPage /></ProtectedRoute>} />
-        <Route exact path='/plo-add' element={<ProtectedRoute><PLOAddPage /></ProtectedRoute>} />
-        <Route exact path='/plo-edit/:id' element={<ProtectedRoute><PLOEditPage /></ProtectedRoute>} />
-        <Route exact path='/plo-bulk-upload' element={<ProtectedRoute><PLOBulkUploadPage /></ProtectedRoute>} />
+        <Route exact path='/plos' element={<ProtectedRoute allowedRoles={["ADMIN"]}><PLOListPage /></ProtectedRoute>} />
+        <Route exact path='/plo-add' element={<ProtectedRoute allowedRoles={["ADMIN"]}><PLOAddPage /></ProtectedRoute>} />
+        <Route exact path='/plo-edit/:id' element={<ProtectedRoute allowedRoles={["ADMIN"]}><PLOEditPage /></ProtectedRoute>} />
+        <Route exact path='/plo-bulk-upload' element={<ProtectedRoute allowedRoles={["ADMIN"]}><PLOBulkUploadPage /></ProtectedRoute>} />
 
         {/* CLO Routes — admin only */}
-        <Route exact path='/clos' element={<ProtectedRoute><CLOListPage /></ProtectedRoute>} />
-        <Route exact path='/clo-add' element={<ProtectedRoute><CLOAddPage /></ProtectedRoute>} />
-        <Route exact path='/clo-edit/:id' element={<ProtectedRoute><CLOEditPage /></ProtectedRoute>} />
-        <Route exact path='/clo-bulk-upload' element={<ProtectedRoute><CLOBulkUploadPage /></ProtectedRoute>} />
-        <Route exact path='/clo-plo-statement/:courseId' element={<ProtectedRoute><CLOPLOStatementPage /></ProtectedRoute>} />
-        <Route exact path='/clo-plo-generator' element={<ProtectedRoute><CLOPLOGeneratorPage /></ProtectedRoute>} />
+        <Route exact path='/clos' element={<ProtectedRoute allowedRoles={["ADMIN"]}><CLOListPage /></ProtectedRoute>} />
+        <Route exact path='/clo-add' element={<ProtectedRoute allowedRoles={["ADMIN"]}><CLOAddPage /></ProtectedRoute>} />
+        <Route exact path='/clo-edit/:id' element={<ProtectedRoute allowedRoles={["ADMIN"]}><CLOEditPage /></ProtectedRoute>} />
+        <Route exact path='/clo-bulk-upload' element={<ProtectedRoute allowedRoles={["ADMIN"]}><CLOBulkUploadPage /></ProtectedRoute>} />
+        <Route exact path='/clo-plo-statement/:courseId' element={<ProtectedRoute allowedRoles={["ADMIN"]}><CLOPLOStatementPage /></ProtectedRoute>} />
+        <Route exact path='/clo-plo-generator' element={<ProtectedRoute allowedRoles={["ADMIN"]}><CLOPLOGeneratorPage /></ProtectedRoute>} />
 
-        {/* Assessment / Generated Papers Routes — ADMIN + TEACHER */}
+        {/* Assessment Routes — generated-papers: all auth; generate-paper: teacher only */}
         <Route exact path='/generated-papers' element={<ProtectedRoute><GeneratedPaperListPage /></ProtectedRoute>} />
-        <Route exact path='/generate-paper'   element={<ProtectedRoute><GeneratedPaperGeneratePage /></ProtectedRoute>} />
+        <Route exact path='/generate-paper'   element={<ProtectedRoute allowedRoles={["TEACHER"]}><GeneratedPaperGeneratePage /></ProtectedRoute>} />
 
         {/* Profile Routes */}
         <Route exact path='/view-profile' element={<ProtectedRoute><ViewProfilePage /></ProtectedRoute>} />
