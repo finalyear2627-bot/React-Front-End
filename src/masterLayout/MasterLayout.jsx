@@ -118,19 +118,22 @@ const MasterLayout = ({ children }) => {
         <div>
           <Link to='/dashboard' className='sidebar-logo'>
             <img
-              src='assets/images/logo.png'
+              src='assets/images/logo.jpeg'
               alt='site logo'
               className='light-logo'
+              style={{ borderRadius: '50%', objectFit: 'cover' }}
             />
             <img
-              src='assets/images/logo-light.png'
+              src='assets/images/logo.jpeg'
               alt='site logo'
               className='dark-logo'
+              style={{ borderRadius: '50%', objectFit: 'cover' }}
             />
             <img
-              src='assets/images/logo-icon.png'
+              src='assets/images/logo.jpeg'
               alt='site logo'
               className='logo-icon'
+              style={{ borderRadius: '50%', objectFit: 'cover' }}
             />
           </Link>
         </div>

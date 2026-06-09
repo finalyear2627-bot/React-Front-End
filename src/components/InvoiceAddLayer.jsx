@@ -44,7 +44,7 @@ const InvoiceAddLayer = () => {
                                     </div>
                                     <div className="col-sm-4">
                                         <img
-                                            src="assets/images/logo.png"
+                                            src="assets/images/logo.jpeg"
                                             alt="image_icon"
                                             className="mb-8"
                                         />
