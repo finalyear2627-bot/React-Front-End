@@ -58,9 +58,12 @@ const GeneratedPaperGenerateLayer = () => {
   const [loadingPlos,    setLoadingPlos]    = useState(true);
   const [submitting,     setSubmitting]     = useState(false);
 
+  const getAssignmentCourseId = (a) =>
+    a.course_id ?? (typeof a.course === "object" ? a.course?.id : a.course);
+
   // Normalize a course assignment into a plain course shape { id, code, name }
   const normAssignment = (a) => ({
-    id:   a.course_id  || a.course?.id,
+    id:   getAssignmentCourseId(a),
     code: a.course_code || a.course?.code || "",
     name: a.course_name || a.course?.name || "",
     course_type: a.course_type || a.course?.course_type,
@@ -78,8 +81,14 @@ const GeneratedPaperGenerateLayer = () => {
       ])
         .then(([td, ld]) => {
           const toList = (d) => (Array.isArray(d) ? d : d.result || d.results || []);
-          setTheoryCourses(toList(td).filter((a) => a.is_active !== false).map(normAssignment));
-          setLabCourses(toList(ld).filter((a) => a.is_active !== false).map(normAssignment));
+          const activeAssignments = (items) =>
+            items
+              .filter((a) => a.is_active !== false)
+              .map(normAssignment)
+              .filter((c) => c.id !== undefined && c.id !== null && c.id !== "");
+
+          setTheoryCourses(activeAssignments(toList(td)));
+          setLabCourses(activeAssignments(toList(ld)));
         })
         .catch(() => showError("Failed to load courses"))
         .finally(() => setLoadingCourses(false));

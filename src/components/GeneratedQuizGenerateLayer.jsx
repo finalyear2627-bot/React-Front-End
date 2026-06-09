@@ -54,8 +54,11 @@ const GeneratedQuizGenerateLayer = () => {
   const [loadingPlos,    setLoadingPlos]    = useState(true);
   const [submitting,     setSubmitting]     = useState(false);
 
+  const getAssignmentCourseId = (a) =>
+    a.course_id ?? (typeof a.course === "object" ? a.course?.id : a.course);
+
   const normAssignment = (a) => ({
-    id:   a.course_id  || a.course?.id,
+    id:   getAssignmentCourseId(a),
     code: a.course_code || a.course?.code || "",
     name: a.course_name || a.course?.name || "",
   });
@@ -67,7 +70,12 @@ const GeneratedQuizGenerateLayer = () => {
       courseAssignmentService.getMyCourses()
         .then((d) => {
           const list = Array.isArray(d) ? d : d.result || d.results || [];
-          setCourses(list.filter((a) => a.is_active !== false).map(normAssignment));
+          setCourses(
+            list
+              .filter((a) => a.is_active !== false)
+              .map(normAssignment)
+              .filter((c) => c.id !== undefined && c.id !== null && c.id !== "")
+          );
         })
         .catch(() => showError("Failed to load courses"))
         .finally(() => setLoadingCourses(false));
