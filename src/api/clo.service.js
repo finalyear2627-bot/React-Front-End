@@ -35,4 +35,7 @@ export const cloService = {
     axiosInstance
       .get(`/academics/courses/${courseId}/clo-plo-statement/`)
       .then((r) => r.data),
+
+  clearAll: () =>
+    axiosInstance.delete(`${BASE}/clear-all/`).then((r) => r.data),
 };

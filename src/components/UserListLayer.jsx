@@ -134,6 +134,9 @@ const UserListLayer = () => {
   const [loading,    setLoading]    = useState(true);
   const [togglingId, setTogglingId] = useState(null);
   const [error,      setError]      = useState("");
+  const [filterUsername, setFilterUsername] = useState("");
+  const [filterFullName, setFilterFullName] = useState("");
+  const [filterEmail,    setFilterEmail]    = useState("");
   const [page,       setPage]       = useState(1);
   const [pageSize,   setPageSize]   = useState(10);
 
@@ -190,7 +193,27 @@ const UserListLayer = () => {
     }
   };
 
-  const paginated = users.slice((page - 1) * pageSize, page * pageSize);
+  const resetFilters = () => {
+    setFilterUsername("");
+    setFilterFullName("");
+    setFilterEmail("");
+    setPage(1);
+  };
+
+  const hasFilter = filterUsername || filterFullName || filterEmail;
+
+  const filtered = users.filter((user) => {
+    const username = (user.username || "").toLowerCase();
+    const fullName = `${user.first_name || ""} ${user.last_name || ""}`.trim().toLowerCase();
+    const email = (user.email || "").toLowerCase();
+
+    if (filterUsername && !username.includes(filterUsername.trim().toLowerCase())) return false;
+    if (filterFullName && !fullName.includes(filterFullName.trim().toLowerCase())) return false;
+    if (filterEmail && !email.includes(filterEmail.trim().toLowerCase())) return false;
+    return true;
+  });
+
+  const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
 
   if (loading) return <div className="card"><div className="card-body">Loading...</div></div>;
 
@@ -216,11 +239,100 @@ const UserListLayer = () => {
 
         {error && <div className="card-body pb-0"><div className="alert alert-danger">{error}</div></div>}
 
+        <div className="card-body pb-0">
+          <div className="row g-2 align-items-end">
+            <div className="col-sm-6 col-md-3">
+              <label className="form-label text-sm fw-semibold text-primary-light mb-4">Username</label>
+              <div className="position-relative">
+                <input
+                  type="text"
+                  className="form-control radius-8 ps-36"
+                  placeholder="Search username"
+                  value={filterUsername}
+                  onChange={(e) => { setFilterUsername(e.target.value); setPage(1); }}
+                />
+                <Icon icon="ion:search-outline" className="position-absolute top-50 translate-middle-y text-secondary-light" style={{ left: 10, pointerEvents: "none" }} />
+              </div>
+            </div>
+
+            <div className="col-sm-6 col-md-3">
+              <label className="form-label text-sm fw-semibold text-primary-light mb-4">Full Name</label>
+              <div className="position-relative">
+                <input
+                  type="text"
+                  className="form-control radius-8 ps-36"
+                  placeholder="Search full name"
+                  value={filterFullName}
+                  onChange={(e) => { setFilterFullName(e.target.value); setPage(1); }}
+                />
+                <Icon icon="ion:search-outline" className="position-absolute top-50 translate-middle-y text-secondary-light" style={{ left: 10, pointerEvents: "none" }} />
+              </div>
+            </div>
+
+            <div className="col-sm-6 col-md-3">
+              <label className="form-label text-sm fw-semibold text-primary-light mb-4">Email</label>
+              <div className="position-relative">
+                <input
+                  type="text"
+                  className="form-control radius-8 ps-36"
+                  placeholder="Search email"
+                  value={filterEmail}
+                  onChange={(e) => { setFilterEmail(e.target.value); setPage(1); }}
+                />
+                <Icon icon="ion:search-outline" className="position-absolute top-50 translate-middle-y text-secondary-light" style={{ left: 10, pointerEvents: "none" }} />
+              </div>
+            </div>
+
+            <div className="col-sm-auto">
+              <label className="form-label text-sm mb-4 d-block invisible">x</label>
+              <button
+                className="btn btn-outline-secondary radius-8"
+                onClick={resetFilters}
+                disabled={!hasFilter}
+                title="Clear filters"
+              >
+                <Icon icon="material-symbols:filter-alt-off-outline" />
+              </button>
+            </div>
+          </div>
+
+          {hasFilter && (
+            <div className="d-flex flex-wrap gap-2 mt-12 mb-0">
+              {filterUsername && (
+                <span className="badge bg-primary-100 text-primary-600 radius-4 d-flex align-items-center gap-1">
+                  Username: {filterUsername}
+                  <Icon icon="material-symbols:close" className="cursor-pointer" onClick={() => { setFilterUsername(""); setPage(1); }} />
+                </span>
+              )}
+              {filterFullName && (
+                <span className="badge bg-info-focus text-info-main radius-4 d-flex align-items-center gap-1">
+                  Full Name: {filterFullName}
+                  <Icon icon="material-symbols:close" className="cursor-pointer" onClick={() => { setFilterFullName(""); setPage(1); }} />
+                </span>
+              )}
+              {filterEmail && (
+                <span className="badge bg-success-focus text-success-main radius-4 d-flex align-items-center gap-1">
+                  Email: {filterEmail}
+                  <Icon icon="material-symbols:close" className="cursor-pointer" onClick={() => { setFilterEmail(""); setPage(1); }} />
+                </span>
+              )}
+              <span className="text-secondary-light text-sm align-self-center">
+                {filtered.length} result{filtered.length !== 1 ? "s" : ""}
+              </span>
+            </div>
+          )}
+        </div>
+
         <div className="card-body">
-          {users.length === 0 ? (
+          {filtered.length === 0 ? (
             <div className="text-center py-40">
-              <p className="text-secondary-light">No users found</p>
-              <Link to="/user-add" className="btn btn-sm btn-primary mt-16">Add First User</Link>
+              <p className="text-secondary-light">
+                {hasFilter ? "No users match the current filters." : "No users found"}
+              </p>
+              {hasFilter
+                ? <button className="btn btn-sm btn-outline-secondary mt-16" onClick={resetFilters}>Clear Filters</button>
+                : <Link to="/user-add" className="btn btn-sm btn-primary mt-16">Add First User</Link>
+              }
             </div>
           ) : (
             <React.Fragment>
@@ -300,7 +412,7 @@ const UserListLayer = () => {
                 </table>
               </div>
               <TablePagination
-                total={users.length}
+                total={filtered.length}
                 page={page}
                 pageSize={pageSize}
                 onPageChange={setPage}

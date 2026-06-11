@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { courseService } from "../api/course.service";
+import { programService } from "../api/program.service";
 import { showSuccess, showError, getApiError } from "../utils/toast";
 import TablePagination from "./TablePagination";
 import { canView } from "../utils/permissions";
@@ -10,6 +11,7 @@ const CourseListLayer = () => {
   const userRole = localStorage.getItem("user_role");
 
   const [courses,    setCourses]    = useState([]);
+  const [programs,   setPrograms]   = useState([]);
   const [loading,    setLoading]    = useState(true);
   const [togglingId, setTogglingId] = useState(null);
   const [error,      setError]      = useState("");
@@ -18,6 +20,7 @@ const CourseListLayer = () => {
   // filters
   const [search,      setSearch]      = useState("");
   const [filterCode,  setFilterCode]  = useState("");
+  const [filterProgram, setFilterProgram] = useState("");
   const [filterType,  setFilterType]  = useState("");
   const [filterClass, setFilterClass] = useState("");
 
@@ -25,6 +28,13 @@ const CourseListLayer = () => {
   const [pageSize, setPageSize] = useState(5);
 
   useEffect(() => { fetchCourses(); }, []);
+
+  useEffect(() => {
+    programService
+      .getAllPrograms()
+      .then((data) => setPrograms(Array.isArray(data) ? data : data.result || data.results || []))
+      .catch(() => {});
+  }, []);
 
   const fetchCourses = async () => {
     try {
@@ -77,11 +87,19 @@ const CourseListLayer = () => {
   };
 
   const resetFilters = () => {
-    setSearch(""); setFilterCode(""); setFilterType(""); setFilterClass("");
+    setSearch(""); setFilterCode(""); setFilterProgram(""); setFilterType(""); setFilterClass("");
     setPage(1);
   };
 
-  const hasFilter = search || filterCode || filterType || filterClass;
+  const hasFilter = search || filterCode || filterProgram || filterType || filterClass;
+
+  const getCourseProgramId = (course) => {
+    if (course.program_detail?.id) return course.program_detail.id;
+    if (course.program && typeof course.program === "object") return course.program.id;
+    return course.program;
+  };
+
+  const selectedProgram = programs.find((p) => String(p.id) === String(filterProgram));
 
   // apply all filters
   const filtered = courses.filter((c) => {
@@ -92,6 +110,7 @@ const CourseListLayer = () => {
       String(c.semester || "").includes(q)
     )) return false;
     if (filterCode  && !(c.code        || "").toLowerCase().includes(filterCode.trim().toLowerCase())) return false;
+    if (filterProgram && String(getCourseProgramId(c)) !== String(filterProgram)) return false;
     if (filterType  && c.course_type  !== filterType)  return false;
     if (filterClass && c.course_class !== filterClass) return false;
     return true;
@@ -163,6 +182,21 @@ const CourseListLayer = () => {
             />
           </div>
 
+          {/* Program */}
+          <div className="col-sm-4 col-md-2">
+            <label className="form-label text-sm fw-semibold text-primary-light mb-4">Program</label>
+            <select
+              className="form-control form-select radius-8"
+              value={filterProgram}
+              onChange={(e) => { setFilterProgram(e.target.value); setPage(1); }}
+            >
+              <option value="">All Programs</option>
+              {programs.map((p) => (
+                <option key={p.id} value={p.id}>{p.code} - {p.name}</option>
+              ))}
+            </select>
+          </div>
+
           {/* Type */}
           <div className="col-sm-4 col-md-2">
             <label className="form-label text-sm fw-semibold text-primary-light mb-4">Type</label>
@@ -221,6 +255,12 @@ const CourseListLayer = () => {
                 <Icon icon="material-symbols:close" className="cursor-pointer" onClick={() => { setFilterCode(""); setPage(1); }} />
               </span>
             )}
+            {filterProgram && (
+              <span className="badge bg-primary-100 text-primary-600 radius-4 d-flex align-items-center gap-1">
+                Program: {selectedProgram ? `${selectedProgram.code} - ${selectedProgram.name}` : filterProgram}
+                <Icon icon="material-symbols:close" className="cursor-pointer" onClick={() => { setFilterProgram(""); setPage(1); }} />
+              </span>
+            )}
             {filterType && (
               <span className="badge bg-warning-focus text-warning-main radius-4 d-flex align-items-center gap-1">
                 {filterType}
@@ -260,10 +300,10 @@ const CourseListLayer = () => {
               <table className="table bordered-table mb-0">
                 <thead>
                   <tr>
-                    <th>ID</th>
-                    <th>Sem</th>
                     <th>Code</th>
+                    <th>Semester</th>
                     <th>Name</th>
+                    <th>Program</th>
                     <th>Type</th>
                     <th>Class</th>
                     <th>Theory</th>
@@ -275,10 +315,10 @@ const CourseListLayer = () => {
                 <tbody>
                   {paginated.map((course, index) => (
                     <tr key={course.id || index}>
-                      <td>{course.id}</td>
-                      <td>{course.semester ?? "N/A"}</td>
                       <td className="fw-medium">{course.code || "N/A"}</td>
+                      <td>{course.semester ?? "N/A"}</td>
                       <td>{course.name || "N/A"}</td>
+                      <td>{course.program_name || "N/A"}</td>
                       <td>
                         <span className={`badge radius-4 ${course.course_type === "THEORY" ? "bg-info-focus text-info-main" : "bg-warning-focus text-warning-main"}`}>
                           {course.course_type || "N/A"}
