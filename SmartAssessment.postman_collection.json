@@ -1434,7 +1434,8 @@
                 "value": "Bearer {{access_token}}"
               }
             ],
-            "url": "{{base_url}}/api/academics/clos/"
+            "url": "{{base_url}}/api/academics/clos/",
+            "description": "Returns CLOs with course_name, semester, course_class, credit_hours, pre_req, co_req."
           }
         },
         {
@@ -1448,7 +1449,7 @@
               }
             ],
             "url": "{{base_url}}/api/academics/clos/?course=1",
-            "description": "Filter CLOs by course ID. Returns clo_number, ga_code, bt_level, ga_detail."
+            "description": "Filter CLOs for a specific course ID."
           }
         },
         {
@@ -1481,31 +1482,9 @@
             "url": "{{base_url}}/api/academics/clos/",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"course_code\": \"CMC111\",\n  \"clo_number\": 1,\n  \"ga_code\": \"GA2\",\n  \"bt_level\": \"C2\",\n  \"description\": \"\"\n}"
+              "raw": "{\n  \"course_code\": \"CMC111\",\n  \"clo_number\": 1,\n  \"description\": \"Understand fundamental concepts of programming.\",\n  \"bt_level\": \"C2\"\n}"
             },
-            "description": "Single CLO create.\n- course_code: code from Courses list (e.g. 'CMC111', 'CMC111-L')\n- clo_number: 1, 2, or 3\n- ga_code: GA1 to GA10 (must exist for the course program)\n- bt_level: Cognitive C1-C6 | Psychomotor P1-P5 | Affective A1-A5\n- description: optional\nBlocked if course is inactive."
-          }
-        },
-        {
-          "name": "Create CLO (no GA mapping)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/api/academics/clos/",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"course_code\": \"CMC111\",\n  \"clo_number\": 2,\n  \"bt_level\": \"C3\",\n  \"description\": \"\"\n}"
-            },
-            "description": "Create CLO without GA mapping. bt_level only."
+            "description": "Create a single CLO.\nFields:\n  course_code  \u2014 code from Courses API (e.g. 'CMC111', 'CMC111-L')\n  clo_number   \u2014 1, 2, or 3\n  description  \u2014 CLO description text\n  bt_level     \u2014 dropdown: C1-C6 (Cognitive) | P1-P5 (Psychomotor) | A1-A5 (Affective)\n\nResponse auto-includes from Course: course_name, semester, course_class, credit_hours, pre_req, co_req.\nBlocked if course is inactive."
           }
         },
         {
@@ -1525,12 +1504,13 @@
             "url": "{{base_url}}/api/academics/clos/1/",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"course_code\": \"CMC111\",\n  \"clo_number\": 1,\n  \"ga_code\": \"GA4\",\n  \"bt_level\": \"C4\",\n  \"description\": \"\"\n}"
-            }
+              "raw": "{\n  \"course_code\": \"CMC111\",\n  \"clo_number\": 1,\n  \"description\": \"Updated CLO description.\",\n  \"bt_level\": \"C3\"\n}"
+            },
+            "description": "Full update. Same fields as Create CLO."
           }
         },
         {
-          "name": "Partial Update CLO (change GA mapping)",
+          "name": "Partial Update CLO",
           "request": {
             "method": "PATCH",
             "header": [
@@ -1546,9 +1526,9 @@
             "url": "{{base_url}}/api/academics/clos/1/",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ga_code\": \"GA3\",\n  \"bt_level\": \"P3\"\n}"
+              "raw": "{\n  \"description\": \"Partially updated description.\",\n  \"bt_level\": \"P3\"\n}"
             },
-            "description": "Partial update \u2014 change bt_level or GA mapping.\nSend only the fields you want to update."
+            "description": "Update only the fields you send (description and/or bt_level)."
           }
         },
         {
@@ -1575,7 +1555,7 @@
               }
             ],
             "url": "{{base_url}}/api/academics/courses/1/clo-plo-statement/",
-            "description": "Returns combined CLO descriptions + mapped PLOs for a course (matches Curriculum_CLO_PLO sheet)"
+            "description": "Returns CLOs for a course with their GA\u2192PLO chain."
           }
         },
         {
@@ -1589,7 +1569,17 @@
               }
             ],
             "url": "{{base_url}}/api/academics/clos/bulk-import/",
-            "description": "Multipart form: file (CSV/XLSX).\nExact columns: course_code | course_name | semester | clo_number | ga_code | bt_level\n- ga_code: GA1 to GA10\n- bt_level: C1-C6 (Cognitive) | P1-P5 (Psychomotor) | A1-A5 (Affective)\nEach course has 3 CLOs (clo_number 1, 2, 3). Theory and Lab are separate course_codes."
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "CSV or XLSX file"
+                }
+              ]
+            },
+            "description": "Multipart form: file (CSV / XLSX).\nExact column order:\n  course_code | course_name | semester | course_class | credit_hours | pre_req | co_req | clo_number | description | bt_level\n\nOnly course_code, clo_number, description, bt_level are stored.\nRemaining columns are auto-filled from Courses API (include them for reference but they are not required to match).\nbt_level: C1-C6 (Cognitive) | P1-P5 (Psychomotor) | A1-A5 (Affective).\nEach course typically has 3 CLOs (clo_number 1, 2, 3). Theory and Lab are separate course_codes."
           }
         },
         {
@@ -1599,8 +1589,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{access_token}}",
-                "type": "text"
+                "value": "Bearer {{access_token}}"
               }
             ],
             "url": {
@@ -1616,7 +1605,7 @@
                 ""
               ]
             },
-            "description": "Permanently deletes ALL CLOs (and their PLO mappings) from the database. Use before re-importing."
+            "description": "Permanently deletes ALL CLOs."
           },
           "response": []
         }

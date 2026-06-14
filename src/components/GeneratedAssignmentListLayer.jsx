@@ -17,6 +17,7 @@ const GeneratedAssignmentListLayer = () => {
   const [assignments,  setAssignments]  = useState([]);
   const [loading,      setLoading]      = useState(true);
   const [downloading,  setDownloading]  = useState(null);
+  const [openingId,    setOpeningId]    = useState(null);
   const [deletingId,   setDeletingId]   = useState(null);
   const [statusFilter, setStatusFilter] = useState("");
   const [page,     setPage]     = useState(1);
@@ -50,6 +51,17 @@ const GeneratedAssignmentListLayer = () => {
       showError("Failed to download PDF");
     } finally {
       setDownloading(null);
+    }
+  };
+
+  const handleOpenInNewTab = async (id) => {
+    setOpeningId(id);
+    try {
+      await generatedAssignmentService.openInNewTab(id);
+    } catch {
+      showError("Failed to open PDF");
+    } finally {
+      setOpeningId(null);
     }
   };
 
@@ -132,7 +144,6 @@ const GeneratedAssignmentListLayer = () => {
                     <th>Topic / Title</th>
                     <th>Course</th>
                     <th>CLOs</th>
-                    <th>PLOs</th>
                     <th>Status</th>
                     <th>Created</th>
                     <th>Actions</th>
@@ -157,9 +168,6 @@ const GeneratedAssignmentListLayer = () => {
                       <td className="text-center">
                         {assignment.clo_ids?.length ?? assignment.clos?.length ?? "—"}
                       </td>
-                      <td className="text-center">
-                        {assignment.plo_ids?.length ?? assignment.plos?.length ?? "—"}
-                      </td>
                       <td>
                         <span className={`badge radius-4 ${STATUS_BADGE[assignment.status] || "bg-neutral-200 text-neutral-600"}`}>
                           {assignment.status || "—"}
@@ -172,16 +180,28 @@ const GeneratedAssignmentListLayer = () => {
                       </td>
                       <td>
                         {assignment.status === "COMPLETED" && (
-                          <button
-                            onClick={() => handleDownload(assignment)}
-                            disabled={downloading === assignment.id}
-                            className="w-32-px h-32-px me-8 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
-                            title="Download PDF"
-                          >
-                            {downloading === assignment.id
-                              ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
-                              : <Icon icon="solar:download-linear" />}
-                          </button>
+                          <>
+                            <button
+                              onClick={() => handleDownload(assignment)}
+                              disabled={downloading === assignment.id}
+                              className="w-32-px h-32-px me-8 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
+                              title="Download PDF"
+                            >
+                              {downloading === assignment.id
+                                ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
+                                : <Icon icon="solar:download-linear" />}
+                            </button>
+                            <button
+                              onClick={() => handleOpenInNewTab(assignment.id)}
+                              disabled={openingId === assignment.id}
+                              className="w-32-px h-32-px me-8 bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
+                              title="Open in New Tab"
+                            >
+                              {openingId === assignment.id
+                                ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
+                                : <Icon icon="solar:arrow-right-up-outline" />}
+                            </button>
+                          </>
                         )}
                         {userRole === "ADMIN" && (
                           <button

@@ -17,6 +17,7 @@ const GeneratedPaperListLayer = () => {
   const [papers,      setPapers]      = useState([]);
   const [loading,     setLoading]     = useState(true);
   const [downloading, setDownloading] = useState(null);
+  const [openingId,   setOpeningId]   = useState(null);
   const [deletingId,  setDeletingId]  = useState(null);
   const [statusFilter, setStatusFilter] = useState("");
   const [page,     setPage]     = useState(1);
@@ -51,6 +52,17 @@ const GeneratedPaperListLayer = () => {
       showError("Failed to download PDF");
     } finally {
       setDownloading(null);
+    }
+  };
+
+  const handleOpenInNewTab = async (id) => {
+    setOpeningId(id);
+    try {
+      await generatedPaperService.openInNewTab(id);
+    } catch {
+      showError("Failed to open PDF");
+    } finally {
+      setOpeningId(null);
     }
   };
 
@@ -135,7 +147,6 @@ const GeneratedPaperListLayer = () => {
                     <th>Theory Course</th>
                     <th>Lab Course</th>
                     <th>CLOs</th>
-                    <th>PLOs</th>
                     <th>Status</th>
                     <th>Created</th>
                     <th>Actions</th>
@@ -165,9 +176,6 @@ const GeneratedPaperListLayer = () => {
                       <td className="text-center">
                         {paper.clo_ids?.length ?? paper.clos?.length ?? "—"}
                       </td>
-                      <td className="text-center">
-                        {paper.plo_ids?.length ?? paper.plos?.length ?? "—"}
-                      </td>
                       <td>
                         <span className={`badge radius-4 ${STATUS_BADGE[paper.status] || "bg-neutral-200 text-neutral-600"}`}>
                           {paper.status || "—"}
@@ -179,20 +187,30 @@ const GeneratedPaperListLayer = () => {
                           : "—"}
                       </td>
                       <td>
-                        {/* Download — only when COMPLETED */}
                         {paper.status === "COMPLETED" && (
-                          <button
-                            onClick={() => handleDownload(paper)}
-                            disabled={downloading === paper.id}
-                            className="w-32-px h-32-px me-8 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
-                            title="Download PDF"
-                          >
-                            {downloading === paper.id
-                              ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
-                              : <Icon icon="solar:download-linear" />}
-                          </button>
+                          <>
+                            <button
+                              onClick={() => handleDownload(paper)}
+                              disabled={downloading === paper.id}
+                              className="w-32-px h-32-px me-8 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
+                              title="Download PDF"
+                            >
+                              {downloading === paper.id
+                                ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
+                                : <Icon icon="solar:download-linear" />}
+                            </button>
+                            <button
+                              onClick={() => handleOpenInNewTab(paper.id)}
+                              disabled={openingId === paper.id}
+                              className="w-32-px h-32-px me-8 bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
+                              title="Open in New Tab"
+                            >
+                              {openingId === paper.id
+                                ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
+                                : <Icon icon="solar:arrow-right-up-outline" />}
+                            </button>
+                          </>
                         )}
-                        {/* Delete — not for students */}
                         {userRole !== "STUDENT" && (
                           <button
                             onClick={() => handleDelete(paper.id)}
