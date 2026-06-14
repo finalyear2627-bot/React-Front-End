@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { cloService } from "../api/clo.service";
 import { courseService } from "../api/course.service";
-import { gaService } from "../api/ga.service";
 import { showSuccess, showError, getApiError } from "../utils/toast";
 
 const BT_LEVELS = [
@@ -15,58 +14,27 @@ const CLOEditLayer = () => {
   const { id }   = useParams();
   const navigate = useNavigate();
 
-  const [formData,     setFormData]     = useState({ course_code: "", clo_number: "", description: "", bt_level: "", ga_code: "" });
-  const [courses,      setCourses]      = useState([]);
-  const [availableGAs, setAvailableGAs] = useState([]);
-  const [loadingGAs,   setLoadingGAs]   = useState(false);
-  const [loading,      setLoading]      = useState(false);
-  const [fetchingId,   setFetchingId]   = useState(true);
-
-  const loadGAsForProgram = async (programId) => {
-    if (!programId) return;
-    setLoadingGAs(true);
-    try {
-      const data = await gaService.getAll({ program: programId });
-      setAvailableGAs(Array.isArray(data) ? data : data.result || data.results || []);
-    } catch (_) {
-      setAvailableGAs([]);
-    } finally {
-      setLoadingGAs(false);
-    }
-  };
+  const [formData,   setFormData]   = useState({ course_code: "", clo_number: "", description: "", bt_level: "" });
+  const [courses,    setCourses]    = useState([]);
+  const [loading,    setLoading]    = useState(false);
+  const [fetchingId, setFetchingId] = useState(true);
 
   useEffect(() => {
     Promise.all([cloService.getById(id), courseService.getAllCourses()])
-      .then(async ([cloData, courseData]) => {
+      .then(([cloData, courseData]) => {
         const clo        = cloData?.result?.[0] ?? cloData?.result ?? cloData;
         const allCourses = Array.isArray(courseData) ? courseData : courseData.result || courseData.results || [];
         setCourses(allCourses);
-
-        const courseCode = clo.course_code || clo.course_detail?.code || "";
         setFormData({
-          course_code: courseCode,
+          course_code: clo.course_code || clo.course_detail?.code || "",
           clo_number:  String(clo.clo_number || ""),
           description: clo.description || "",
           bt_level:    clo.bt_level || "",
-          ga_code:     clo.ga_code || clo.ga_detail?.code || "",
         });
-
-        const course = allCourses.find((c) => c.code === courseCode);
-        const programId = course?.program || course?.program_detail?.id;
-        if (programId) await loadGAsForProgram(programId);
       })
       .catch((err) => showError(getApiError(err)))
       .finally(() => setFetchingId(false));
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleCourseChange = async (courseCode) => {
-    setFormData((prev) => ({ ...prev, course_code: courseCode, ga_code: "" }));
-    setAvailableGAs([]);
-    if (!courseCode) return;
-    const course = courses.find((c) => c.code === courseCode);
-    const programId = course?.program || course?.program_detail?.id;
-    await loadGAsForProgram(programId);
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -83,7 +51,6 @@ const CLOEditLayer = () => {
         bt_level:    formData.bt_level,
         description: formData.description.trim(),
       };
-      if (formData.ga_code) payload.ga_code = formData.ga_code;
 
       const res = await cloService.update(id, payload);
       if (res?.status?.code !== 0) { showError(res?.status?.message || "Update failed"); return; }
@@ -119,7 +86,7 @@ const CLOEditLayer = () => {
                       className="form-control radius-8"
                       name="course_code"
                       value={formData.course_code}
-                      onChange={(e) => handleCourseChange(e.target.value)}
+                      onChange={handleChange}
                       required
                     >
                       <option value="">-- Select Course --</option>
@@ -170,37 +137,6 @@ const CLOEditLayer = () => {
                         </optgroup>
                       ))}
                     </select>
-                  </div>
-
-                  {/* GA Code */}
-                  <div className="mb-20">
-                    <label className="form-label fw-semibold text-primary-light text-sm mb-8">
-                      Graduate Attribute (GA Code)
-                      <span className="text-secondary-light fw-normal ms-8 text-xs">optional</span>
-                    </label>
-                    {!formData.course_code ? (
-                      <p className="text-secondary-light text-sm">Select a course first to load available GAs.</p>
-                    ) : loadingGAs ? (
-                      <p className="text-secondary-light text-sm">Loading GAs…</p>
-                    ) : availableGAs.length === 0 ? (
-                      <div className="alert alert-info radius-8 text-sm mb-0">
-                        No GAs found for this course's program.
-                      </div>
-                    ) : (
-                      <select
-                        className="form-control radius-8"
-                        name="ga_code"
-                        value={formData.ga_code}
-                        onChange={handleChange}
-                      >
-                        <option value="">-- No GA mapping --</option>
-                        {availableGAs.map((ga) => (
-                          <option key={ga.id} value={`GA${ga.ga_number}`}>
-                            GA{ga.ga_number} — {ga.name}
-                          </option>
-                        ))}
-                      </select>
-                    )}
                   </div>
 
                   {/* Description */}

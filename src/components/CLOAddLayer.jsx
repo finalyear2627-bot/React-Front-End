@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { cloService } from "../api/clo.service";
 import { courseService } from "../api/course.service";
-import { gaService } from "../api/ga.service";
 import { showSuccess, showError, getApiError } from "../utils/toast";
 
 const BT_LEVELS = [
@@ -13,11 +12,9 @@ const BT_LEVELS = [
 
 const CLOAddLayer = () => {
   const navigate = useNavigate();
-  const [formData,    setFormData]    = useState({ course_code: "", clo_number: "", description: "", bt_level: "", ga_code: "" });
-  const [courses,     setCourses]     = useState([]);
-  const [availableGAs, setAvailableGAs] = useState([]);
-  const [loadingGAs,  setLoadingGAs]  = useState(false);
-  const [loading,     setLoading]     = useState(false);
+  const [formData, setFormData] = useState({ course_code: "", clo_number: "", description: "", bt_level: "" });
+  const [courses,  setCourses]  = useState([]);
+  const [loading,  setLoading]  = useState(false);
 
   useEffect(() => {
     courseService
@@ -25,25 +22,6 @@ const CLOAddLayer = () => {
       .then((d) => setCourses(Array.isArray(d) ? d : d.result || d.results || []))
       .catch(() => {});
   }, []);
-
-  const handleCourseChange = async (courseCode) => {
-    setFormData((prev) => ({ ...prev, course_code: courseCode, ga_code: "" }));
-    setAvailableGAs([]);
-    if (!courseCode) return;
-    const course = courses.find((c) => c.code === courseCode);
-    if (!course) return;
-    const programId = course.program || course.program_detail?.id;
-    if (!programId) return;
-    setLoadingGAs(true);
-    try {
-      const data = await gaService.getAll({ program: programId });
-      setAvailableGAs(Array.isArray(data) ? data : data.result || data.results || []);
-    } catch (_) {
-      setAvailableGAs([]);
-    } finally {
-      setLoadingGAs(false);
-    }
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -60,7 +38,6 @@ const CLOAddLayer = () => {
         bt_level:    formData.bt_level,
         description: formData.description.trim(),
       };
-      if (formData.ga_code) payload.ga_code = formData.ga_code;
 
       const res = await cloService.create(payload);
       if (res?.status?.code !== 0) { showError(res?.status?.message || "Create failed"); return; }
@@ -94,7 +71,7 @@ const CLOAddLayer = () => {
                       className="form-control radius-8"
                       name="course_code"
                       value={formData.course_code}
-                      onChange={(e) => handleCourseChange(e.target.value)}
+                      onChange={handleChange}
                       required
                     >
                       <option value="">-- Select Course --</option>
@@ -145,37 +122,6 @@ const CLOAddLayer = () => {
                         </optgroup>
                       ))}
                     </select>
-                  </div>
-
-                  {/* GA Code */}
-                  <div className="mb-20">
-                    <label className="form-label fw-semibold text-primary-light text-sm mb-8">
-                      Graduate Attribute (GA Code)
-                      <span className="text-secondary-light fw-normal ms-8 text-xs">optional</span>
-                    </label>
-                    {!formData.course_code ? (
-                      <p className="text-secondary-light text-sm">Select a course first to load available GAs.</p>
-                    ) : loadingGAs ? (
-                      <p className="text-secondary-light text-sm">Loading GAs…</p>
-                    ) : availableGAs.length === 0 ? (
-                      <div className="alert alert-info radius-8 text-sm mb-0">
-                        No GAs found for this course's program. Add GAs first.
-                      </div>
-                    ) : (
-                      <select
-                        className="form-control radius-8"
-                        name="ga_code"
-                        value={formData.ga_code}
-                        onChange={handleChange}
-                      >
-                        <option value="">-- No GA mapping --</option>
-                        {availableGAs.map((ga) => (
-                          <option key={ga.id} value={`GA${ga.ga_number}`}>
-                            GA{ga.ga_number} — {ga.name}
-                          </option>
-                        ))}
-                      </select>
-                    )}
                   </div>
 
                   {/* Description */}

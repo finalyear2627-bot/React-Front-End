@@ -14,14 +14,15 @@ const STATUS_BADGE = {
 
 const GeneratedPaperListLayer = () => {
   const userRole = localStorage.getItem("user_role");
-  const [papers,      setPapers]      = useState([]);
-  const [loading,     setLoading]     = useState(true);
-  const [downloading, setDownloading] = useState(null);
-  const [openingId,   setOpeningId]   = useState(null);
-  const [deletingId,  setDeletingId]  = useState(null);
+
+  const [papers,       setPapers]       = useState([]);
+  const [loading,      setLoading]      = useState(true);
+  const [downloading,  setDownloading]  = useState(null);
+  const [openingId,    setOpeningId]    = useState(null);
+  const [deletingId,   setDeletingId]   = useState(null);
   const [statusFilter, setStatusFilter] = useState("");
-  const [page,     setPage]     = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [page,         setPage]         = useState(1);
+  const [pageSize,     setPageSize]     = useState(10);
 
   const fetchPapers = useCallback(async () => {
     setLoading(true);
@@ -29,10 +30,7 @@ const GeneratedPaperListLayer = () => {
       const params = {};
       if (statusFilter) params.status = statusFilter;
       const data = await generatedPaperService.getAll(params);
-      const list = Array.isArray(data)
-        ? data
-        : data.result || data.results || [];
-      setPapers(list);
+      setPapers(Array.isArray(data) ? data : data.result || data.results || []);
     } catch (err) {
       showError(getApiError(err));
     } finally {
@@ -45,9 +43,11 @@ const GeneratedPaperListLayer = () => {
   const handleDownload = async (paper) => {
     setDownloading(paper.id);
     try {
-      const topic = paper.topic || `paper_${paper.id}`;
-      const filename = `${topic.replace(/\s+/g, "_").slice(0, 40)}.pdf`;
-      await generatedPaperService.download(paper.id, filename);
+      const name = paper.topic || `paper_${paper.id}`;
+      await generatedPaperService.download(
+        paper.id,
+        `${name.replace(/\s+/g, "_").slice(0, 40)}.pdf`
+      );
     } catch {
       showError("Failed to download PDF");
     } finally {
@@ -67,7 +67,7 @@ const GeneratedPaperListLayer = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this paper? This will also remove the PDF file from disk.")) return;
+    if (!window.confirm("Delete this paper? This will also remove the PDF file.")) return;
     setDeletingId(id);
     try {
       const res = await generatedPaperService.delete(id);
@@ -84,11 +84,9 @@ const GeneratedPaperListLayer = () => {
 
   return (
     <div className="card basic-data-table">
-      {/* Header */}
       <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <h5 className="card-title mb-0">Generated Assessment Papers</h5>
+        <h5 className="card-title mb-0">Generated Papers</h5>
         <div className="d-flex align-items-center gap-2 flex-wrap">
-          {/* Status filter */}
           <select
             className="form-select form-select-sm radius-8"
             style={{ width: 160 }}
@@ -120,15 +118,26 @@ const GeneratedPaperListLayer = () => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="card-body">
         {loading ? (
-          <div className="text-center py-40">Loading…</div>
+          <div className="text-center py-40">
+            <Icon
+              icon="svg-spinners:180-ring"
+              className="text-primary-600"
+              style={{ fontSize: 32 }}
+            />
+          </div>
         ) : papers.length === 0 ? (
           <div className="text-center py-40">
-            <Icon icon="solar:document-outline" style={{ fontSize: 48 }} className="text-secondary-light mb-16" />
+            <Icon
+              icon="solar:document-text-bold-duotone"
+              style={{ fontSize: 48 }}
+              className="text-secondary-light mb-16"
+            />
             <p className="text-secondary-light mb-16">
-              {statusFilter ? `No ${statusFilter} papers found.` : "No assessment papers generated yet."}
+              {statusFilter
+                ? `No ${statusFilter} papers found.`
+                : "No exam papers generated yet."}
             </p>
             {userRole === "TEACHER" && (
               <Link to="/generate-paper" className="btn btn-sm btn-primary radius-8">
@@ -146,7 +155,8 @@ const GeneratedPaperListLayer = () => {
                     <th>Topic</th>
                     <th>Theory Course</th>
                     <th>Lab Course</th>
-                    <th>CLOs</th>
+                    <th>Teacher</th>
+                    <th>Marks / Time</th>
                     <th>Status</th>
                     <th>Created</th>
                     <th>Actions</th>
@@ -156,28 +166,55 @@ const GeneratedPaperListLayer = () => {
                   {paginated.map((paper, idx) => (
                     <tr key={paper.id || idx}>
                       <td>{(page - 1) * pageSize + idx + 1}</td>
-                      <td style={{ maxWidth: 200 }}>
-                        <span className="fw-medium" title={paper.topic}>
-                          {paper.topic?.length > 50
-                            ? paper.topic.slice(0, 50) + "…"
+                      <td style={{ maxWidth: 180 }}>
+                        <span
+                          className="fw-medium"
+                          title={paper.topic}
+                        >
+                          {(paper.topic || "").length > 45
+                            ? paper.topic.slice(0, 45) + "…"
                             : paper.topic || "—"}
                         </span>
                       </td>
                       <td>
                         <span className="badge bg-info-focus text-info-main radius-4">
-                          {paper.theory_course_name || paper.theory_course?.name || paper.theory_course_code || `Course ${paper.theory_course_id || "—"}`}
+                          {paper.theory_course_code ||
+                            paper.theory_course_name ||
+                            (paper.theory_course_id ? `Course ${paper.theory_course_id}` : "—")}
                         </span>
                       </td>
                       <td>
-                        <span className="badge bg-warning-focus text-warning-main radius-4">
-                          {paper.lab_course_name || paper.lab_course?.name || paper.lab_course_code || `Course ${paper.lab_course_id || "—"}`}
-                        </span>
+                        {paper.lab_course_id ? (
+                          <span className="badge bg-warning-focus text-warning-main radius-4">
+                            {paper.lab_course_code ||
+                              paper.lab_course_name ||
+                              `Course ${paper.lab_course_id}`}
+                          </span>
+                        ) : (
+                          <span className="text-secondary-light text-xs">—</span>
+                        )}
                       </td>
-                      <td className="text-center">
-                        {paper.clo_ids?.length ?? paper.clos?.length ?? "—"}
+                      <td className="text-nowrap">
+                        {paper.teacher_name || "—"}
+                      </td>
+                      <td className="text-nowrap text-sm">
+                        {paper.total_marks && (
+                          <span>{paper.total_marks} marks</span>
+                        )}
+                        {paper.total_marks && paper.total_time && (
+                          <span className="text-secondary-light mx-4">/</span>
+                        )}
+                        {paper.total_time && (
+                          <span className="text-secondary-light">{paper.total_time}</span>
+                        )}
+                        {!paper.total_marks && !paper.total_time && "—"}
                       </td>
                       <td>
-                        <span className={`badge radius-4 ${STATUS_BADGE[paper.status] || "bg-neutral-200 text-neutral-600"}`}>
+                        <span
+                          className={`badge radius-4 ${
+                            STATUS_BADGE[paper.status] || "bg-neutral-200 text-neutral-600"
+                          }`}
+                        >
                           {paper.status || "—"}
                         </span>
                       </td>
@@ -195,9 +232,14 @@ const GeneratedPaperListLayer = () => {
                               className="w-32-px h-32-px me-8 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
                               title="Download PDF"
                             >
-                              {downloading === paper.id
-                                ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
-                                : <Icon icon="solar:download-linear" />}
+                              {downloading === paper.id ? (
+                                <span
+                                  className="spinner-border spinner-border-sm"
+                                  style={{ width: 12, height: 12 }}
+                                />
+                              ) : (
+                                <Icon icon="solar:download-linear" />
+                              )}
                             </button>
                             <button
                               onClick={() => handleOpenInNewTab(paper.id)}
@@ -205,22 +247,32 @@ const GeneratedPaperListLayer = () => {
                               className="w-32-px h-32-px me-8 bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
                               title="Open in New Tab"
                             >
-                              {openingId === paper.id
-                                ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
-                                : <Icon icon="solar:arrow-right-up-outline" />}
+                              {openingId === paper.id ? (
+                                <span
+                                  className="spinner-border spinner-border-sm"
+                                  style={{ width: 12, height: 12 }}
+                                />
+                              ) : (
+                                <Icon icon="solar:arrow-right-up-outline" />
+                              )}
                             </button>
                           </>
                         )}
-                        {userRole !== "STUDENT" && (
+                        {userRole === "ADMIN" && (
                           <button
                             onClick={() => handleDelete(paper.id)}
                             disabled={deletingId === paper.id}
                             className="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
                             title="Delete"
                           >
-                            {deletingId === paper.id
-                              ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
-                              : <Icon icon="mingcute:delete-2-line" />}
+                            {deletingId === paper.id ? (
+                              <span
+                                className="spinner-border spinner-border-sm"
+                                style={{ width: 12, height: 12 }}
+                              />
+                            ) : (
+                              <Icon icon="mingcute:delete-2-line" />
+                            )}
                           </button>
                         )}
                       </td>

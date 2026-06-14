@@ -313,6 +313,7 @@ const MasterLayout = ({ children }) => {
                 <span>Assessments</span>
               </Link>
               <ul className='sidebar-submenu'>
+                {/* Papers */}
                 <li>
                   <NavLink to='/generated-papers' className={(n) => n.isActive ? "active-page" : ""}>
                     <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Papers
@@ -325,6 +326,7 @@ const MasterLayout = ({ children }) => {
                     </NavLink>
                   </li>
                 )}
+                {/* Quizzes */}
                 <li>
                   <NavLink to='/generated-quizzes' className={(n) => n.isActive ? "active-page" : ""}>
                     <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Quizzes
@@ -337,6 +339,7 @@ const MasterLayout = ({ children }) => {
                     </NavLink>
                   </li>
                 )}
+                {/* Assignments */}
                 <li>
                   <NavLink to='/generated-assignments' className={(n) => n.isActive ? "active-page" : ""}>
                     <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Assignments
