@@ -160,7 +160,8 @@ const CLOListLayer = () => {
                     <th style={{ width: 90 }}>CLO No.</th>
                     <th>Course</th>
                     <th>Description</th>
-                    <th>Mapped PLOs</th>
+                    <th style={{ width: 100 }}>BT Level</th>
+                    <th style={{ width: 110 }}>GA Code</th>
                     <th style={{ width: 120 }}>Action</th>
                   </tr>
                 </thead>
@@ -178,15 +179,14 @@ const CLOListLayer = () => {
                       </td>
                       <td className="text-sm">{clo.description || "N/A"}</td>
                       <td>
-                        <div className="d-flex flex-wrap gap-1">
-                          {(clo.mapped_plos || []).length > 0
-                            ? (clo.mapped_plos || []).map((p, i) => (
-                                <span key={i} className="badge bg-primary-100 text-primary-600 radius-4 text-xs">
-                                  {typeof p === "object" ? `PLO-${p.plo_number}` : `PLO-${p}`}
-                                </span>
-                              ))
-                            : <span className="text-secondary-light text-sm">—</span>}
-                        </div>
+                        {clo.bt_level
+                          ? <span className="badge bg-warning-focus text-warning-main radius-4 fw-semibold">{clo.bt_level}</span>
+                          : <span className="text-secondary-light">—</span>}
+                      </td>
+                      <td>
+                        {clo.ga_code || clo.ga_detail?.code
+                          ? <span className="badge bg-info-focus text-info-main radius-4 fw-semibold">{clo.ga_code || clo.ga_detail?.code}</span>
+                          : <span className="text-secondary-light">—</span>}
                       </td>
                       <td>
                         <Link

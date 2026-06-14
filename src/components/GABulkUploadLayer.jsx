@@ -1,13 +1,13 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { cloService } from "../api/clo.service";
-import { downloadCLOTemplate } from "../utils/excelHelper";
+import { gaService } from "../api/ga.service";
+import { downloadGATemplate } from "../utils/excelHelper";
 import { showSuccess, showError, showInfo } from "../utils/toast";
 
-const CLOBulkUploadLayer = () => {
-  const navigate = useNavigate();
-  const fileRef  = useRef(null);
+const GABulkUploadLayer = () => {
+  const navigate    = useNavigate();
+  const fileRef     = useRef(null);
   const [rawFile,      setRawFile]      = useState(null);
   const [fileName,     setFileName]     = useState("");
   const [dragOver,     setDragOver]     = useState(false);
@@ -37,9 +37,9 @@ const CLOBulkUploadLayer = () => {
     if (!rawFile) return;
     setUploading(true); setUploadResult(null);
     try {
-      const res = await cloService.bulkImport(rawFile);
+      const res = await gaService.bulkImport(rawFile);
       setUploadResult(res); setDone(true);
-      if (res?.status?.code === 0) showSuccess(res?.status?.message || "CLOs uploaded successfully");
+      if (res?.status?.code === 0) showSuccess(res?.status?.message || "GAs uploaded successfully");
       else showInfo(res?.status?.message || "Upload completed with issues");
     } catch (err) {
       const msg = err?.response?.data?.status?.message || err?.response?.data?.detail || err?.message || "Upload failed";
@@ -54,8 +54,8 @@ const CLOBulkUploadLayer = () => {
   return (
     <div className="card h-100 p-0 radius-12">
       <div className="card-header border-bottom py-16 px-24 d-flex align-items-center justify-content-between">
-        <h5 className="mb-0">Bulk Upload CLOs</h5>
-        <button onClick={() => navigate("/clos")} className="btn btn-sm btn-outline-secondary radius-8">
+        <h5 className="mb-0">Bulk Upload Graduate Attributes (GAs)</h5>
+        <button onClick={() => navigate("/gas")} className="btn btn-sm btn-outline-secondary radius-8">
           <Icon icon="ep:arrow-left" className="me-4" /> Back to List
         </button>
       </div>
@@ -68,34 +68,27 @@ const CLOBulkUploadLayer = () => {
             <h6 className="mb-0 text-primary-light">Download CSV Template</h6>
           </div>
           <p className="text-secondary-light text-sm ms-40 mb-4">
-            Download <strong>CLOs_Template.csv</strong> and fill in CLO data. Required columns:
+            Download <strong>GAs_Template.csv</strong> and fill in your GA data. Required columns:
           </p>
           <ul className="text-secondary-light text-sm ms-40 mb-12">
-            <li><strong>course_code</strong> — Course code (e.g., CMC111 or CMC111-L)</li>
-            <li><strong>course_name</strong> — Course name (e.g., Programming Fundamentals)</li>
-            <li><strong>semester</strong> — Semester number (e.g., 1, 2, 3…)</li>
-            <li><strong>clo_number</strong> — CLO number: 1, 2, or 3 (each course has 3 CLOs)</li>
-            <li><strong>ga_code</strong> — Graduate Attribute code: GA1 to GA10 (optional)</li>
-            <li><strong>bt_level</strong> — Cognitive: C1–C6 | Psychomotor: P1–P5 | Affective: A1–A5</li>
+            <li><strong>program_code</strong> — Program code (e.g., BSCS)</li>
+            <li><strong>ga_number</strong> — GA number (e.g., 1, 2, 3…)</li>
+            <li><strong>name</strong> — GA name (e.g., Individual and Teamwork)</li>
+            <li><strong>description</strong> — Full GA description text</li>
+            <li><strong>mapped_plos</strong> — Comma-separated PLO refs (e.g., PLO-1, PLO-2)</li>
           </ul>
-          <div className="alert alert-info radius-8 text-sm ms-40 mb-12 d-flex align-items-start gap-8">
-            <Icon icon="solar:info-circle-outline" className="text-xl flex-shrink-0 mt-1" />
-            <span>
-              Theory and Lab are separate rows with separate course codes (e.g., CMC111 and CMC111-L).
-              Rows with an inactive course are skipped automatically.
-            </span>
-          </div>
-          <button onClick={downloadCLOTemplate} className="btn btn-outline-primary radius-8 d-inline-flex align-items-center gap-8 ms-40">
-            <Icon icon="vscode-icons:file-type-excel" className="text-xl" /> Download CLOs_Template.csv
+          <button onClick={downloadGATemplate} className="btn btn-outline-primary radius-8 d-inline-flex align-items-center gap-8 ms-40">
+            <Icon icon="vscode-icons:file-type-excel" className="text-xl" /> Download GAs_Template.csv
           </button>
         </div>
 
-        {/* Step 2 */}
+        {/* Step 2 — Upload */}
         <div className="mb-32">
           <div className="d-flex align-items-center gap-12 mb-8">
             <span className="w-28-px h-28-px rounded-circle bg-primary-600 text-white d-inline-flex align-items-center justify-content-center text-sm fw-bold">2</span>
             <h6 className="mb-0 text-primary-light">Upload Filled File</h6>
           </div>
+
           {!fileName ? (
             <div
               className="ms-40 rounded-12 p-32 text-center cursor-pointer"
@@ -122,7 +115,7 @@ const CLOBulkUploadLayer = () => {
           {fileError && <div className="ms-40 alert alert-danger mt-12 radius-8">{fileError}</div>}
         </div>
 
-        {/* Step 3 */}
+        {/* Step 3 — Confirm */}
         {rawFile && !done && (
           <div className="mb-32">
             <div className="d-flex align-items-center gap-12 mb-8">
@@ -133,7 +126,7 @@ const CLOBulkUploadLayer = () => {
               <button className="btn btn-primary radius-8 px-32 py-11" onClick={handleUpload} disabled={uploading}>
                 {uploading
                   ? <><span className="spinner-border spinner-border-sm me-8" />Uploading…</>
-                  : <><Icon icon="solar:upload-bold" className="me-6" />Upload CLOs</>}
+                  : <><Icon icon="solar:upload-bold" className="me-6" />Upload GAs</>}
               </button>
               <button className="btn btn-outline-secondary radius-8 px-32" onClick={reset} disabled={uploading}>Cancel</button>
             </div>
@@ -150,20 +143,21 @@ const CLOBulkUploadLayer = () => {
               <div className="table-responsive mb-16" style={{ maxHeight: 300, overflowY: "auto" }}>
                 <table className="table bordered-table mb-0">
                   <thead>
-                    <tr><th>#</th><th>Course</th><th>CLO No.</th><th>Status</th><th>Message</th></tr>
+                    <tr><th>#</th><th>Program</th><th>GA No.</th><th>Name</th><th>Status</th><th>Message</th></tr>
                   </thead>
                   <tbody>
                     {resultRows.map((r, i) => (
                       <tr key={i}>
                         <td className="text-secondary-light">{i + 1}</td>
-                        <td>{r.course_code || "-"}</td>
-                        <td>{r.clo_number || "-"}</td>
+                        <td>{r.program_code || "-"}</td>
+                        <td>{r.ga_number || "-"}</td>
+                        <td>{r.name || "-"}</td>
                         <td>
                           {r.success !== false
                             ? <span className="badge bg-success-focus text-success-main radius-4">Success</span>
-                            : <span className="badge bg-danger-focus text-danger-main radius-4">Skipped</span>}
+                            : <span className="badge bg-danger-focus text-danger-main radius-4">Failed</span>}
                         </td>
-                        <td className="text-sm text-secondary-light">{r.message || r.error || r.reason || "-"}</td>
+                        <td className="text-sm text-secondary-light">{r.message || r.error || "-"}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -171,7 +165,7 @@ const CLOBulkUploadLayer = () => {
               </div>
             )}
             <div className="d-flex gap-12">
-              <button className="btn btn-primary radius-8 px-32 py-11" onClick={() => navigate("/clos")}>Go to CLO List</button>
+              <button className="btn btn-primary radius-8 px-32 py-11" onClick={() => navigate("/gas")}>Go to GA List</button>
               <button className="btn btn-outline-secondary radius-8 px-32" onClick={reset}>Upload Another</button>
             </div>
           </div>
@@ -181,4 +175,4 @@ const CLOBulkUploadLayer = () => {
   );
 };
 
-export default CLOBulkUploadLayer;
+export default GABulkUploadLayer;

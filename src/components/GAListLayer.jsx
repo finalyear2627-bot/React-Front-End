@@ -97,6 +97,9 @@ const GAListLayer = () => {
               ? <><span className="spinner-border spinner-border-sm me-4" /> Deleting…</>
               : <><Icon icon="mingcute:delete-2-line" className="text-lg" /> Delete All GAs</>}
           </button>
+          <Link to="/ga-bulk-upload" className="btn btn-sm btn-outline-primary radius-8 d-inline-flex align-items-center gap-1">
+            <Icon icon="vscode-icons:file-type-excel" className="text-lg" /> Bulk Upload
+          </Link>
           <Link to="/ga-add" className="btn btn-sm btn-primary-600 radius-8 d-inline-flex align-items-center gap-1">
             <Icon icon="ic:round-plus" className="text-xl" /> Add GA
           </Link>

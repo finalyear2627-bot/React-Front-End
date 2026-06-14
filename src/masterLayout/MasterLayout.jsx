@@ -429,6 +429,11 @@ const MasterLayout = ({ children }) => {
                       <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Add GA
                     </NavLink>
                   </li>
+                  <li>
+                    <NavLink to='/ga-bulk-upload' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-warning-main w-auto' /> Bulk Upload GAs
+                    </NavLink>
+                  </li>
                 </ul>
               </li>
             )}

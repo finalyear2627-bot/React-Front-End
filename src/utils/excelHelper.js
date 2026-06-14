@@ -125,12 +125,14 @@ export const downloadPLOTemplate = () => {
 // ─── CLO template ───────────────────────────────────────────────────────────
 
 export const downloadCLOTemplate = () => {
-  const headers = ["course_code", "clo_number", "description", "mapped_plos"];
+  const headers = ["course_code", "course_name", "semester", "clo_number", "ga_code", "bt_level"];
   const sampleData = [
-    ["CMC111",   "1", "Write syntactically correct programs in a high-level language", "PLO-1,PLO-2"],
-    ["CMC111",   "2", "Trace and debug logic errors in small programs",                "PLO-1"],
-    ["CMC111",   "3", "Describe basic programming constructs clearly in writing",       "PLO-3"],
-    ["CMC111-L", "1", "Implement programs using arrays and functions in the lab",      "PLO-1,PLO-2"],
+    ["CMC111",   "Programming Fundamentals",       "1", "1", "GA2", "C3"],
+    ["CMC111",   "Programming Fundamentals",       "1", "2", "GA4", "C4"],
+    ["CMC111",   "Programming Fundamentals",       "1", "3", "GA1", "A2"],
+    ["CMC111-L", "Programming Fundamentals (Lab)", "1", "1", "GA3", "P3"],
+    ["CMC111-L", "Programming Fundamentals (Lab)", "1", "2", "GA5", "P2"],
+    ["CMC111-L", "Programming Fundamentals (Lab)", "1", "3", "",    "C2"],
   ];
   let csv = headers.join(",") + "\n";
   sampleData.forEach((r) => { csv += r.map((c) => `"${c}"`).join(",") + "\n"; });
@@ -138,6 +140,29 @@ export const downloadCLOTemplate = () => {
   const link = document.createElement("a");
   link.setAttribute("href", URL.createObjectURL(blob));
   link.setAttribute("download", "CLOs_Template.csv");
+  link.style.visibility = "hidden";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+// ─── GA template ────────────────────────────────────────────────────────────
+
+export const downloadGATemplate = () => {
+  const headers = ["program_code", "ga_number", "name", "description", "mapped_plos"];
+  const sampleData = [
+    ["BSCS", "1", "Individual and Teamwork",                   "Ability to function effectively as an individual and as a member of a team.", "PLO-1,PLO-2"],
+    ["BSCS", "2", "Communication",                             "Ability to communicate effectively on complex engineering activities.",        "PLO-3"],
+    ["BSCS", "3", "Computing Professionalism and Society",     "Apply reasoning and knowledge to assess societal issues.",                     "PLO-4"],
+    ["BSCS", "4", "Ethics",                                    "Apply ethical principles and commit to professional ethics.",                  "PLO-5"],
+    ["BSCS", "5", "Life-long Learning",                        "Recognize the need for and engage in independent and life-long learning.",    "PLO-6"],
+  ];
+  let csv = headers.join(",") + "\n";
+  sampleData.forEach((r) => { csv += r.map((c) => `"${c}"`).join(",") + "\n"; });
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.setAttribute("href", URL.createObjectURL(blob));
+  link.setAttribute("download", "GAs_Template.csv");
   link.style.visibility = "hidden";
   document.body.appendChild(link);
   link.click();

@@ -1448,7 +1448,7 @@
               }
             ],
             "url": "{{base_url}}/api/academics/clos/?course=1",
-            "description": "Filter CLOs for a specific course"
+            "description": "Filter CLOs by course ID. Returns clo_number, ga_code, bt_level, ga_detail."
           }
         },
         {
@@ -1481,13 +1481,13 @@
             "url": "{{base_url}}/api/academics/clos/",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"course\": 1,\n  \"clo_number\": 1,\n  \"description\": \"Understand fundamental concepts of Programming Fundamentals.\",\n  \"bt_level\": \"C2\",\n  \"mapped_plos\": [\n    1,\n    2,\n    3\n  ]\n}"
+              "raw": "{\n  \"course_code\": \"CMC111\",\n  \"clo_number\": 1,\n  \"ga_code\": \"GA2\",\n  \"bt_level\": \"C2\",\n  \"description\": \"\"\n}"
             },
-            "description": "bt_level choices: C1 (Remember), C2 (Understand), C3 (Apply), C4 (Analyze), C5 (Evaluate), C6 (Create). mapped_plos = list of PLO IDs. Blocked if course is inactive."
+            "description": "Single CLO create.\n- course_code: code from Courses list (e.g. 'CMC111', 'CMC111-L')\n- clo_number: 1, 2, or 3\n- ga_code: GA1 to GA10 (must exist for the course program)\n- bt_level: Cognitive C1-C6 | Psychomotor P1-P5 | Affective A1-A5\n- description: optional\nBlocked if course is inactive."
           }
         },
         {
-          "name": "Create CLO (no PLO mapping)",
+          "name": "Create CLO (no GA mapping)",
           "request": {
             "method": "POST",
             "header": [
@@ -1503,8 +1503,9 @@
             "url": "{{base_url}}/api/academics/clos/",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"course\": 1,\n  \"clo_number\": 2,\n  \"description\": \"Apply data structures and algorithms.\",\n  \"bt_level\": \"C3\"\n}"
-            }
+              "raw": "{\n  \"course_code\": \"CMC111\",\n  \"clo_number\": 2,\n  \"bt_level\": \"C3\",\n  \"description\": \"\"\n}"
+            },
+            "description": "Create CLO without GA mapping. bt_level only."
           }
         },
         {
@@ -1524,12 +1525,12 @@
             "url": "{{base_url}}/api/academics/clos/1/",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"course\": 1,\n  \"clo_number\": 1,\n  \"description\": \"Updated CLO description.\",\n  \"bt_level\": \"C4\",\n  \"mapped_plos\": [\n    1,\n    2\n  ]\n}"
+              "raw": "{\n  \"course_code\": \"CMC111\",\n  \"clo_number\": 1,\n  \"ga_code\": \"GA4\",\n  \"bt_level\": \"C4\",\n  \"description\": \"\"\n}"
             }
           }
         },
         {
-          "name": "Partial Update CLO (change PLO mapping)",
+          "name": "Partial Update CLO (change GA mapping)",
           "request": {
             "method": "PATCH",
             "header": [
@@ -1545,8 +1546,9 @@
             "url": "{{base_url}}/api/academics/clos/1/",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"bt_level\": \"C5\",\n  \"mapped_plos\": [\n    2,\n    3\n  ]\n}"
-            }
+              "raw": "{\n  \"ga_code\": \"GA3\",\n  \"bt_level\": \"P3\"\n}"
+            },
+            "description": "Partial update \u2014 change bt_level or GA mapping.\nSend only the fields you want to update."
           }
         },
         {
@@ -1587,7 +1589,7 @@
               }
             ],
             "url": "{{base_url}}/api/academics/clos/bulk-import/",
-            "description": "Multipart form: file (CSV/XLSX). Columns: course_code, clo_number, description, bt_level (C1-C6), mapped_plos (e.g. \"PLO-1, PLO-2\")"
+            "description": "Multipart form: file (CSV/XLSX).\nExact columns: course_code | course_name | semester | clo_number | ga_code | bt_level\n- ga_code: GA1 to GA10\n- bt_level: C1-C6 (Cognitive) | P1-P5 (Psychomotor) | A1-A5 (Affective)\nEach course has 3 CLOs (clo_number 1, 2, 3). Theory and Lab are separate course_codes."
           }
         },
         {

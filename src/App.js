@@ -52,6 +52,7 @@ import CLOPLOGeneratorPage from "./pages/CLOPLOGeneratorPage";
 import GAListPage from "./pages/GAListPage";
 import GAAddPage from "./pages/GAAddPage";
 import GAEditPage from "./pages/GAEditPage";
+import GABulkUploadPage from "./pages/GABulkUploadPage";
 
 import GeneratedPaperListPage from "./pages/GeneratedPaperListPage";
 import GeneratedPaperGeneratePage from "./pages/GeneratedPaperGeneratePage";
@@ -120,6 +121,7 @@ function App() {
         <Route exact path='/gas' element={<ProtectedRoute allowedRoles={["ADMIN"]}><GAListPage /></ProtectedRoute>} />
         <Route exact path='/ga-add' element={<ProtectedRoute allowedRoles={["ADMIN"]}><GAAddPage /></ProtectedRoute>} />
         <Route exact path='/ga-edit/:id' element={<ProtectedRoute allowedRoles={["ADMIN"]}><GAEditPage /></ProtectedRoute>} />
+        <Route exact path='/ga-bulk-upload' element={<ProtectedRoute allowedRoles={["ADMIN"]}><GABulkUploadPage /></ProtectedRoute>} />
 
         {/* Assessment Routes — list pages: all auth; generate pages: teacher only */}
         <Route exact path='/generated-papers'      element={<ProtectedRoute><GeneratedPaperListPage /></ProtectedRoute>} />

@@ -2,65 +2,70 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { cloService } from "../api/clo.service";
 import { courseService } from "../api/course.service";
-import { ploService } from "../api/plo.service";
+import { gaService } from "../api/ga.service";
 import { showSuccess, showError, getApiError } from "../utils/toast";
+
+const BT_LEVELS = [
+  { group: "Cognitive (C)",   options: ["C1 — Remember", "C2 — Understand", "C3 — Apply", "C4 — Analyze", "C5 — Evaluate", "C6 — Create"] },
+  { group: "Psychomotor (P)", options: ["P1 — Imitation", "P2 — Manipulation", "P3 — Precision", "P4 — Articulation", "P5 — Naturalization"] },
+  { group: "Affective (A)",   options: ["A1 — Receiving", "A2 — Responding", "A3 — Valuing", "A4 — Organizing", "A5 — Characterizing"] },
+];
 
 const CLOEditLayer = () => {
   const { id }   = useParams();
   const navigate = useNavigate();
 
-  const [formData,      setFormData]      = useState({ course: "", clo_number: "", description: "" });
-  const [courses,       setCourses]       = useState([]);
-  const [availablePLOs, setAvailablePLOs] = useState([]);
-  const [selectedPLOs,  setSelectedPLOs]  = useState([]);
-  const [loading,       setLoading]       = useState(false);
-  const [fetchingId,    setFetchingId]    = useState(true);
+  const [formData,     setFormData]     = useState({ course_code: "", clo_number: "", description: "", bt_level: "", ga_code: "" });
+  const [courses,      setCourses]      = useState([]);
+  const [availableGAs, setAvailableGAs] = useState([]);
+  const [loadingGAs,   setLoadingGAs]   = useState(false);
+  const [loading,      setLoading]      = useState(false);
+  const [fetchingId,   setFetchingId]   = useState(true);
 
-  const loadPLOsForCourse = async (courseId, allCourses) => {
-    const course = allCourses.find((c) => String(c.id) === String(courseId));
-    if (!course) return;
-    const programId = course.program || course.program_detail?.id;
+  const loadGAsForProgram = async (programId) => {
     if (!programId) return;
+    setLoadingGAs(true);
     try {
-      const data = await ploService.getAll({ program: programId });
-      setAvailablePLOs(Array.isArray(data) ? data : data.result || data.results || []);
-    } catch (_) {}
+      const data = await gaService.getAll({ program: programId });
+      setAvailableGAs(Array.isArray(data) ? data : data.result || data.results || []);
+    } catch (_) {
+      setAvailableGAs([]);
+    } finally {
+      setLoadingGAs(false);
+    }
   };
 
   useEffect(() => {
     Promise.all([cloService.getById(id), courseService.getAllCourses()])
       .then(async ([cloData, courseData]) => {
-        const clo = cloData?.result?.[0] ?? cloData?.result ?? cloData;
+        const clo        = cloData?.result?.[0] ?? cloData?.result ?? cloData;
         const allCourses = Array.isArray(courseData) ? courseData : courseData.result || courseData.results || [];
         setCourses(allCourses);
+
+        const courseCode = clo.course_code || clo.course_detail?.code || "";
         setFormData({
-          course:      String(clo.course || ""),
+          course_code: courseCode,
           clo_number:  String(clo.clo_number || ""),
           description: clo.description || "",
+          bt_level:    clo.bt_level || "",
+          ga_code:     clo.ga_code || clo.ga_detail?.code || "",
         });
-        // Extract mapped PLO ids
-        const mappedIds = (clo.mapped_plos || []).map((p) =>
-          typeof p === "object" ? p.id : p
-        );
-        setSelectedPLOs(mappedIds);
-        await loadPLOsForCourse(clo.course, allCourses);
+
+        const course = allCourses.find((c) => c.code === courseCode);
+        const programId = course?.program || course?.program_detail?.id;
+        if (programId) await loadGAsForProgram(programId);
       })
       .catch((err) => showError(getApiError(err)))
       .finally(() => setFetchingId(false));
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleCourseChange = async (courseId) => {
-    setFormData((prev) => ({ ...prev, course: courseId }));
-    setSelectedPLOs([]);
-    setAvailablePLOs([]);
-    if (!courseId) return;
-    await loadPLOsForCourse(courseId, courses);
-  };
-
-  const togglePLO = (ploId) => {
-    setSelectedPLOs((prev) =>
-      prev.includes(ploId) ? prev.filter((x) => x !== ploId) : [...prev, ploId]
-    );
+  const handleCourseChange = async (courseCode) => {
+    setFormData((prev) => ({ ...prev, course_code: courseCode, ga_code: "" }));
+    setAvailableGAs([]);
+    if (!courseCode) return;
+    const course = courses.find((c) => c.code === courseCode);
+    const programId = course?.program || course?.program_detail?.id;
+    await loadGAsForProgram(programId);
   };
 
   const handleChange = (e) => {
@@ -73,11 +78,13 @@ const CLOEditLayer = () => {
     setLoading(true);
     try {
       const payload = {
-        course:      parseInt(formData.course, 10),
+        course_code: formData.course_code,
         clo_number:  parseInt(formData.clo_number, 10),
+        bt_level:    formData.bt_level,
         description: formData.description.trim(),
-        mapped_plos: selectedPLOs,
       };
+      if (formData.ga_code) payload.ga_code = formData.ga_code;
+
       const res = await cloService.update(id, payload);
       if (res?.status?.code !== 0) { showError(res?.status?.message || "Update failed"); return; }
       showSuccess(res?.status?.message || "CLO updated successfully");
@@ -109,14 +116,15 @@ const CLOEditLayer = () => {
                       Course <span className="text-danger-600">*</span>
                     </label>
                     <select
-                      className="form-control radius-8" name="course"
-                      value={formData.course}
+                      className="form-control radius-8"
+                      name="course_code"
+                      value={formData.course_code}
                       onChange={(e) => handleCourseChange(e.target.value)}
                       required
                     >
                       <option value="">-- Select Course --</option>
                       {courses.map((c) => (
-                        <option key={c.id} value={c.id}>{c.code} - {c.name}</option>
+                        <option key={c.id} value={c.code}>{c.code} — {c.name}</option>
                       ))}
                     </select>
                   </div>
@@ -126,62 +134,88 @@ const CLOEditLayer = () => {
                     <label className="form-label fw-semibold text-primary-light text-sm mb-8">
                       CLO Number <span className="text-danger-600">*</span>
                     </label>
-                    <input
-                      type="number" className="form-control radius-8" name="clo_number"
-                      min="1" value={formData.clo_number} onChange={handleChange} required
-                    />
+                    <select
+                      className="form-control radius-8"
+                      name="clo_number"
+                      value={formData.clo_number}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">-- Select --</option>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                    </select>
+                  </div>
+
+                  {/* BT Level */}
+                  <div className="mb-20">
+                    <label className="form-label fw-semibold text-primary-light text-sm mb-8">
+                      BT Level <span className="text-danger-600">*</span>
+                    </label>
+                    <select
+                      className="form-control radius-8"
+                      name="bt_level"
+                      value={formData.bt_level}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">-- Select BT Level --</option>
+                      {BT_LEVELS.map((grp) => (
+                        <optgroup key={grp.group} label={grp.group}>
+                          {grp.options.map((opt) => {
+                            const code = opt.split(" — ")[0];
+                            return <option key={code} value={code}>{opt}</option>;
+                          })}
+                        </optgroup>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* GA Code */}
+                  <div className="mb-20">
+                    <label className="form-label fw-semibold text-primary-light text-sm mb-8">
+                      Graduate Attribute (GA Code)
+                      <span className="text-secondary-light fw-normal ms-8 text-xs">optional</span>
+                    </label>
+                    {!formData.course_code ? (
+                      <p className="text-secondary-light text-sm">Select a course first to load available GAs.</p>
+                    ) : loadingGAs ? (
+                      <p className="text-secondary-light text-sm">Loading GAs…</p>
+                    ) : availableGAs.length === 0 ? (
+                      <div className="alert alert-info radius-8 text-sm mb-0">
+                        No GAs found for this course's program.
+                      </div>
+                    ) : (
+                      <select
+                        className="form-control radius-8"
+                        name="ga_code"
+                        value={formData.ga_code}
+                        onChange={handleChange}
+                      >
+                        <option value="">-- No GA mapping --</option>
+                        {availableGAs.map((ga) => (
+                          <option key={ga.id} value={`GA${ga.ga_number}`}>
+                            GA{ga.ga_number} — {ga.name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
                   </div>
 
                   {/* Description */}
                   <div className="mb-20">
                     <label className="form-label fw-semibold text-primary-light text-sm mb-8">
-                      Description <span className="text-danger-600">*</span>
+                      Description
+                      <span className="text-secondary-light fw-normal ms-8 text-xs">optional</span>
                     </label>
                     <textarea
-                      className="form-control radius-8" name="description" rows={4}
-                      value={formData.description} onChange={handleChange} required
+                      className="form-control radius-8"
+                      name="description"
+                      rows={3}
+                      value={formData.description}
+                      onChange={handleChange}
                     />
-                  </div>
-
-                  {/* Mapped PLOs */}
-                  <div className="mb-20">
-                    <label className="form-label fw-semibold text-primary-light text-sm mb-8">
-                      Map to PLOs
-                      {selectedPLOs.length > 0 && (
-                        <span className="badge bg-primary-600 text-white ms-8 radius-4 fw-normal text-xs">
-                          {selectedPLOs.length} selected
-                        </span>
-                      )}
-                    </label>
-                    {availablePLOs.length === 0 ? (
-                      <p className="text-secondary-light text-sm">Select a course to load available PLOs.</p>
-                    ) : (
-                      <div className="border radius-8 p-12" style={{ maxHeight: 240, overflowY: "auto" }}>
-                        {availablePLOs.map((plo) => (
-                          <div
-                            key={plo.id}
-                            className={`d-flex align-items-start gap-12 p-10 radius-6 mb-6 cursor-pointer ${selectedPLOs.includes(plo.id) ? "bg-primary-50 border border-primary-200" : "bg-base"}`}
-                            style={{ cursor: "pointer" }}
-                            onClick={() => togglePLO(plo.id)}
-                          >
-                            <input
-                              type="checkbox"
-                              className="form-check-input mt-1 flex-shrink-0"
-                              checked={selectedPLOs.includes(plo.id)}
-                              onChange={() => togglePLO(plo.id)}
-                              onClick={(e) => e.stopPropagation()}
-                              style={{ width: 16, height: 16 }}
-                            />
-                            <div>
-                              <span className="badge bg-primary-100 text-primary-600 radius-4 me-8 text-xs fw-semibold">
-                                PLO-{plo.plo_number}
-                              </span>
-                              <span className="text-sm text-secondary-light">{plo.description}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
 
                   <div className="d-flex gap-3 pt-20">
