@@ -76,4 +76,7 @@ export const authService = {
 
   changePassword: (data) =>
     axiosInstance.post("/accounts/change-password/", data).then((r) => r.data),
+
+  getMyPermissions: () =>
+    axiosInstance.get("/accounts/my-permissions/").then((r) => r.data),
 };

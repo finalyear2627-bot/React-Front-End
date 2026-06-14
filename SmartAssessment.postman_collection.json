@@ -2,7 +2,7 @@
   "info": {
     "name": "Smart Assessment AI - Backend APIs",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Standardized response format: all responses wrapped in {status, result}. JWT Auth, Accounts, Academics (Programs, Semesters, Courses, PLO, CLO), Assessments. CLO creation blocked for inactive courses. PLO creation blocked when all program semesters are inactive."
+    "description": "Standardized response format: all responses wrapped in {status, result}. JWT Auth, Accounts, Academics (Programs, Semesters, Courses, PLO, CLO, GA), Assessments. CLO creation blocked for inactive courses. PLO creation blocked when all program semesters are inactive. GA (Graduate Attributes) maps to PLOs \u2014 admin only write access."
   },
   "variable": [
     {
@@ -1481,9 +1481,9 @@
             "url": "{{base_url}}/api/academics/clos/",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"course\": 1,\n  \"clo_number\": 1,\n  \"description\": \"Understand fundamental concepts of Programming Fundamentals.\",\n  \"mapped_plos\": [\n    1,\n    2,\n    3\n  ]\n}"
+              "raw": "{\n  \"course\": 1,\n  \"clo_number\": 1,\n  \"description\": \"Understand fundamental concepts of Programming Fundamentals.\",\n  \"bt_level\": \"C2\",\n  \"mapped_plos\": [\n    1,\n    2,\n    3\n  ]\n}"
             },
-            "description": "mapped_plos = list of PLO IDs. Blocked if course is inactive or course semester is inactive."
+            "description": "bt_level choices: C1 (Remember), C2 (Understand), C3 (Apply), C4 (Analyze), C5 (Evaluate), C6 (Create). mapped_plos = list of PLO IDs. Blocked if course is inactive."
           }
         },
         {
@@ -1503,7 +1503,7 @@
             "url": "{{base_url}}/api/academics/clos/",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"course\": 1,\n  \"clo_number\": 2,\n  \"description\": \"Apply concepts of Programming Fundamentals to solve problems.\",\n  \"mapped_plos\": []\n}"
+              "raw": "{\n  \"course\": 1,\n  \"clo_number\": 2,\n  \"description\": \"Apply data structures and algorithms.\",\n  \"bt_level\": \"C3\"\n}"
             }
           }
         },
@@ -1524,7 +1524,7 @@
             "url": "{{base_url}}/api/academics/clos/1/",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"course\": 1,\n  \"clo_number\": 1,\n  \"description\": \"Updated CLO description.\",\n  \"mapped_plos\": [\n    1,\n    2\n  ]\n}"
+              "raw": "{\n  \"course\": 1,\n  \"clo_number\": 1,\n  \"description\": \"Updated CLO description.\",\n  \"bt_level\": \"C4\",\n  \"mapped_plos\": [\n    1,\n    2\n  ]\n}"
             }
           }
         },
@@ -1545,7 +1545,7 @@
             "url": "{{base_url}}/api/academics/clos/1/",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"mapped_plos\": [\n    1,\n    3,\n    5\n  ]\n}"
+              "raw": "{\n  \"bt_level\": \"C5\",\n  \"mapped_plos\": [\n    2,\n    3\n  ]\n}"
             }
           }
         },
@@ -1587,7 +1587,7 @@
               }
             ],
             "url": "{{base_url}}/api/academics/clos/bulk-import/",
-            "description": "Multipart form: file (CSV/XLSX). Columns: course_code, clo_number, description, mapped_plos (e.g. \"1,2,3\" or \"PLO-1,PLO-2\"). Skips inactive course rows."
+            "description": "Multipart form: file (CSV/XLSX). Columns: course_code, clo_number, description, bt_level (C1-C6), mapped_plos (e.g. \"PLO-1, PLO-2\")"
           }
         },
         {
@@ -1615,6 +1615,203 @@
               ]
             },
             "description": "Permanently deletes ALL CLOs (and their PLO mappings) from the database. Use before re-importing."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ACADEMICS - GA",
+      "item": [
+        {
+          "name": "List GAs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/gas/",
+            "description": "List all Graduate Attributes. Accessible by Admin and Teacher."
+          }
+        },
+        {
+          "name": "List GAs by Program",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/gas/?program=1",
+            "description": "Filter GAs for a specific program."
+          }
+        },
+        {
+          "name": "Get GA",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/gas/1/"
+          }
+        },
+        {
+          "name": "Create GA (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/gas/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"program\": 1,\n  \"ga_number\": 1,\n  \"name\": \"Individual and Teamwork\",\n  \"description\": \"Ability to function effectively as an individual and as a member of a team.\",\n  \"mapped_plos\": [\n    1,\n    2\n  ]\n}"
+            },
+            "description": "Admin only. mapped_plos = list of PLO IDs. GA names per picture: Individual and Teamwork, Communication, Computing Professionalism and Society, Ethics, Life-long Learning (GA 1-5 then repeat for GA 6-10 mapping to different PLOs)."
+          }
+        },
+        {
+          "name": "Update GA (Admin Only)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/gas/1/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"program\": 1,\n  \"ga_number\": 1,\n  \"name\": \"Individual and Teamwork\",\n  \"description\": \"Updated description.\",\n  \"mapped_plos\": [\n    1,\n    2\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Partial Update GA (Admin Only)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/gas/1/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mapped_plos\": [\n    2,\n    3\n  ]\n}"
+            },
+            "description": "Update mapped PLOs or any GA field partially."
+          }
+        },
+        {
+          "name": "Delete GA (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/gas/1/"
+          }
+        },
+        {
+          "name": "Bulk Delete GAs (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/gas/bulk-delete/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    1,\n    2,\n    3\n  ]\n}"
+            },
+            "description": "Delete multiple GAs by ID list. Body: {\"ids\": [1, 2, 3]}"
+          }
+        },
+        {
+          "name": "Bulk Import GAs (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/gas/bulk-import/",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "CSV or XLSX file"
+                }
+              ]
+            },
+            "description": "Admin only. Multipart form: file (CSV/XLSX). Columns: program_code, ga_number, name, description, mapped_plos (e.g. \"PLO-1, PLO-2\"). Standard GA names: Individual and Teamwork | Communication | Computing Professionalism and Society | Ethics | Life-long Learning"
+          }
+        },
+        {
+          "name": "Clear All GAs (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/academics/gas/clear-all/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "academics",
+                "gas",
+                "clear-all",
+                ""
+              ]
+            },
+            "description": "Permanently deletes ALL GAs from the database. Admin only."
           },
           "response": []
         }

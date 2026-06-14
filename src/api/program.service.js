@@ -36,7 +36,17 @@ export const programService = {
     await axiosInstance.delete(`/academics/programs/${id}/`);
   },
 
-  // Bulk create programs (one by one)
+  // Bulk import via CSV/Excel file upload
+  bulkImport: async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await axiosInstance.post("/academics/programs/bulk-import/", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data;
+  },
+
+  // Bulk create programs (one by one — kept for legacy use)
   bulkCreatePrograms: async (programs) => {
     const results = [];
     for (const program of programs) {

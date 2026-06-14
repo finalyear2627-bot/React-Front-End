@@ -411,6 +411,28 @@ const MasterLayout = ({ children }) => {
               </li>
             )}
 
+            {/* GA — admin only */}
+            {localStorage.getItem("user_role") === "ADMIN" && (
+              <li className='dropdown'>
+                <Link to='#'>
+                  <Icon icon='solar:medal-ribbons-star-outline' className='menu-icon' />
+                  <span>GAs</span>
+                </Link>
+                <ul className='sidebar-submenu'>
+                  <li>
+                    <NavLink to='/gas' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> List GAs
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to='/ga-add' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Add GA
+                    </NavLink>
+                  </li>
+                </ul>
+              </li>
+            )}
+
             {/* Role Permissions — admin only */}
             {localStorage.getItem("user_role") === "ADMIN" && (
               <li className='dropdown'>
