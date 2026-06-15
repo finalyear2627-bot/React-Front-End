@@ -68,6 +68,7 @@ const GeneratedPaperGenerateLayer = () => {
   const [loadingClos,    setLoadingClos]    = useState(false);
   const [loadingPlos,    setLoadingPlos]    = useState(false);
   const [submitting,     setSubmitting]     = useState(false);
+  const [topicError,     setTopicError]     = useState("");
 
   useEffect(() => {
     const role = localStorage.getItem("user_role");
@@ -178,7 +179,12 @@ const GeneratedPaperGenerateLayer = () => {
       showSuccess(res?.status?.message || "Paper generated successfully");
       navigate("/generated-papers");
     } catch (err) {
-      showError(getApiError(err));
+      const msg = getApiError(err);
+      if (err?.response?.status === 422) {
+        setTopicError(msg);
+      } else {
+        showError(msg);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -248,12 +254,16 @@ const GeneratedPaperGenerateLayer = () => {
               </label>
               <input
                 type="text"
-                className="form-control radius-8"
+                className={`form-control radius-8 ${topicError ? "is-invalid" : ""}`}
                 placeholder="e.g., Machine Learning Fundamentals"
                 value={topic}
-                onChange={(e) => setTopic(e.target.value)}
+                onChange={(e) => { setTopic(e.target.value); if (topicError) setTopicError(""); }}
                 required
               />
+              <small className="text-secondary-light">Topic must be correctly spelled and relevant to the selected CLOs and PLOs.</small>
+              {topicError && (
+                <div className="alert alert-danger radius-8 mt-8 text-sm py-8 px-12">{topicError}</div>
+              )}
             </div>
             <div className="col-md-6">
               <label className="form-label fw-semibold text-primary-light text-sm mb-8">

@@ -1830,7 +1830,7 @@
               "mode": "raw",
               "raw": "{\n  \"theory_course_id\": 1,\n  \"lab_course_id\": 2,\n  \"topic\": \"Machine Learning Fundamentals\",\n  \"teacher_name\": \"Ms Tayyaba Shehzad\",\n  \"total_marks\": \"60\",\n  \"total_time\": \"2 Hours and 30 Minutes\",\n  \"clo_ids\": [\n    1,\n    2,\n    3\n  ],\n  \"plo_ids\": [\n    1,\n    2\n  ]\n}"
             },
-            "description": "Generate exam paper PDF.\n\nRequired:\n  theory_course_id  \u2014 ID of the theory course (course_type=THEORY)\n  topic             \u2014 exam topic\n  clo_ids           \u2014 list of CLO IDs (theory CLOs required; lab CLOs auto-fetched if lab course provided but none selected)\n  plo_ids           \u2014 list of PLO IDs\n\nOptional:\n  lab_course_id \u2014 ID of the lab course (course_type=LAB); omit if no lab course\n  teacher_name  \u2014 defaults to logged-in teacher name\n  total_marks   \u2014 default '60'\n  total_time    \u2014 default '2 Hours and 30 Minutes'\n\nPDF header table (matches sample image):\n  Course Code    | Course Title\n  Teacher's Name | Total Marks\n  Date (auto)    | Total Time\n  Student's Name | Reg. No."
+            "description": "Generate exam paper PDF.\n\nRequired:\n  theory_course_id  \u2014 ID of the theory course (course_type=THEORY)\n  topic             \u2014 exam topic (must be correctly spelled and relevant to the selected CLOs/PLOs)\n  clo_ids           \u2014 list of CLO IDs (theory CLOs required; lab CLOs auto-fetched if lab course provided but none selected)\n  plo_ids           \u2014 list of PLO IDs\n\nOptional:\n  lab_course_id \u2014 ID of the lab course (course_type=LAB); omit if no lab course\n  teacher_name  \u2014 defaults to logged-in teacher name\n  total_marks   \u2014 default '60'\n  total_time    \u2014 default '2 Hours and 30 Minutes'\n\nTopic validation (HTTP 422 if failed):\n  Before generating, the system checks that the topic is a valid academic subject with correct spelling and is relevant to the selected CLOs and PLOs. If invalid, an error is returned with a corrective message.\n\nPDF header table:\n  Course Code    | Course Title\n  Teacher's Name | Total Marks\n  Date (auto)    | Total Time\n  Student's Name | Reg. No."
           }
         },
         {
@@ -1951,7 +1951,7 @@
                 ""
               ]
             },
-            "description": "Generate a quiz PDF for a single assigned course. Teacher only."
+            "description": "Generate a quiz PDF for a single assigned course. Teacher only.\n\nTopic validation (HTTP 422 if failed): topic must be correctly spelled and relevant to the selected CLOs and PLOs. An error with a corrective message is returned if the topic is invalid or irrelevant."
           },
           "response": []
         },
@@ -2105,7 +2105,7 @@
                 ""
               ]
             },
-            "description": "Generate an assignment PDF for a single assigned course. Teacher only."
+            "description": "Generate an assignment PDF for a single assigned course. Teacher only.\n\nTopic validation (HTTP 422 if failed): topic must be correctly spelled and relevant to the selected CLOs and PLOs. An error with a corrective message is returned if the topic is invalid or irrelevant."
           },
           "response": []
         },
