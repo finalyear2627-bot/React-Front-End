@@ -173,16 +173,21 @@ export const downloadGATemplate = () => {
 
 export const exportCLOPLOStatementWord = (courseName, rows) => {
   const tableRows = rows
-    .map(
-      (r) => `
+    .map((r) => {
+      const gaNumber = r.ga_number ?? r.ga?.number ?? null;
+      const gaName   = r.ga_name   || r.ga?.name   || "";
+      const gaCode   = r.ga_code   || (gaNumber != null ? `GA-${gaNumber}` : null);
+      const gaCell   = gaCode ? `${gaCode}${gaName ? ": " + gaName : ""}` : "—";
+      return `
       <tr>
         <td style="border:1px solid #ccc;padding:6px 10px;font-weight:600">CLO-${r.clo_number || r.clo}</td>
         <td style="border:1px solid #ccc;padding:6px 10px">${r.description || r.clo_description || ""}</td>
+        <td style="border:1px solid #ccc;padding:6px 10px;text-align:center">${gaCell}</td>
         <td style="border:1px solid #ccc;padding:6px 10px;text-align:center">
           ${(r.mapped_plos || []).join(", ")}
         </td>
-      </tr>`
-    )
+      </tr>`;
+    })
     .join("");
 
   const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office'
@@ -202,9 +207,10 @@ export const exportCLOPLOStatementWord = (courseName, rows) => {
       <table>
         <thead>
           <tr>
-            <th style="width:12%">CLO</th>
-            <th style="width:66%">Description</th>
-            <th style="width:22%;text-align:center">Mapped PLOs</th>
+            <th style="width:10%">CLO</th>
+            <th style="width:46%">Description</th>
+            <th style="width:24%;text-align:center">Graduate Attribute (GA)</th>
+            <th style="width:20%;text-align:center">Mapped PLOs</th>
           </tr>
         </thead>
         <tbody>${tableRows}</tbody>

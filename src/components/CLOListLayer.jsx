@@ -160,7 +160,8 @@ const CLOListLayer = () => {
                     <th style={{ width: 90 }}>CLO No.</th>
                     <th>Course</th>
                     <th>Description</th>
-                    <th style={{ width: 100 }}>BT Level</th>
+                    <th style={{ width: 90 }}>BT Level</th>
+                    <th style={{ width: 80 }}>GA</th>
                     <th style={{ width: 120 }}>Action</th>
                   </tr>
                 </thead>
@@ -180,6 +181,11 @@ const CLOListLayer = () => {
                       <td>
                         {clo.bt_level
                           ? <span className="badge bg-warning-focus text-warning-main radius-4 fw-semibold">{clo.bt_level}</span>
+                          : <span className="text-secondary-light">—</span>}
+                      </td>
+                      <td>
+                        {clo.ga_code
+                          ? <span className="badge bg-purple-focus text-purple radius-4 fw-semibold">{clo.ga_code}</span>
                           : <span className="text-secondary-light">—</span>}
                       </td>
                       <td>

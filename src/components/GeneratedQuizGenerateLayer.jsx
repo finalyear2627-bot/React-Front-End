@@ -8,25 +8,26 @@ import { cloService } from "../api/clo.service";
 import { ploService } from "../api/plo.service";
 import { showSuccess, showError, getApiError } from "../utils/toast";
 
-const CloCheckGroup = ({ items, selected, onToggle, emptyMsg }) => (
+const CloRadioGroup = ({ items, selected, onSelect, emptyMsg }) => (
   <div className="border radius-8 p-12" style={{ maxHeight: 280, overflowY: "auto" }}>
     {items.length === 0 ? (
       <p className="text-secondary-light text-sm mb-0">{emptyMsg}</p>
     ) : (
       items.map((item) => {
-        const checked = selected.includes(item.id);
+        const checked = selected === item.id;
         return (
           <div
             key={item.id}
             className={`d-flex align-items-start gap-10 p-10 radius-6 mb-6 ${checked ? "bg-primary-50 border border-primary-200" : "bg-base"}`}
             style={{ cursor: "pointer" }}
-            onClick={() => onToggle(item.id)}
+            onClick={() => onSelect(item.id)}
           >
             <input
-              type="checkbox"
+              type="radio"
+              name="clo_radio"
               className="form-check-input mt-1 flex-shrink-0"
               checked={checked}
-              onChange={() => onToggle(item.id)}
+              onChange={() => onSelect(item.id)}
               onClick={(e) => e.stopPropagation()}
               style={{ width: 16, height: 16 }}
             />
@@ -52,25 +53,26 @@ const CloCheckGroup = ({ items, selected, onToggle, emptyMsg }) => (
   </div>
 );
 
-const PloCheckGroup = ({ items, selected, onToggle, emptyMsg }) => (
+const PloRadioGroup = ({ items, selected, onSelect, emptyMsg }) => (
   <div className="border radius-8 p-12" style={{ maxHeight: 240, overflowY: "auto" }}>
     {items.length === 0 ? (
       <p className="text-secondary-light text-sm mb-0">{emptyMsg}</p>
     ) : (
       items.map((item) => {
-        const checked = selected.includes(item.id);
+        const checked = selected === item.id;
         return (
           <div
             key={item.id}
             className={`d-flex align-items-start gap-10 p-10 radius-6 mb-6 ${checked ? "bg-success-50 border border-success-200" : "bg-base"}`}
             style={{ cursor: "pointer" }}
-            onClick={() => onToggle(item.id)}
+            onClick={() => onSelect(item.id)}
           >
             <input
-              type="checkbox"
+              type="radio"
+              name="plo_radio"
               className="form-check-input mt-1 flex-shrink-0"
               checked={checked}
-              onChange={() => onToggle(item.id)}
+              onChange={() => onSelect(item.id)}
               onClick={(e) => e.stopPropagation()}
               style={{ width: 16, height: 16 }}
             />
@@ -94,10 +96,10 @@ const PloCheckGroup = ({ items, selected, onToggle, emptyMsg }) => (
 const GeneratedQuizGenerateLayer = () => {
   const navigate = useNavigate();
 
-  const [topic,          setTopic]          = useState("");
-  const [courseId,       setCourseId]       = useState("");
-  const [selectedCloIds, setSelectedCloIds] = useState([]);
-  const [selectedPloIds, setSelectedPloIds] = useState([]);
+  const [topic,         setTopic]         = useState("");
+  const [courseId,      setCourseId]      = useState("");
+  const [selectedCloId, setSelectedCloId] = useState(null);
+  const [selectedPloId, setSelectedPloId] = useState(null);
 
   const [courses,      setCourses]      = useState([]);
   const [allCourses,   setAllCourses]   = useState([]);
@@ -146,9 +148,9 @@ const GeneratedQuizGenerateLayer = () => {
   }, []);
 
   useEffect(() => {
-    if (!courseId) { setClos([]); setPlos([]); setSelectedPloIds([]); return; }
+    if (!courseId) { setClos([]); setPlos([]); setSelectedCloId(null); setSelectedPloId(null); return; }
     setLoadingClos(true);
-    setSelectedCloIds([]);
+    setSelectedCloId(null);
 
     const course = allCourses.find((c) => String(c.id) === String(courseId));
     const programId = course?.program_id || course?.program;
@@ -160,7 +162,7 @@ const GeneratedQuizGenerateLayer = () => {
 
     if (programId) {
       setLoadingPlos(true);
-      setSelectedPloIds([]);
+      setSelectedPloId(null);
       ploService.getAll({ program: programId })
         .then((d) => setPlos(Array.isArray(d) ? d : d.result || d.results || []))
         .catch(() => showError("Failed to load PLOs"))
@@ -169,26 +171,20 @@ const GeneratedQuizGenerateLayer = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId]);
 
-  const toggleClo = (id) =>
-    setSelectedCloIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
-
-  const togglePlo = (id) =>
-    setSelectedPloIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!courseId)                   { showError("Please select a course"); return; }
-    if (selectedCloIds.length === 0) { showError("Select at least one CLO"); return; }
-    if (selectedPloIds.length === 0) { showError("Select at least one PLO"); return; }
-    if (!topic.trim())               { showError("Please enter a topic"); return; }
+    if (!courseId)       { showError("Please select a course"); return; }
+    if (!selectedCloId)  { showError("Please select a CLO"); return; }
+    if (!selectedPloId)  { showError("Please select a PLO"); return; }
+    if (!topic.trim())   { showError("Please enter a topic"); return; }
 
     setSubmitting(true);
     try {
       const payload = {
         course_id: parseInt(courseId, 10),
         topic:     topic.trim(),
-        clo_ids:   selectedCloIds,
-        plo_ids:   selectedPloIds,
+        clo_ids:   [selectedCloId],
+        plo_ids:   [selectedPloId],
       };
       const res = await generatedQuizService.generate(payload);
       if (res?.status?.code !== 0) { showError(res?.status?.message || "Generation failed"); return; }
@@ -243,45 +239,41 @@ const GeneratedQuizGenerateLayer = () => {
             )}
           </div>
 
-          {/* CLOs */}
+          {/* CLO */}
           <div className="mb-20">
             <label className="form-label fw-semibold text-primary-light text-sm mb-8">
-              CLOs <span className="text-danger-600">*</span>
-              {courseId && (
-                <span className="ms-8 badge bg-info-focus text-info-main radius-4">
-                  {selectedCloIds.length} selected
-                </span>
+              CLO <span className="text-danger-600">*</span>
+              {selectedCloId && (
+                <span className="ms-8 badge bg-info-focus text-info-main radius-4">1 selected</span>
               )}
             </label>
             {loadingClos ? (
               <div className="text-center py-20"><span className="spinner-border spinner-border-sm" /></div>
             ) : (
-              <CloCheckGroup
+              <CloRadioGroup
                 items={clos}
-                selected={selectedCloIds}
-                onToggle={toggleClo}
+                selected={selectedCloId}
+                onSelect={setSelectedCloId}
                 emptyMsg={courseId ? "No CLOs found for this course" : "Select a course first"}
               />
             )}
           </div>
 
-          {/* PLOs */}
+          {/* PLO */}
           <div className="mb-20">
             <label className="form-label fw-semibold text-primary-light text-sm mb-8">
-              Program Learning Outcomes (PLOs) <span className="text-danger-600">*</span>
-              {plos.length > 0 && (
-                <span className="ms-8 badge bg-success-focus text-success-main radius-4">
-                  {selectedPloIds.length} selected
-                </span>
+              Program Learning Outcome (PLO) <span className="text-danger-600">*</span>
+              {selectedPloId && (
+                <span className="ms-8 badge bg-success-focus text-success-main radius-4">1 selected</span>
               )}
             </label>
             {loadingPlos ? (
               <div className="text-center py-20"><span className="spinner-border spinner-border-sm" /></div>
             ) : (
-              <PloCheckGroup
+              <PloRadioGroup
                 items={plos}
-                selected={selectedPloIds}
-                onToggle={togglePlo}
+                selected={selectedPloId}
+                onSelect={setSelectedPloId}
                 emptyMsg={courseId ? "No PLOs found for this program" : "Select a course first to load PLOs"}
               />
             )}
@@ -293,15 +285,15 @@ const GeneratedQuizGenerateLayer = () => {
               <div className="card-body p-16">
                 <div className="d-flex gap-24 flex-wrap">
                   <div className="d-flex align-items-center gap-12">
-                    <span className="text-sm text-secondary-light fw-semibold">CLOs selected:</span>
-                    <span className={`badge radius-4 ${selectedCloIds.length > 0 ? "bg-success-focus text-success-main" : "bg-danger-focus text-danger-main"}`}>
-                      {selectedCloIds.length} / {clos.length}
+                    <span className="text-sm text-secondary-light fw-semibold">CLO selected:</span>
+                    <span className={`badge radius-4 ${selectedCloId ? "bg-success-focus text-success-main" : "bg-danger-focus text-danger-main"}`}>
+                      {selectedCloId ? "1 / " + clos.length : "None"}
                     </span>
                   </div>
                   <div className="d-flex align-items-center gap-12">
-                    <span className="text-sm text-secondary-light fw-semibold">PLOs selected:</span>
-                    <span className={`badge radius-4 ${selectedPloIds.length > 0 ? "bg-success-focus text-success-main" : "bg-danger-focus text-danger-main"}`}>
-                      {selectedPloIds.length} / {plos.length}
+                    <span className="text-sm text-secondary-light fw-semibold">PLO selected:</span>
+                    <span className={`badge radius-4 ${selectedPloId ? "bg-success-focus text-success-main" : "bg-danger-focus text-danger-main"}`}>
+                      {selectedPloId ? "1 / " + plos.length : "None"}
                     </span>
                   </div>
                 </div>

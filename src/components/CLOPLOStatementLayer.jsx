@@ -96,9 +96,10 @@ const CLOPLOStatementLayer = () => {
             <table className="table bordered-table mb-0">
               <thead>
                 <tr className="bg-base">
-                  <th style={{ width: 100 }}>CLO</th>
+                  <th style={{ width: 90 }}>CLO</th>
                   <th>CLO Description</th>
-                  <th style={{ width: 200 }}>Mapped PLOs</th>
+                  <th style={{ width: 180 }}>Graduate Attribute (GA)</th>
+                  <th style={{ width: 180 }}>Mapped PLOs</th>
                   <th style={{ width: 220 }}>PLO Description(s)</th>
                 </tr>
               </thead>
@@ -106,6 +107,9 @@ const CLOPLOStatementLayer = () => {
                 {rows.map((row, idx) => {
                   const ploLabels = row.mapped_plos || row.plo_labels || [];
                   const ploDescs  = row.plo_descriptions || [];
+                  const gaNumber  = row.ga_number ?? row.ga?.number ?? null;
+                  const gaName    = row.ga_name   || row.ga?.name   || "";
+                  const gaCode    = row.ga_code   || (gaNumber != null ? `GA-${gaNumber}` : null);
                   return (
                     <tr key={idx}>
                       <td>
@@ -114,6 +118,20 @@ const CLOPLOStatementLayer = () => {
                         </span>
                       </td>
                       <td className="text-sm">{row.description || row.clo_description || "—"}</td>
+                      <td>
+                        {gaCode ? (
+                          <>
+                            <span className="badge bg-purple-focus text-purple radius-4 fw-semibold">
+                              {gaCode}
+                            </span>
+                            {gaName && (
+                              <div className="text-xs text-secondary-light mt-4">{gaName}</div>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-secondary-light text-sm">—</span>
+                        )}
+                      </td>
                       <td>
                         <div className="d-flex flex-wrap gap-1">
                           {ploLabels.length > 0

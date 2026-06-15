@@ -14,7 +14,7 @@ const CLOEditLayer = () => {
   const { id }   = useParams();
   const navigate = useNavigate();
 
-  const [formData,   setFormData]   = useState({ course_code: "", clo_number: "", description: "", bt_level: "" });
+  const [formData,   setFormData]   = useState({ course_code: "", clo_number: "", description: "", bt_level: "", ga_code: "" });
   const [courses,    setCourses]    = useState([]);
   const [loading,    setLoading]    = useState(false);
   const [fetchingId, setFetchingId] = useState(true);
@@ -30,6 +30,7 @@ const CLOEditLayer = () => {
           clo_number:  String(clo.clo_number || ""),
           description: clo.description || "",
           bt_level:    clo.bt_level || "",
+          ga_code:     clo.ga_code || "",
         });
       })
       .catch((err) => showError(getApiError(err)))
@@ -50,6 +51,7 @@ const CLOEditLayer = () => {
         clo_number:  parseInt(formData.clo_number, 10),
         bt_level:    formData.bt_level,
         description: formData.description.trim(),
+        ...(formData.ga_code.trim() && { ga_code: formData.ga_code.trim() }),
       };
 
       const res = await cloService.update(id, payload);
@@ -137,6 +139,22 @@ const CLOEditLayer = () => {
                         </optgroup>
                       ))}
                     </select>
+                  </div>
+
+                  {/* GA Code */}
+                  <div className="mb-20">
+                    <label className="form-label fw-semibold text-primary-light text-sm mb-8">
+                      GA Code
+                      <span className="text-secondary-light fw-normal ms-8 text-xs">optional — e.g. GA1, GA-2</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control radius-8"
+                      name="ga_code"
+                      placeholder="e.g. GA1 or GA-2"
+                      value={formData.ga_code}
+                      onChange={handleChange}
+                    />
                   </div>
 
                   {/* Description */}
