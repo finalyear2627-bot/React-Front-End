@@ -86,6 +86,48 @@ const GeneratedPaperListLayer = ({ courseType }) => {
 
   const paginated = papers.slice((page - 1) * pageSize, page * pageSize);
 
+  // Resolve field names outside JSX — API may return flat or nested objects
+  const rows = paginated.map((paper, idx) => {
+    const theoryCourseCode =
+      paper.theory_course_code || paper.theory_course?.code || paper.theory_course?.course_code;
+    const theoryCourseId =
+      paper.theory_course_id || paper.theory_course?.id;
+    const theoryCourseName =
+      paper.theory_course_name || paper.theory_course?.name;
+
+    const labCourseCode =
+      paper.lab_course_code || paper.lab_course?.code || paper.lab_course?.course_code;
+    const labCourseName =
+      paper.lab_course_name || paper.lab_course?.name || paper.lab_course?.course_name;
+    const labCourseId =
+      paper.lab_course_id || paper.lab_course?.id;
+    const hasLab = !!(
+      labCourseId || labCourseCode || labCourseName ||
+      (paper.course_component && paper.course_component !== "THEORY")
+    );
+
+    const teacherDisplay =
+      paper.teacher_name ||
+      (paper.teacher && typeof paper.teacher === "object"
+        ? (
+            `${paper.teacher.first_name || ""} ${paper.teacher.last_name || ""}`.trim() ||
+            paper.teacher.name ||
+            paper.teacher.username
+          )
+        : "") ||
+      "—";
+
+    const totalMarks = paper.total_marks || paper.marks || "";
+    const totalTime  = paper.total_time  || paper.time  || "";
+
+    return {
+      paper, idx,
+      theoryCourseCode, theoryCourseId, theoryCourseName,
+      labCourseCode, labCourseName, labCourseId, hasLab,
+      teacherDisplay, totalMarks, totalTime,
+    };
+  });
+
   return (
     <div className="card basic-data-table">
       <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -168,85 +210,72 @@ const GeneratedPaperListLayer = ({ courseType }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {paginated.map((paper, idx) => (
-                    <tr key={paper.id || idx}>
-                      <td>{(page - 1) * pageSize + idx + 1}</td>
+                  {rows.map((r) => (
+                    <tr key={r.paper.id || r.idx}>
+                      <td>{(page - 1) * pageSize + r.idx + 1}</td>
                       <td style={{ maxWidth: 180 }}>
-                        <span
-                          className="fw-medium"
-                          title={paper.topic}
-                        >
-                          {(paper.topic || "").length > 45
-                            ? paper.topic.slice(0, 45) + "…"
-                            : paper.topic || "—"}
+                        <span className="fw-medium" title={r.paper.topic}>
+                          {(r.paper.topic || "").length > 45
+                            ? r.paper.topic.slice(0, 45) + "…"
+                            : r.paper.topic || "—"}
                         </span>
                       </td>
                       <td>
                         <span className="badge bg-info-focus text-info-main radius-4">
-                          {paper.theory_course_code ||
-                            paper.theory_course_name ||
-                            (paper.theory_course_id ? `Course ${paper.theory_course_id}` : "—")}
+                          {r.theoryCourseCode || r.theoryCourseName ||
+                            (r.theoryCourseId ? `Course ${r.theoryCourseId}` : "—")}
                         </span>
                       </td>
                       <td>
-                        {paper.lab_course_id ? (
+                        {r.hasLab ? (
                           <span className="badge bg-warning-focus text-warning-main radius-4">
-                            {paper.lab_course_code ||
-                              paper.lab_course_name ||
-                              `Course ${paper.lab_course_id}`}
+                            {r.labCourseCode || r.labCourseName ||
+                              (r.labCourseId ? `Course ${r.labCourseId}` : "Lab Course")}
                           </span>
                         ) : (
                           <span className="text-secondary-light text-xs">—</span>
                         )}
                       </td>
                       <td>
-                        {paper.course_component ? (
+                        {r.paper.course_component ? (
                           <span className="badge bg-primary-focus text-primary-main radius-4">
-                            {paper.course_component}
+                            {r.paper.course_component}
                           </span>
                         ) : (
                           <span className="text-secondary-light text-xs">—</span>
                         )}
                       </td>
-                      <td className="text-nowrap">
-                        {paper.teacher_name || "—"}
-                      </td>
+                      <td className="text-nowrap">{r.teacherDisplay}</td>
                       <td className="text-nowrap text-sm">
-                        {paper.total_marks && (
-                          <span>{paper.total_marks} marks</span>
-                        )}
-                        {paper.total_marks && paper.total_time && (
-                          <span className="text-secondary-light mx-4">/</span>
-                        )}
-                        {paper.total_time && (
-                          <span className="text-secondary-light">{paper.total_time}</span>
-                        )}
-                        {!paper.total_marks && !paper.total_time && "—"}
+                        {r.totalMarks && <span>{r.totalMarks} marks</span>}
+                        {r.totalMarks && r.totalTime && <span className="text-secondary-light mx-4">/</span>}
+                        {r.totalTime  && <span className="text-secondary-light">{r.totalTime}</span>}
+                        {!r.totalMarks && !r.totalTime && "—"}
                       </td>
                       <td>
                         <span
                           className={`badge radius-4 ${
-                            STATUS_BADGE[paper.status] || "bg-neutral-200 text-neutral-600"
+                            STATUS_BADGE[r.paper.status] || "bg-neutral-200 text-neutral-600"
                           }`}
                         >
-                          {paper.status || "—"}
+                          {r.paper.status || "—"}
                         </span>
                       </td>
                       <td className="text-nowrap">
-                        {paper.created_at
-                          ? new Date(paper.created_at).toLocaleDateString()
+                        {r.paper.created_at
+                          ? new Date(r.paper.created_at).toLocaleDateString()
                           : "—"}
                       </td>
                       <td>
-                        {paper.status === "COMPLETED" && (
+                        {r.paper.status === "COMPLETED" && (
                           <>
                             <button
-                              onClick={() => handleDownload(paper)}
-                              disabled={downloading === paper.id}
+                              onClick={() => handleDownload(r.paper)}
+                              disabled={downloading === r.paper.id}
                               className="w-32-px h-32-px me-8 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
                               title="Download PDF"
                             >
-                              {downloading === paper.id ? (
+                              {downloading === r.paper.id ? (
                                 <span
                                   className="spinner-border spinner-border-sm"
                                   style={{ width: 12, height: 12 }}
@@ -256,12 +285,12 @@ const GeneratedPaperListLayer = ({ courseType }) => {
                               )}
                             </button>
                             <button
-                              onClick={() => handleOpenInNewTab(paper.id)}
-                              disabled={openingId === paper.id}
+                              onClick={() => handleOpenInNewTab(r.paper.id)}
+                              disabled={openingId === r.paper.id}
                               className="w-32-px h-32-px me-8 bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
                               title="Open in New Tab"
                             >
-                              {openingId === paper.id ? (
+                              {openingId === r.paper.id ? (
                                 <span
                                   className="spinner-border spinner-border-sm"
                                   style={{ width: 12, height: 12 }}
@@ -274,12 +303,12 @@ const GeneratedPaperListLayer = ({ courseType }) => {
                         )}
                         {userRole === "ADMIN" && (
                           <button
-                            onClick={() => handleDelete(paper.id)}
-                            disabled={deletingId === paper.id}
+                            onClick={() => handleDelete(r.paper.id)}
+                            disabled={deletingId === r.paper.id}
                             className="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
                             title="Delete"
                           >
-                            {deletingId === paper.id ? (
+                            {deletingId === r.paper.id ? (
                               <span
                                 className="spinner-border spinner-border-sm"
                                 style={{ width: 12, height: 12 }}
