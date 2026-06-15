@@ -93,11 +93,12 @@ const PloRadioGroup = ({ items, selected, onSelect, emptyMsg }) => (
   </div>
 );
 
-const GeneratedQuizGenerateLayer = () => {
+const GeneratedQuizGenerateLayer = ({ courseType = "THEORY" }) => {
   const navigate = useNavigate();
 
   const [topic,         setTopic]         = useState("");
   const [courseId,      setCourseId]      = useState("");
+  const [teacherName,   setTeacherName]   = useState("");
   const [selectedCloId, setSelectedCloId] = useState(null);
   const [selectedPloId, setSelectedPloId] = useState(null);
 
@@ -113,16 +114,21 @@ const GeneratedQuizGenerateLayer = () => {
   const [topicError,     setTopicError]     = useState("");
 
   const normAssignment = (a) => ({
-    id:         a.course_id ?? (typeof a.course === "object" ? a.course?.id : a.course),
-    code:       a.course_code || a.course?.code || "",
-    name:       a.course_name || a.course?.name || "",
-    program_id: a.program_id || a.program || a.course?.program || a.course?.program_id,
+    id:          a.course_id ?? (typeof a.course === "object" ? a.course?.id : a.course),
+    code:        a.course_code || a.course?.code || "",
+    name:        a.course_name || a.course?.name || "",
+    program_id:  a.program_id || a.program || a.course?.program || a.course?.program_id,
+    course_type: a.course_type || a.course?.course_type || "",
+    teacher_name: a.teacher_name || (typeof a.teacher === "object" ? `${a.teacher?.first_name || ""} ${a.teacher?.last_name || ""}`.trim() : "") || "",
   });
+
+  const fallbackTeacher = () =>
+    `${localStorage.getItem("user_first_name") || ""} ${localStorage.getItem("user_last_name") || ""}`.trim();
 
   useEffect(() => {
     const role = localStorage.getItem("user_role");
     if (role === "TEACHER") {
-      courseAssignmentService.getMyCourses()
+      courseAssignmentService.getMyCourses({ course_type: courseType })
         .then((d) => {
           const list = Array.isArray(d) ? d : d.result || d.results || [];
           const mapped = list
@@ -138,7 +144,10 @@ const GeneratedQuizGenerateLayer = () => {
       courseService.getAllCourses()
         .then((d) => {
           const all = Array.isArray(d) ? d : d.result || d.results || [];
-          const active = all.filter((c) => c.is_active);
+          const active = all
+            .filter((c) => c.is_active)
+            .map(normAssignment)
+            .filter((c) => !courseType || c.course_type === courseType || !c.course_type);
           setCourses(active);
           setAllCourses(active);
         })
@@ -146,15 +155,23 @@ const GeneratedQuizGenerateLayer = () => {
         .finally(() => setLoadingCourses(false));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [courseType]);
 
   useEffect(() => {
-    if (!courseId) { setClos([]); setPlos([]); setSelectedCloId(null); setSelectedPloId(null); return; }
-    setLoadingClos(true);
-    setSelectedCloId(null);
+    if (!courseId) {
+      setClos([]); setPlos([]);
+      setSelectedCloId(null); setSelectedPloId(null);
+      setTeacherName("");
+      return;
+    }
 
     const course = allCourses.find((c) => String(c.id) === String(courseId));
     const programId = course?.program_id || course?.program;
+    const tName = course?.teacher_name || fallbackTeacher();
+    setTeacherName(tName);
+
+    setLoadingClos(true);
+    setSelectedCloId(null);
 
     cloService.getAll({ course: courseId })
       .then((d) => setClos(Array.isArray(d) ? d : d.result || d.results || []))
@@ -172,6 +189,9 @@ const GeneratedQuizGenerateLayer = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId]);
 
+  const listRoute = courseType === "LAB" ? "/generated-lab-quizzes" : "/generated-theory-quizzes";
+  const buttonLabel = courseType === "LAB" ? "Generate Lab Quiz" : "Generate Theory Quiz";
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!courseId)       { showError("Please select a course"); return; }
@@ -182,15 +202,16 @@ const GeneratedQuizGenerateLayer = () => {
     setSubmitting(true);
     try {
       const payload = {
-        course_id: parseInt(courseId, 10),
-        topic:     topic.trim(),
-        clo_ids:   [selectedCloId],
-        plo_ids:   [selectedPloId],
+        course_id:    parseInt(courseId, 10),
+        topic:        topic.trim(),
+        clo_ids:      [selectedCloId],
+        plo_ids:      [selectedPloId],
+        teacher_name: teacherName.trim() || undefined,
       };
       const res = await generatedQuizService.generate(payload);
       if (res?.status?.code !== 0) { showError(res?.status?.message || "Generation failed"); return; }
       showSuccess(res?.status?.message || "Quiz generated successfully");
-      navigate("/generated-quizzes");
+      navigate(listRoute);
     } catch (err) {
       const msg = getApiError(err);
       if (err?.response?.status === 422) {
@@ -248,6 +269,22 @@ const GeneratedQuizGenerateLayer = () => {
               </select>
             )}
           </div>
+
+          {/* Teacher Name (auto-populated, disabled) */}
+          {courseId && (
+            <div className="mb-20">
+              <label className="form-label fw-semibold text-primary-light text-sm mb-8">
+                Teacher Name
+              </label>
+              <select
+                className="form-control radius-8"
+                value={teacherName}
+                disabled
+              >
+                <option value={teacherName}>{teacherName || "—"}</option>
+              </select>
+            </div>
+          )}
 
           {/* CLO */}
           <div className="mb-20">
@@ -320,11 +357,11 @@ const GeneratedQuizGenerateLayer = () => {
             >
               {submitting
                 ? <><span className="spinner-border spinner-border-sm me-6" /> Generating…</>
-                : <><Icon icon="solar:magic-stick-3-outline" className="text-lg" /> Generate Quiz</>}
+                : <><Icon icon="solar:magic-stick-3-outline" className="text-lg" /> {buttonLabel}</>}
             </button>
             <button
               type="button"
-              onClick={() => navigate("/generated-quizzes")}
+              onClick={() => navigate(listRoute)}
               className="btn btn-outline-secondary radius-8 py-10 px-32"
             >
               Cancel

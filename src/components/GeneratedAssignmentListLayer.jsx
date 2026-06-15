@@ -12,7 +12,7 @@ const STATUS_BADGE = {
   FAILED:     "bg-danger-focus text-danger-main",
 };
 
-const GeneratedAssignmentListLayer = () => {
+const GeneratedAssignmentListLayer = ({ courseType }) => {
   const userRole = localStorage.getItem("user_role");
   const [assignments,  setAssignments]  = useState([]);
   const [loading,      setLoading]      = useState(true);
@@ -28,6 +28,7 @@ const GeneratedAssignmentListLayer = () => {
     try {
       const params = {};
       if (statusFilter) params.status = statusFilter;
+      if (courseType) params.course_type = courseType;
       const data = await generatedAssignmentService.getAll(params);
       setAssignments(Array.isArray(data) ? data : data.result || data.results || []);
     } catch (err) {
@@ -35,7 +36,7 @@ const GeneratedAssignmentListLayer = () => {
     } finally {
       setLoading(false);
     }
-  }, [statusFilter]);
+  }, [statusFilter, courseType]);
 
   useEffect(() => { fetchAssignments(); }, [fetchAssignments]);
 
@@ -79,12 +80,15 @@ const GeneratedAssignmentListLayer = () => {
     }
   };
 
+  const title = courseType === "THEORY" ? "Theory Assignments" : courseType === "LAB" ? "Lab Assignments" : "Generated Assignments";
+  const generateRoute = courseType === "LAB" ? "/generate-lab-assignment" : "/generate-theory-assignment";
+
   const paginated = assignments.slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <div className="card basic-data-table">
       <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <h5 className="card-title mb-0">Generated Assignments</h5>
+        <h5 className="card-title mb-0">{title}</h5>
         <div className="d-flex align-items-center gap-2 flex-wrap">
           <select
             className="form-select form-select-sm radius-8"
@@ -107,7 +111,7 @@ const GeneratedAssignmentListLayer = () => {
           </button>
           {userRole === "TEACHER" && (
             <Link
-              to="/generate-assignment"
+              to={generateRoute}
               className="btn btn-sm btn-primary-600 radius-8 d-inline-flex align-items-center gap-1"
             >
               <Icon icon="ic:round-plus" className="text-xl" />
@@ -129,7 +133,7 @@ const GeneratedAssignmentListLayer = () => {
               {statusFilter ? `No ${statusFilter} assignments found.` : "No assignments generated yet."}
             </p>
             {userRole === "TEACHER" && (
-              <Link to="/generate-assignment" className="btn btn-sm btn-primary radius-8">
+              <Link to={generateRoute} className="btn btn-sm btn-primary radius-8">
                 Generate First Assignment
               </Link>
             )}
@@ -164,6 +168,11 @@ const GeneratedAssignmentListLayer = () => {
                         <span className="badge bg-info-focus text-info-main radius-4">
                           {assignment.course_name || assignment.course?.name || assignment.course_code || `Course ${assignment.course_id || "—"}`}
                         </span>
+                        {assignment.course_component && (
+                          <span className="badge bg-secondary-focus text-secondary-main radius-4 ms-4">
+                            {assignment.course_component}
+                          </span>
+                        )}
                       </td>
                       <td className="text-center">
                         {assignment.clo_ids?.length ?? assignment.clos?.length ?? "—"}

@@ -61,6 +61,19 @@ import GeneratedQuizGeneratePage from "./pages/GeneratedQuizGeneratePage";
 import GeneratedAssignmentListPage from "./pages/GeneratedAssignmentListPage";
 import GeneratedAssignmentGeneratePage from "./pages/GeneratedAssignmentGeneratePage";
 
+import GenerateTheoryPaperPage from "./pages/GenerateTheoryPaperPage";
+import GenerateLabPaperPage from "./pages/GenerateLabPaperPage";
+import GeneratedTheoryPapersPage from "./pages/GeneratedTheoryPapersPage";
+import GeneratedLabPapersPage from "./pages/GeneratedLabPapersPage";
+import GenerateTheoryQuizPage from "./pages/GenerateTheoryQuizPage";
+import GenerateLabQuizPage from "./pages/GenerateLabQuizPage";
+import GeneratedTheoryQuizzesPage from "./pages/GeneratedTheoryQuizzesPage";
+import GeneratedLabQuizzesPage from "./pages/GeneratedLabQuizzesPage";
+import GenerateTheoryAssignmentPage from "./pages/GenerateTheoryAssignmentPage";
+import GenerateLabAssignmentPage from "./pages/GenerateLabAssignmentPage";
+import GeneratedTheoryAssignmentsPage from "./pages/GeneratedTheoryAssignmentsPage";
+import GeneratedLabAssignmentsPage from "./pages/GeneratedLabAssignmentsPage";
+
 function App() {
   return (
     <BrowserRouter>
@@ -123,13 +136,31 @@ function App() {
         <Route exact path='/ga-edit/:id' element={<ProtectedRoute allowedRoles={["ADMIN"]}><GAEditPage /></ProtectedRoute>} />
         <Route exact path='/ga-bulk-upload' element={<ProtectedRoute allowedRoles={["ADMIN"]}><GABulkUploadPage /></ProtectedRoute>} />
 
-        {/* Assessment Routes — list pages: all auth; generate pages: teacher only */}
-        <Route exact path='/generated-papers'      element={<ProtectedRoute><GeneratedPaperListPage /></ProtectedRoute>} />
-        <Route exact path='/generate-paper'        element={<ProtectedRoute allowedRoles={["TEACHER"]}><GeneratedPaperGeneratePage /></ProtectedRoute>} />
-        <Route exact path='/generated-quizzes'     element={<ProtectedRoute><GeneratedQuizListPage /></ProtectedRoute>} />
-        <Route exact path='/generate-quiz'         element={<ProtectedRoute allowedRoles={["TEACHER"]}><GeneratedQuizGeneratePage /></ProtectedRoute>} />
-        <Route exact path='/generated-assignments' element={<ProtectedRoute><GeneratedAssignmentListPage /></ProtectedRoute>} />
-        <Route exact path='/generate-assignment'   element={<ProtectedRoute allowedRoles={["TEACHER"]}><GeneratedAssignmentGeneratePage /></ProtectedRoute>} />
+        {/* Assessment Routes — redirects from old paths */}
+        <Route exact path='/generated-papers'      element={<Navigate to='/generated-theory-papers' replace />} />
+        <Route exact path='/generate-paper'        element={<Navigate to='/generate-theory-paper' replace />} />
+        <Route exact path='/generated-quizzes'     element={<Navigate to='/generated-theory-quizzes' replace />} />
+        <Route exact path='/generate-quiz'         element={<Navigate to='/generate-theory-quiz' replace />} />
+        <Route exact path='/generated-assignments' element={<Navigate to='/generated-theory-assignments' replace />} />
+        <Route exact path='/generate-assignment'   element={<Navigate to='/generate-theory-assignment' replace />} />
+
+        {/* Paper Routes */}
+        <Route exact path='/generate-theory-paper'       element={<ProtectedRoute allowedRoles={["TEACHER"]}><GenerateTheoryPaperPage /></ProtectedRoute>} />
+        <Route exact path='/generate-lab-paper'          element={<ProtectedRoute allowedRoles={["TEACHER"]}><GenerateLabPaperPage /></ProtectedRoute>} />
+        <Route exact path='/generated-theory-papers'     element={<ProtectedRoute><GeneratedTheoryPapersPage /></ProtectedRoute>} />
+        <Route exact path='/generated-lab-papers'        element={<ProtectedRoute><GeneratedLabPapersPage /></ProtectedRoute>} />
+
+        {/* Quiz Routes */}
+        <Route exact path='/generate-theory-quiz'        element={<ProtectedRoute allowedRoles={["TEACHER"]}><GenerateTheoryQuizPage /></ProtectedRoute>} />
+        <Route exact path='/generate-lab-quiz'           element={<ProtectedRoute allowedRoles={["TEACHER"]}><GenerateLabQuizPage /></ProtectedRoute>} />
+        <Route exact path='/generated-theory-quizzes'    element={<ProtectedRoute><GeneratedTheoryQuizzesPage /></ProtectedRoute>} />
+        <Route exact path='/generated-lab-quizzes'       element={<ProtectedRoute><GeneratedLabQuizzesPage /></ProtectedRoute>} />
+
+        {/* Assignment Routes */}
+        <Route exact path='/generate-theory-assignment'  element={<ProtectedRoute allowedRoles={["TEACHER"]}><GenerateTheoryAssignmentPage /></ProtectedRoute>} />
+        <Route exact path='/generate-lab-assignment'     element={<ProtectedRoute allowedRoles={["TEACHER"]}><GenerateLabAssignmentPage /></ProtectedRoute>} />
+        <Route exact path='/generated-theory-assignments' element={<ProtectedRoute><GeneratedTheoryAssignmentsPage /></ProtectedRoute>} />
+        <Route exact path='/generated-lab-assignments'   element={<ProtectedRoute><GeneratedLabAssignmentsPage /></ProtectedRoute>} />
 
         {/* Profile Routes */}
         <Route exact path='/view-profile' element={<ProtectedRoute><ViewProfilePage /></ProtectedRoute>} />

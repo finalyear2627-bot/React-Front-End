@@ -1849,7 +1849,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "assessments", "generated-papers", ""]
             },
-            "description": "Admin sees all generated papers. Teacher sees only papers for their assigned courses.\n\nOptional query params:\n  ?course=<course_id>  \u2014 filter by theory or lab course\n  ?status=COMPLETED    \u2014 filter by status (COMPLETED or FAILED)"
+            "description": "List generated exam papers. Admin sees all; Teacher sees only papers for their assigned courses.\n\nEach record includes:\n  course_component     \u2014 'THEORY + LAB' | 'THEORY' | 'LAB'\n  theory_course_code/name/type \u2014 primary (theory) course details\n  lab_course_code/name \u2014 paired lab course details (null if none)\n\nOptional query params:\n  ?course=<id>         \u2014 filter by a specific course ID (theory or lab)\n  ?status=COMPLETED    \u2014 filter by status: COMPLETED or FAILED\n  ?course_type=THEORY  \u2014 show only papers for theory-only courses\n  ?course_type=LAB     \u2014 show only papers that include a lab course"
           },
           "response": []
         },
@@ -1951,7 +1951,7 @@
                 ""
               ]
             },
-            "description": "Generate a quiz PDF for a single assigned course. Teacher only.\n\nTopic validation (HTTP 422 if failed): topic must be correctly spelled and relevant to the selected CLOs and PLOs. An error with a corrective message is returned if the topic is invalid or irrelevant."
+            "description": "Generate a quiz PDF for a single assigned course. Teacher only.\n\ncourse_id can be a THEORY or LAB course — the response will label it accordingly via course_component.\n\nRequired: course_id, topic, clo_ids, plo_ids\nOptional: teacher_name, total_marks (default 10), total_time (default 15 Minutes)\n\nTopic validation (HTTP 422): topic must be correctly spelled and relevant to the selected CLOs and PLOs."
           },
           "response": []
         },
@@ -1978,7 +1978,7 @@
                 ""
               ]
             },
-            "description": "Admin sees all quizzes. Teacher sees only quizzes for their assigned courses."
+            "description": "List generated quizzes. Admin sees all; Teacher sees only quizzes for their assigned courses.\n\nEach record includes:\n  course_component — 'THEORY' if generated for a theory course, 'LAB' if generated for a lab course\n  theory_course_code/name/type — the course the quiz was generated for\n\nOptional query params:\n  ?course=<id>        — filter by a specific course ID\n  ?status=COMPLETED   — filter by status: COMPLETED or FAILED\n  ?course_type=THEORY — show only quizzes for theory courses\n  ?course_type=LAB    — show only quizzes for lab courses"
           },
           "response": []
         },
@@ -2105,7 +2105,7 @@
                 ""
               ]
             },
-            "description": "Generate an assignment PDF for a single assigned course. Teacher only.\n\nTopic validation (HTTP 422 if failed): topic must be correctly spelled and relevant to the selected CLOs and PLOs. An error with a corrective message is returned if the topic is invalid or irrelevant."
+            "description": "Generate an assignment PDF for a single assigned course. Teacher only.\n\ncourse_id can be a THEORY or LAB course — the response will label it accordingly via course_component.\n\nRequired: course_id, topic, clo_ids, plo_ids\nOptional: teacher_name, total_marks (default 20), total_time (default 1 Hour)\n\nTopic validation (HTTP 422): topic must be correctly spelled and relevant to the selected CLOs and PLOs."
           },
           "response": []
         },
@@ -2132,7 +2132,7 @@
                 ""
               ]
             },
-            "description": "Admin sees all assignments. Teacher sees only assignments for their assigned courses."
+            "description": "List generated assignments. Admin sees all; Teacher sees only assignments for their assigned courses.\n\nEach record includes:\n  course_component — 'THEORY' if generated for a theory course, 'LAB' if generated for a lab course\n  theory_course_code/name/type — the course the assignment was generated for\n\nOptional query params:\n  ?course=<id>        — filter by a specific course ID\n  ?status=COMPLETED   — filter by status: COMPLETED or FAILED\n  ?course_type=THEORY — show only assignments for theory courses\n  ?course_type=LAB    — show only assignments for lab courses"
           },
           "response": []
         },

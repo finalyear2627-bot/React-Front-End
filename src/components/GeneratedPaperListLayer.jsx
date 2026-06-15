@@ -12,7 +12,7 @@ const STATUS_BADGE = {
   FAILED:     "bg-danger-focus text-danger-main",
 };
 
-const GeneratedPaperListLayer = () => {
+const GeneratedPaperListLayer = ({ courseType }) => {
   const userRole = localStorage.getItem("user_role");
 
   const [papers,       setPapers]       = useState([]);
@@ -29,6 +29,7 @@ const GeneratedPaperListLayer = () => {
     try {
       const params = {};
       if (statusFilter) params.status = statusFilter;
+      if (courseType) params.course_type = courseType;
       const data = await generatedPaperService.getAll(params);
       setPapers(Array.isArray(data) ? data : data.result || data.results || []);
     } catch (err) {
@@ -36,7 +37,7 @@ const GeneratedPaperListLayer = () => {
     } finally {
       setLoading(false);
     }
-  }, [statusFilter]);
+  }, [statusFilter, courseType]);
 
   useEffect(() => { fetchPapers(); }, [fetchPapers]);
 
@@ -80,12 +81,15 @@ const GeneratedPaperListLayer = () => {
     }
   };
 
+  const title = courseType === "THEORY" ? "Theory Papers" : courseType === "LAB" ? "Lab Papers" : "Generated Papers";
+  const generateRoute = courseType === "LAB" ? "/generate-lab-paper" : "/generate-theory-paper";
+
   const paginated = papers.slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <div className="card basic-data-table">
       <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <h5 className="card-title mb-0">Generated Papers</h5>
+        <h5 className="card-title mb-0">{title}</h5>
         <div className="d-flex align-items-center gap-2 flex-wrap">
           <select
             className="form-select form-select-sm radius-8"
@@ -108,7 +112,7 @@ const GeneratedPaperListLayer = () => {
           </button>
           {userRole === "TEACHER" && (
             <Link
-              to="/generate-paper"
+              to={generateRoute}
               className="btn btn-sm btn-primary-600 radius-8 d-inline-flex align-items-center gap-1"
             >
               <Icon icon="ic:round-plus" className="text-xl" />
@@ -140,7 +144,7 @@ const GeneratedPaperListLayer = () => {
                 : "No exam papers generated yet."}
             </p>
             {userRole === "TEACHER" && (
-              <Link to="/generate-paper" className="btn btn-sm btn-primary radius-8">
+              <Link to={generateRoute} className="btn btn-sm btn-primary radius-8">
                 Generate First Paper
               </Link>
             )}
@@ -155,6 +159,7 @@ const GeneratedPaperListLayer = () => {
                     <th>Topic</th>
                     <th>Theory Course</th>
                     <th>Lab Course</th>
+                    <th>Component</th>
                     <th>Teacher</th>
                     <th>Marks / Time</th>
                     <th>Status</th>
@@ -189,6 +194,15 @@ const GeneratedPaperListLayer = () => {
                             {paper.lab_course_code ||
                               paper.lab_course_name ||
                               `Course ${paper.lab_course_id}`}
+                          </span>
+                        ) : (
+                          <span className="text-secondary-light text-xs">—</span>
+                        )}
+                      </td>
+                      <td>
+                        {paper.course_component ? (
+                          <span className="badge bg-primary-focus text-primary-main radius-4">
+                            {paper.course_component}
                           </span>
                         ) : (
                           <span className="text-secondary-light text-xs">—</span>

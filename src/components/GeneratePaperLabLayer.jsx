@@ -42,10 +42,11 @@ const CheckItem = ({ badge, badgeColor = "info", label, checked, onClick }) => (
   </div>
 );
 
-const GeneratedPaperGenerateLayer = () => {
+const GeneratePaperLabLayer = () => {
   const navigate = useNavigate();
 
   const [theoryCourseId, setTheoryCourseId] = useState("");
+  const [labCourseId,    setLabCourseId]    = useState("");
   const [topic,          setTopic]          = useState("");
   const [teacherName,    setTeacherName]    = useState("");
   const [totalMarks,  setTotalMarks]  = useState("60");
@@ -54,6 +55,7 @@ const GeneratedPaperGenerateLayer = () => {
   const [customTime,  setCustomTime]  = useState(false);
 
   const [theoryCourses, setTheoryCourses] = useState([]);
+  const [labCourses,    setLabCourses]    = useState([]);
   const [allCourses,    setAllCourses]    = useState([]);
   const [clos,          setClos]          = useState([]);
   const [plos,          setPlos]          = useState([]);
@@ -81,14 +83,22 @@ const GeneratedPaperGenerateLayer = () => {
     });
 
     if (role === "TEACHER") {
-      courseAssignmentService.getMyCourses({ course_type: "THEORY" })
-        .then((theoryData) => {
+      Promise.all([
+        courseAssignmentService.getMyCourses({ course_type: "THEORY" }),
+        courseAssignmentService.getMyCourses({ course_type: "LAB" }),
+      ])
+        .then(([theoryData, labData]) => {
           const theoryList = (Array.isArray(theoryData) ? theoryData : theoryData.result || theoryData.results || [])
             .filter((a) => a.is_active !== false)
             .map(normItem)
             .filter((c) => c.id != null);
+          const labList = (Array.isArray(labData) ? labData : labData.result || labData.results || [])
+            .filter((a) => a.is_active !== false)
+            .map(normItem)
+            .filter((c) => c.id != null);
           setTheoryCourses(theoryList);
-          setAllCourses(theoryList);
+          setLabCourses(labList);
+          setAllCourses([...theoryList, ...labList]);
         })
         .catch(() => showError("Failed to load courses"))
         .finally(() => setLoadingCourses(false));
@@ -97,9 +107,9 @@ const GeneratedPaperGenerateLayer = () => {
         .then((d) => {
           const all = Array.isArray(d) ? d : d.result || d.results || [];
           const active = all.filter((c) => c.is_active).map(normItem);
-          const theory = active.filter((c) => c.course_type === "THEORY" || !c.course_type);
-          setTheoryCourses(theory);
           setAllCourses(active);
+          setTheoryCourses(active.filter((c) => c.course_type === "THEORY" || !c.course_type));
+          setLabCourses(active.filter((c) => c.course_type === "LAB"));
         })
         .catch(() => showError("Failed to load courses"))
         .finally(() => setLoadingCourses(false));
@@ -107,18 +117,23 @@ const GeneratedPaperGenerateLayer = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // When theory course changes: load CLOs + PLOs; if no lab course selected yet, set teacher from theory
   useEffect(() => {
     if (!theoryCourseId) {
       setClos([]); setPlos([]);
       setSelectedCloIds([]); setSelectedPloIds([]);
-      setTeacherName("");
+      if (!labCourseId) setTeacherName("");
       return;
     }
 
     const course = allCourses.find((c) => String(c.id) === String(theoryCourseId));
     const programId = course?.program_id || course?.program;
-    const tName = course?.teacher_name || fallbackTeacher();
-    setTeacherName(tName);
+
+    // Only update teacher from theory if lab course not already providing one
+    if (!labCourseId) {
+      const tName = course?.teacher_name || fallbackTeacher();
+      setTeacherName(tName);
+    }
 
     setLoadingClos(true);
     setSelectedCloIds([]);
@@ -138,6 +153,30 @@ const GeneratedPaperGenerateLayer = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theoryCourseId]);
 
+  // When lab course changes: update teacher (lab course teacher takes priority)
+  useEffect(() => {
+    if (!labCourseId) {
+      // Revert to theory course teacher if theory is selected
+      if (theoryCourseId) {
+        const theoryCourse = allCourses.find((c) => String(c.id) === String(theoryCourseId));
+        const tName = theoryCourse?.teacher_name || fallbackTeacher();
+        setTeacherName(tName);
+      } else {
+        setTeacherName("");
+      }
+      return;
+    }
+
+    const labCourse = allCourses.find((c) => String(c.id) === String(labCourseId));
+    const theoryCourse = allCourses.find((c) => String(c.id) === String(theoryCourseId));
+    const tName =
+      labCourse?.teacher_name ||
+      theoryCourse?.teacher_name ||
+      fallbackTeacher();
+    setTeacherName(tName);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [labCourseId]);
+
   const toggleClo = (id) =>
     setSelectedCloIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
 
@@ -147,6 +186,7 @@ const GeneratedPaperGenerateLayer = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!theoryCourseId)             { showError("Please select a theory course"); return; }
+    if (!labCourseId)                { showError("Please select a lab course"); return; }
     if (!topic.trim())               { showError("Please enter a topic"); return; }
     if (!teacherName.trim())         { showError("Please enter teacher name"); return; }
     if (!totalMarks)                 { showError("Please enter total marks"); return; }
@@ -158,6 +198,7 @@ const GeneratedPaperGenerateLayer = () => {
     try {
       const payload = {
         theory_course_id: parseInt(theoryCourseId, 10),
+        lab_course_id:    parseInt(labCourseId, 10),
         topic:            topic.trim(),
         teacher_name:     teacherName.trim(),
         total_marks:      totalMarks,
@@ -172,7 +213,7 @@ const GeneratedPaperGenerateLayer = () => {
         return;
       }
       showSuccess(res?.status?.message || "Paper generated successfully");
-      navigate("/generated-theory-papers");
+      navigate("/generated-lab-papers");
     } catch (err) {
       const msg = getApiError(err);
       if (err?.response?.status === 422) {
@@ -190,34 +231,60 @@ const GeneratedPaperGenerateLayer = () => {
       <div className="card-body p-24">
         <form onSubmit={handleSubmit}>
 
-          {/* Theory Course */}
-          <div className="mb-20">
-            <label className="form-label fw-semibold text-primary-light text-sm mb-8">
-              Theory Course <span className="text-danger-600">*</span>
-            </label>
-            {loadingCourses ? (
-              <div className="placeholder-glow">
-                <span className="placeholder col-12 radius-8" style={{ height: 38 }} />
-              </div>
-            ) : (
-              <select
-                className="form-control radius-8"
-                value={theoryCourseId}
-                onChange={(e) => setTheoryCourseId(e.target.value)}
-                required
-              >
-                <option value="">-- Select Theory Course --</option>
-                {theoryCourses.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.code} — {c.name}
-                  </option>
-                ))}
-              </select>
-            )}
+          {/* Row 1: Theory Course + Lab Course */}
+          <div className="row g-3 mb-20">
+            <div className="col-md-6">
+              <label className="form-label fw-semibold text-primary-light text-sm mb-8">
+                Theory Course <span className="text-danger-600">*</span>
+              </label>
+              {loadingCourses ? (
+                <div className="placeholder-glow">
+                  <span className="placeholder col-12 radius-8" style={{ height: 38 }} />
+                </div>
+              ) : (
+                <select
+                  className="form-control radius-8"
+                  value={theoryCourseId}
+                  onChange={(e) => setTheoryCourseId(e.target.value)}
+                  required
+                >
+                  <option value="">-- Select Theory Course --</option>
+                  {theoryCourses.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.code} — {c.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+            <div className="col-md-6">
+              <label className="form-label fw-semibold text-primary-light text-sm mb-8">
+                Lab Course <span className="text-danger-600">*</span>
+              </label>
+              {loadingCourses ? (
+                <div className="placeholder-glow">
+                  <span className="placeholder col-12 radius-8" style={{ height: 38 }} />
+                </div>
+              ) : (
+                <select
+                  className="form-control radius-8"
+                  value={labCourseId}
+                  onChange={(e) => setLabCourseId(e.target.value)}
+                  required
+                >
+                  <option value="">-- Select Lab Course --</option>
+                  {labCourses.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.code} — {c.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
           </div>
 
           {/* Teacher Name (auto-populated, disabled) */}
-          {theoryCourseId && (
+          {(theoryCourseId || labCourseId) && (
             <div className="mb-20">
               <label className="form-label fw-semibold text-primary-light text-sm mb-8">
                 Teacher Name
@@ -232,7 +299,7 @@ const GeneratedPaperGenerateLayer = () => {
             </div>
           )}
 
-          {/* Row: Topic */}
+          {/* Topic */}
           <div className="mb-20">
             <label className="form-label fw-semibold text-primary-light text-sm mb-8">
               Topic <span className="text-danger-600">*</span>
@@ -251,7 +318,7 @@ const GeneratedPaperGenerateLayer = () => {
             )}
           </div>
 
-          {/* Row 3: Total Marks + Total Time */}
+          {/* Total Marks + Total Time */}
           <div className="row g-3 mb-24">
             <div className="col-md-6">
               <label className="form-label fw-semibold text-primary-light text-sm mb-8">
@@ -420,12 +487,12 @@ const GeneratedPaperGenerateLayer = () => {
               {submitting ? (
                 <><span className="spinner-border spinner-border-sm me-6" /> Generating…</>
               ) : (
-                <><Icon icon="solar:magic-stick-3-outline" className="text-lg" /> Generate Theory Paper</>
+                <><Icon icon="solar:magic-stick-3-outline" className="text-lg" /> Generate Lab Paper</>
               )}
             </button>
             <button
               type="button"
-              onClick={() => navigate("/generated-theory-papers")}
+              onClick={() => navigate("/generated-lab-papers")}
               className="btn btn-outline-secondary radius-8 py-10 px-32"
             >
               Cancel
@@ -437,4 +504,4 @@ const GeneratedPaperGenerateLayer = () => {
   );
 };
 
-export default GeneratedPaperGenerateLayer;
+export default GeneratePaperLabLayer;

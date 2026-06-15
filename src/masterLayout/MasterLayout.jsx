@@ -313,45 +313,94 @@ const MasterLayout = ({ children }) => {
                 <span>Assessments</span>
               </Link>
               <ul className='sidebar-submenu'>
-                {/* Papers */}
-                <li>
-                  <NavLink to='/generated-papers' className={(n) => n.isActive ? "active-page" : ""}>
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Papers
-                  </NavLink>
+
+                {/* ── Paper ── */}
+                <li style={{ padding: "6px 16px 2px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-secondary-light, #9ca3af)", pointerEvents: "none" }}>
+                  Paper
                 </li>
                 {userRole === "TEACHER" && (
-                  <li>
-                    <NavLink to='/generate-paper' className={(n) => n.isActive ? "active-page" : ""}>
-                      <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Generate Paper
-                    </NavLink>
-                  </li>
+                  <>
+                    <li>
+                      <NavLink to='/generate-theory-paper' className={(n) => n.isActive ? "active-page" : ""}>
+                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Theory Paper
+                      </NavLink>
+                    </li>
+                    <li>
+                      <NavLink to='/generate-lab-paper' className={(n) => n.isActive ? "active-page" : ""}>
+                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Lab Paper
+                      </NavLink>
+                    </li>
+                  </>
                 )}
-                {/* Quizzes */}
                 <li>
-                  <NavLink to='/generated-quizzes' className={(n) => n.isActive ? "active-page" : ""}>
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Quizzes
+                  <NavLink to='/generated-theory-papers' className={(n) => n.isActive ? "active-page" : ""}>
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Theory Papers
                   </NavLink>
                 </li>
-                {userRole === "TEACHER" && (
-                  <li>
-                    <NavLink to='/generate-quiz' className={(n) => n.isActive ? "active-page" : ""}>
-                      <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Generate Quiz
-                    </NavLink>
-                  </li>
-                )}
-                {/* Assignments */}
                 <li>
-                  <NavLink to='/generated-assignments' className={(n) => n.isActive ? "active-page" : ""}>
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Assignments
+                  <NavLink to='/generated-lab-papers' className={(n) => n.isActive ? "active-page" : ""}>
+                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' /> Lab Papers
                   </NavLink>
                 </li>
+
+                {/* ── Quiz ── */}
+                <li style={{ padding: "8px 16px 2px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-secondary-light, #9ca3af)", pointerEvents: "none", borderTop: "1px solid var(--neutral-200, #e5e7eb)", marginTop: 4 }}>
+                  Quiz
+                </li>
                 {userRole === "TEACHER" && (
-                  <li>
-                    <NavLink to='/generate-assignment' className={(n) => n.isActive ? "active-page" : ""}>
-                      <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Generate Assignment
-                    </NavLink>
-                  </li>
+                  <>
+                    <li>
+                      <NavLink to='/generate-theory-quiz' className={(n) => n.isActive ? "active-page" : ""}>
+                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Theory Quiz
+                      </NavLink>
+                    </li>
+                    <li>
+                      <NavLink to='/generate-lab-quiz' className={(n) => n.isActive ? "active-page" : ""}>
+                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Lab Quiz
+                      </NavLink>
+                    </li>
+                  </>
                 )}
+                <li>
+                  <NavLink to='/generated-theory-quizzes' className={(n) => n.isActive ? "active-page" : ""}>
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Theory Quizzes
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink to='/generated-lab-quizzes' className={(n) => n.isActive ? "active-page" : ""}>
+                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' /> Lab Quizzes
+                  </NavLink>
+                </li>
+
+                {/* ── Assignment ── */}
+                <li style={{ padding: "8px 16px 2px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-secondary-light, #9ca3af)", pointerEvents: "none", borderTop: "1px solid var(--neutral-200, #e5e7eb)", marginTop: 4 }}>
+                  Assignment
+                </li>
+                {userRole === "TEACHER" && (
+                  <>
+                    <li>
+                      <NavLink to='/generate-theory-assignment' className={(n) => n.isActive ? "active-page" : ""}>
+                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Theory Assignment
+                      </NavLink>
+                    </li>
+                    <li>
+                      <NavLink to='/generate-lab-assignment' className={(n) => n.isActive ? "active-page" : ""}>
+                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Lab Assignment
+                      </NavLink>
+                    </li>
+                  </>
+                )}
+                <li>
+                  <NavLink to='/generated-theory-assignments' className={(n) => n.isActive ? "active-page" : ""}>
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Theory Assignments
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink to='/generated-lab-assignments' className={(n) => n.isActive ? "active-page" : ""}>
+                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' /> Lab Assignments
+                  </NavLink>
+                </li>
+
               </ul>
             </li>
 

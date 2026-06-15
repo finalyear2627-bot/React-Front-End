@@ -12,7 +12,7 @@ const STATUS_BADGE = {
   FAILED:     "bg-danger-focus text-danger-main",
 };
 
-const GeneratedQuizListLayer = () => {
+const GeneratedQuizListLayer = ({ courseType }) => {
   const userRole = localStorage.getItem("user_role");
   const [quizzes,      setQuizzes]      = useState([]);
   const [loading,      setLoading]      = useState(true);
@@ -28,6 +28,7 @@ const GeneratedQuizListLayer = () => {
     try {
       const params = {};
       if (statusFilter) params.status = statusFilter;
+      if (courseType) params.course_type = courseType;
       const data = await generatedQuizService.getAll(params);
       setQuizzes(Array.isArray(data) ? data : data.result || data.results || []);
     } catch (err) {
@@ -35,7 +36,7 @@ const GeneratedQuizListLayer = () => {
     } finally {
       setLoading(false);
     }
-  }, [statusFilter]);
+  }, [statusFilter, courseType]);
 
   useEffect(() => { fetchQuizzes(); }, [fetchQuizzes]);
 
@@ -79,12 +80,15 @@ const GeneratedQuizListLayer = () => {
     }
   };
 
+  const title = courseType === "THEORY" ? "Theory Quizzes" : courseType === "LAB" ? "Lab Quizzes" : "Generated Quizzes";
+  const generateRoute = courseType === "LAB" ? "/generate-lab-quiz" : "/generate-theory-quiz";
+
   const paginated = quizzes.slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <div className="card basic-data-table">
       <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <h5 className="card-title mb-0">Generated Quizzes</h5>
+        <h5 className="card-title mb-0">{title}</h5>
         <div className="d-flex align-items-center gap-2 flex-wrap">
           <select
             className="form-select form-select-sm radius-8"
@@ -107,7 +111,7 @@ const GeneratedQuizListLayer = () => {
           </button>
           {userRole === "TEACHER" && (
             <Link
-              to="/generate-quiz"
+              to={generateRoute}
               className="btn btn-sm btn-primary-600 radius-8 d-inline-flex align-items-center gap-1"
             >
               <Icon icon="ic:round-plus" className="text-xl" />
@@ -129,7 +133,7 @@ const GeneratedQuizListLayer = () => {
               {statusFilter ? `No ${statusFilter} quizzes found.` : "No quizzes generated yet."}
             </p>
             {userRole === "TEACHER" && (
-              <Link to="/generate-quiz" className="btn btn-sm btn-primary radius-8">
+              <Link to={generateRoute} className="btn btn-sm btn-primary radius-8">
                 Generate First Quiz
               </Link>
             )}
@@ -164,6 +168,11 @@ const GeneratedQuizListLayer = () => {
                         <span className="badge bg-info-focus text-info-main radius-4">
                           {quiz.course_name || quiz.course?.name || quiz.course_code || `Course ${quiz.course_id || "—"}`}
                         </span>
+                        {quiz.course_component && (
+                          <span className="badge bg-secondary-focus text-secondary-main radius-4 ms-4">
+                            {quiz.course_component}
+                          </span>
+                        )}
                       </td>
                       <td className="text-center">
                         {quiz.clo_ids?.length ?? quiz.clos?.length ?? "—"}
