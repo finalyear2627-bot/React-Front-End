@@ -322,24 +322,24 @@ const MasterLayout = ({ children }) => {
                   <>
                     <li>
                       <NavLink to='/generate-theory-paper' className={(n) => n.isActive ? "active-page" : ""}>
-                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Theory Paper
+                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Generate Theory Paper
                       </NavLink>
                     </li>
                     <li>
                       <NavLink to='/generate-lab-paper' className={(n) => n.isActive ? "active-page" : ""}>
-                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Lab Paper
+                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Generate Lab Paper
                       </NavLink>
                     </li>
                   </>
                 )}
                 <li>
                   <NavLink to='/generated-theory-papers' className={(n) => n.isActive ? "active-page" : ""}>
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Theory Papers
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Theory Papers
                   </NavLink>
                 </li>
                 <li>
                   <NavLink to='/generated-lab-papers' className={(n) => n.isActive ? "active-page" : ""}>
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' /> Lab Papers
+                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' /> Generated Lab Papers
                   </NavLink>
                 </li>
 
@@ -351,24 +351,24 @@ const MasterLayout = ({ children }) => {
                   <>
                     <li>
                       <NavLink to='/generate-theory-quiz' className={(n) => n.isActive ? "active-page" : ""}>
-                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Theory Quiz
+                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Generate Theory Quiz
                       </NavLink>
                     </li>
                     <li>
                       <NavLink to='/generate-lab-quiz' className={(n) => n.isActive ? "active-page" : ""}>
-                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Lab Quiz
+                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Generate Lab Quiz
                       </NavLink>
                     </li>
                   </>
                 )}
                 <li>
                   <NavLink to='/generated-theory-quizzes' className={(n) => n.isActive ? "active-page" : ""}>
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Theory Quizzes
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Theory Quizzes
                   </NavLink>
                 </li>
                 <li>
                   <NavLink to='/generated-lab-quizzes' className={(n) => n.isActive ? "active-page" : ""}>
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' /> Lab Quizzes
+                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' /> Generated Lab Quizzes
                   </NavLink>
                 </li>
 
@@ -380,24 +380,24 @@ const MasterLayout = ({ children }) => {
                   <>
                     <li>
                       <NavLink to='/generate-theory-assignment' className={(n) => n.isActive ? "active-page" : ""}>
-                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Theory Assignment
+                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Generate Theory Assignment
                       </NavLink>
                     </li>
                     <li>
                       <NavLink to='/generate-lab-assignment' className={(n) => n.isActive ? "active-page" : ""}>
-                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Lab Assignment
+                        <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Generate Lab Assignment
                       </NavLink>
                     </li>
                   </>
                 )}
                 <li>
                   <NavLink to='/generated-theory-assignments' className={(n) => n.isActive ? "active-page" : ""}>
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Theory Assignments
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Theory Assignments
                   </NavLink>
                 </li>
                 <li>
                   <NavLink to='/generated-lab-assignments' className={(n) => n.isActive ? "active-page" : ""}>
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' /> Lab Assignments
+                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' /> Generated Lab Assignments
                   </NavLink>
                 </li>
 

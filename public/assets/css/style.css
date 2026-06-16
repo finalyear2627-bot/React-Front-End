@@ -15724,3 +15724,17 @@ td.fc-header-center {
 }
 
 /* === footer css end === */
+
+
+
+
+@media (min-width: 1200px) {
+    .sidebar {
+        width: 16.75rem !important;
+    }
+}
+@media (min-width: 1200px) {
+    .dashboard-main {
+        margin-inline-start: 16.75rem !important;
+    }
+}
