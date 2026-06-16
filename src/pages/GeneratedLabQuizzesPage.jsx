@@ -5,7 +5,7 @@ import GeneratedQuizListLayer from "../components/GeneratedQuizListLayer";
 
 const GeneratedLabQuizzesPage = () => (
   <MasterLayout>
-    <Breadcrumb title="Lab Quizzes" />
+    <Breadcrumb title="Generated Lab Quizzes" />
     <GeneratedQuizListLayer courseType="LAB" />
   </MasterLayout>
 );

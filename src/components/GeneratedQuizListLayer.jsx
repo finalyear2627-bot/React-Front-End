@@ -12,16 +12,24 @@ const STATUS_BADGE = {
   FAILED:     "bg-danger-focus text-danger-main",
 };
 
+const fmtDate = (val) =>
+  val
+    ? new Date(val).toLocaleString(undefined, {
+        year: "numeric", month: "short", day: "2-digit",
+        hour: "2-digit", minute: "2-digit",
+      })
+    : "—";
+
 const GeneratedQuizListLayer = ({ courseType }) => {
   const userRole = localStorage.getItem("user_role");
+
   const [quizzes,      setQuizzes]      = useState([]);
   const [loading,      setLoading]      = useState(true);
-  const [downloading,  setDownloading]  = useState(null);
   const [openingId,    setOpeningId]    = useState(null);
   const [deletingId,   setDeletingId]   = useState(null);
   const [statusFilter, setStatusFilter] = useState("");
-  const [page,     setPage]     = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [page,         setPage]         = useState(1);
+  const [pageSize,     setPageSize]     = useState(10);
 
   const fetchQuizzes = useCallback(async () => {
     setLoading(true);
@@ -39,21 +47,6 @@ const GeneratedQuizListLayer = ({ courseType }) => {
   }, [statusFilter, courseType]);
 
   useEffect(() => { fetchQuizzes(); }, [fetchQuizzes]);
-
-  const handleDownload = async (quiz) => {
-    setDownloading(quiz.id);
-    try {
-      const name = quiz.topic || quiz.title || `quiz_${quiz.id}`;
-      await generatedQuizService.download(
-        quiz.id,
-        `${name.replace(/\s+/g, "_").slice(0, 40)}.pdf`
-      );
-    } catch {
-      showError("Failed to download PDF");
-    } finally {
-      setDownloading(null);
-    }
-  };
 
   const handleOpenInNewTab = async (id) => {
     setOpeningId(id);
@@ -80,7 +73,12 @@ const GeneratedQuizListLayer = ({ courseType }) => {
     }
   };
 
-  const title = courseType === "THEORY" ? "Theory Quizzes" : courseType === "LAB" ? "Lab Quizzes" : "Generated Quizzes";
+  const title = courseType === "THEORY"
+    ? "Generated Theory Quizzes"
+    : courseType === "LAB"
+    ? "Generated Lab Quizzes"
+    : "Generated Quizzes";
+  const courseColLabel = courseType === "LAB" ? "Lab Course" : "Theory Course";
   const generateRoute = courseType === "LAB" ? "/generate-lab-quiz" : "/generate-theory-quiz";
 
   const paginated = quizzes.slice((page - 1) * pageSize, page * pageSize);
@@ -146,87 +144,76 @@ const GeneratedQuizListLayer = ({ courseType }) => {
                   <tr>
                     <th>#</th>
                     <th>Topic / Title</th>
-                    <th>Course</th>
+                    <th>{courseColLabel}</th>
+                    <th>Teacher</th>
                     <th>CLOs</th>
                     <th>Status</th>
-                    <th>Created</th>
+                    <th>Generated At</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {paginated.map((quiz, idx) => (
-                    <tr key={quiz.id || idx}>
-                      <td>{(page - 1) * pageSize + idx + 1}</td>
-                      <td style={{ maxWidth: 200 }}>
-                        <span className="fw-medium" title={quiz.topic || quiz.title}>
-                          {((quiz.topic || quiz.title || "") .length > 50
-                            ? (quiz.topic || quiz.title || "").slice(0, 50) + "…"
-                            : quiz.topic || quiz.title || "—")}
-                        </span>
-                      </td>
-                      <td>
-                        <span className="badge bg-info-focus text-info-main radius-4">
-                          {quiz.course_name || quiz.course?.name || quiz.course_code || `Course ${quiz.course_id || "—"}`}
-                        </span>
-                        {quiz.course_component && (
-                          <span className="badge bg-secondary-focus text-secondary-main radius-4 ms-4">
-                            {quiz.course_component}
+                  {paginated.map((quiz, idx) => {
+                    const courseDisplay =
+                      quiz.theory_course_code || quiz.theory_course?.code ||
+                      quiz.theory_course_name || quiz.theory_course?.name ||
+                      quiz.course_code || quiz.course_name || "—";
+                    const teacherDisplay = quiz.generated_by_name || quiz.teacher_name || "—";
+                    const dateDisplay = fmtDate(quiz.generated_at || quiz.created_at);
+                    return (
+                      <tr key={quiz.id || idx}>
+                        <td>{(page - 1) * pageSize + idx + 1}</td>
+                        <td style={{ maxWidth: 200 }}>
+                          <span className="fw-medium" title={quiz.topic || quiz.title}>
+                            {((quiz.topic || quiz.title || "").length > 50
+                              ? (quiz.topic || quiz.title || "").slice(0, 50) + "…"
+                              : quiz.topic || quiz.title || "—")}
                           </span>
-                        )}
-                      </td>
-                      <td className="text-center">
-                        {quiz.clo_ids?.length ?? quiz.clos?.length ?? "—"}
-                      </td>
-                      <td>
-                        <span className={`badge radius-4 ${STATUS_BADGE[quiz.status] || "bg-neutral-200 text-neutral-600"}`}>
-                          {quiz.status || "—"}
-                        </span>
-                      </td>
-                      <td className="text-nowrap">
-                        {quiz.created_at
-                          ? new Date(quiz.created_at).toLocaleDateString()
-                          : "—"}
-                      </td>
-                      <td>
-                        {quiz.status === "COMPLETED" && (
-                          <>
-                            <button
-                              onClick={() => handleDownload(quiz)}
-                              disabled={downloading === quiz.id}
-                              className="w-32-px h-32-px me-8 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
-                              title="Download PDF"
-                            >
-                              {downloading === quiz.id
-                                ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
-                                : <Icon icon="solar:download-linear" />}
-                            </button>
+                        </td>
+                        <td>
+                          <span className="badge bg-info-focus text-info-main radius-4">
+                            {courseDisplay}
+                          </span>
+                        </td>
+                        <td className="text-nowrap">{teacherDisplay}</td>
+                        <td className="text-center">
+                          {quiz.clo_ids?.length ?? quiz.clos?.length ?? "—"}
+                        </td>
+                        <td>
+                          <span className={`badge radius-4 ${STATUS_BADGE[quiz.status] || "bg-neutral-200 text-neutral-600"}`}>
+                            {quiz.status || "—"}
+                          </span>
+                        </td>
+                        <td className="text-nowrap text-sm">{dateDisplay}</td>
+                        <td>
+                          {quiz.status === "COMPLETED" && (
                             <button
                               onClick={() => handleOpenInNewTab(quiz.id)}
                               disabled={openingId === quiz.id}
                               className="w-32-px h-32-px me-8 bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
-                              title="Open in New Tab"
+                              title="Open PDF in New Tab"
                             >
                               {openingId === quiz.id
                                 ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
                                 : <Icon icon="solar:arrow-right-up-outline" />}
                             </button>
-                          </>
-                        )}
-                        {userRole === "ADMIN" && (
-                          <button
-                            onClick={() => handleDelete(quiz.id)}
-                            disabled={deletingId === quiz.id}
-                            className="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
-                            title="Delete"
-                          >
-                            {deletingId === quiz.id
-                              ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
-                              : <Icon icon="mingcute:delete-2-line" />}
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                          )}
+                          {userRole === "ADMIN" && (
+                            <button
+                              onClick={() => handleDelete(quiz.id)}
+                              disabled={deletingId === quiz.id}
+                              className="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
+                              title="Delete"
+                            >
+                              {deletingId === quiz.id
+                                ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
+                                : <Icon icon="mingcute:delete-2-line" />}
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

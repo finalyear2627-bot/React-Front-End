@@ -16,6 +16,7 @@ const TIME_OPTIONS = [
   "2 Hours 30 Minutes",
   "3 Hours",
 ];
+const PROG_LANGS = ["Python", "Java", "C++", "C#", "JavaScript", "C", "Other"];
 
 const CheckItem = ({ badge, badgeColor = "info", label, checked, onClick }) => (
   <div
@@ -48,6 +49,7 @@ const GeneratePaperLabLayer = () => {
   const [theoryCourseId, setTheoryCourseId] = useState("");
   const [labCourseId,    setLabCourseId]    = useState("");
   const [topic,          setTopic]          = useState("");
+  const [progLang,       setProgLang]       = useState("");
   const [teacherName,    setTeacherName]    = useState("");
   const [totalMarks,  setTotalMarks]  = useState("60");
   const [totalTime,   setTotalTime]   = useState("2 Hours 30 Minutes");
@@ -205,6 +207,7 @@ const GeneratePaperLabLayer = () => {
         total_time:       totalTime,
         clo_ids:          selectedCloIds,
         plo_ids:          selectedPloIds,
+        ...(progLang && { programming_language: progLang }),
       };
 
       const res = await generatedPaperService.generate(payload);
@@ -316,6 +319,22 @@ const GeneratePaperLabLayer = () => {
             {topicError && (
               <div className="alert alert-danger radius-8 mt-8 text-sm py-8 px-12">{topicError}</div>
             )}
+          </div>
+
+          {/* Programming Language */}
+          <div className="mb-20">
+            <label className="form-label fw-semibold text-primary-light text-sm mb-8">
+              Programming Language
+            </label>
+            <select
+              className="form-control radius-8"
+              value={progLang}
+              onChange={(e) => setProgLang(e.target.value)}
+            >
+              <option value="">-- None / Not Applicable --</option>
+              {PROG_LANGS.map((l) => <option key={l} value={l}>{l}</option>)}
+            </select>
+            <small className="text-secondary-light">Required if the course involves programming topics. All code in the paper will use this language.</small>
           </div>
 
           {/* Total Marks + Total Time */}

@@ -116,6 +116,7 @@ const ProgramListLayer = () => {
                         >
                           <Icon icon="iconamoon:eye-light" />
                         </Link>
+                        {userRole === "ADMIN" && (
                         <Link
                           to={`/program-edit/${program.id}`}
                           className="w-32-px h-32-px me-8 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center"
@@ -123,6 +124,7 @@ const ProgramListLayer = () => {
                         >
                           <Icon icon="lucide:edit" />
                         </Link>
+                        )}
                       </td>
                     </tr>
                   ))}

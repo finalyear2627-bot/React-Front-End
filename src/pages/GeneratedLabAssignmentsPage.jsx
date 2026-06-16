@@ -5,7 +5,7 @@ import GeneratedAssignmentListLayer from "../components/GeneratedAssignmentListL
 
 const GeneratedLabAssignmentsPage = () => (
   <MasterLayout>
-    <Breadcrumb title="Lab Assignments" />
+    <Breadcrumb title="Generated Lab Assignments" />
     <GeneratedAssignmentListLayer courseType="LAB" />
   </MasterLayout>
 );

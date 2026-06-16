@@ -8,6 +8,7 @@ import TablePagination from "./TablePagination";
 
 const SemesterViewLayer = () => {
   const { id } = useParams();
+  const userRole = localStorage.getItem("user_role");
 
   const [semester,    setSemester]    = useState(null);
   const [courses,     setCourses]     = useState([]);
@@ -152,9 +153,12 @@ const SemesterViewLayer = () => {
         <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
           <h5 className="card-title mb-0">Semester Details</h5>
           <div className="d-flex gap-2 flex-wrap">
-            <Link to={`/semester-edit/${id}`} className="btn btn-sm btn-success radius-8 d-inline-flex align-items-center gap-1">
-              <Icon icon="lucide:edit" /> Edit
-            </Link>
+            {userRole === "ADMIN" && (
+              <Link to={`/semester-edit/${id}`} className="btn btn-sm btn-success radius-8 d-inline-flex align-items-center gap-1">
+                <Icon icon="lucide:edit" /> Edit
+              </Link>
+            )}
+            {userRole === "ADMIN" && (
             <button
               onClick={handleToggleSemester}
               disabled={togglingId === "sem"}
@@ -166,6 +170,8 @@ const SemesterViewLayer = () => {
               }
               {semester.is_active ? "Deactivate" : "Activate"}
             </button>
+            )}
+            
             <Link to="/semesters" className="btn btn-sm btn-outline-secondary radius-8">
               Back to List
             </Link>
@@ -200,6 +206,7 @@ const SemesterViewLayer = () => {
       </div>
 
       {/* Courses Card */}
+      {userRole === "ADMIN" && (
       <div className="card basic-data-table">
         <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
           <h5 className="card-title mb-0">Courses in this Semester</h5>
@@ -289,7 +296,7 @@ const SemesterViewLayer = () => {
           )}
         </div>
       </div>
-
+      )}
       {/* Assign Courses Modal */}
       {showModal && (
         <div

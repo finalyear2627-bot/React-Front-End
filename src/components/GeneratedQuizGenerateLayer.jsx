@@ -93,10 +93,13 @@ const PloRadioGroup = ({ items, selected, onSelect, emptyMsg }) => (
   </div>
 );
 
+const PROG_LANGS = ["Python", "Java", "C++", "C#", "JavaScript", "C", "Other"];
+
 const GeneratedQuizGenerateLayer = ({ courseType = "THEORY" }) => {
   const navigate = useNavigate();
 
   const [topic,         setTopic]         = useState("");
+  const [progLang,      setProgLang]      = useState("");
   const [courseId,      setCourseId]      = useState("");
   const [teacherName,   setTeacherName]   = useState("");
   const [selectedCloId, setSelectedCloId] = useState(null);
@@ -206,7 +209,8 @@ const GeneratedQuizGenerateLayer = ({ courseType = "THEORY" }) => {
         topic:        topic.trim(),
         clo_ids:      [selectedCloId],
         plo_ids:      [selectedPloId],
-        teacher_name: teacherName.trim() || undefined,
+        ...(progLang && { programming_language: progLang }),
+        ...(teacherName.trim() && { teacher_name: teacherName.trim() }),
       };
       const res = await generatedQuizService.generate(payload);
       if (res?.status?.code !== 0) { showError(res?.status?.message || "Generation failed"); return; }
@@ -246,6 +250,22 @@ const GeneratedQuizGenerateLayer = ({ courseType = "THEORY" }) => {
             {topicError && (
               <div className="alert alert-danger radius-8 mt-8 text-sm py-8 px-12">{topicError}</div>
             )}
+          </div>
+
+          {/* Programming Language */}
+          <div className="mb-20">
+            <label className="form-label fw-semibold text-primary-light text-sm mb-8">
+              Programming Language
+            </label>
+            <select
+              className="form-control radius-8"
+              value={progLang}
+              onChange={(e) => setProgLang(e.target.value)}
+            >
+              <option value="">-- None / Not Applicable --</option>
+              {PROG_LANGS.map((l) => <option key={l} value={l}>{l}</option>)}
+            </select>
+            <small className="text-secondary-light">Required if the course involves programming topics. All code in the quiz will use this language.</small>
           </div>
 
           {/* Course */}

@@ -5,7 +5,7 @@ import GeneratedPaperListLayer from "../components/GeneratedPaperListLayer";
 
 const GeneratedTheoryPapersPage = () => (
   <MasterLayout>
-    <Breadcrumb title="Theory Papers" />
+    <Breadcrumb title="Generated Theory Papers" />
     <GeneratedPaperListLayer courseType="THEORY" />
   </MasterLayout>
 );

@@ -12,16 +12,24 @@ const STATUS_BADGE = {
   FAILED:     "bg-danger-focus text-danger-main",
 };
 
+const fmtDate = (val) =>
+  val
+    ? new Date(val).toLocaleString(undefined, {
+        year: "numeric", month: "short", day: "2-digit",
+        hour: "2-digit", minute: "2-digit",
+      })
+    : "—";
+
 const GeneratedAssignmentListLayer = ({ courseType }) => {
   const userRole = localStorage.getItem("user_role");
+
   const [assignments,  setAssignments]  = useState([]);
   const [loading,      setLoading]      = useState(true);
-  const [downloading,  setDownloading]  = useState(null);
   const [openingId,    setOpeningId]    = useState(null);
   const [deletingId,   setDeletingId]   = useState(null);
   const [statusFilter, setStatusFilter] = useState("");
-  const [page,     setPage]     = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [page,         setPage]         = useState(1);
+  const [pageSize,     setPageSize]     = useState(10);
 
   const fetchAssignments = useCallback(async () => {
     setLoading(true);
@@ -39,21 +47,6 @@ const GeneratedAssignmentListLayer = ({ courseType }) => {
   }, [statusFilter, courseType]);
 
   useEffect(() => { fetchAssignments(); }, [fetchAssignments]);
-
-  const handleDownload = async (assignment) => {
-    setDownloading(assignment.id);
-    try {
-      const name = assignment.topic || assignment.title || `assignment_${assignment.id}`;
-      await generatedAssignmentService.download(
-        assignment.id,
-        `${name.replace(/\s+/g, "_").slice(0, 40)}.pdf`
-      );
-    } catch {
-      showError("Failed to download PDF");
-    } finally {
-      setDownloading(null);
-    }
-  };
 
   const handleOpenInNewTab = async (id) => {
     setOpeningId(id);
@@ -80,7 +73,12 @@ const GeneratedAssignmentListLayer = ({ courseType }) => {
     }
   };
 
-  const title = courseType === "THEORY" ? "Theory Assignments" : courseType === "LAB" ? "Lab Assignments" : "Generated Assignments";
+  const title = courseType === "THEORY"
+    ? "Generated Theory Assignments"
+    : courseType === "LAB"
+    ? "Generated Lab Assignments"
+    : "Generated Assignments";
+  const courseColLabel = courseType === "LAB" ? "Lab Course" : "Theory Course";
   const generateRoute = courseType === "LAB" ? "/generate-lab-assignment" : "/generate-theory-assignment";
 
   const paginated = assignments.slice((page - 1) * pageSize, page * pageSize);
@@ -146,87 +144,76 @@ const GeneratedAssignmentListLayer = ({ courseType }) => {
                   <tr>
                     <th>#</th>
                     <th>Topic / Title</th>
-                    <th>Course</th>
+                    <th>{courseColLabel}</th>
+                    <th>Teacher</th>
                     <th>CLOs</th>
                     <th>Status</th>
-                    <th>Created</th>
+                    <th>Generated At</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {paginated.map((assignment, idx) => (
-                    <tr key={assignment.id || idx}>
-                      <td>{(page - 1) * pageSize + idx + 1}</td>
-                      <td style={{ maxWidth: 200 }}>
-                        <span className="fw-medium" title={assignment.topic || assignment.title}>
-                          {((assignment.topic || assignment.title || "").length > 50
-                            ? (assignment.topic || assignment.title || "").slice(0, 50) + "…"
-                            : assignment.topic || assignment.title || "—")}
-                        </span>
-                      </td>
-                      <td>
-                        <span className="badge bg-info-focus text-info-main radius-4">
-                          {assignment.course_name || assignment.course?.name || assignment.course_code || `Course ${assignment.course_id || "—"}`}
-                        </span>
-                        {assignment.course_component && (
-                          <span className="badge bg-secondary-focus text-secondary-main radius-4 ms-4">
-                            {assignment.course_component}
+                  {paginated.map((assignment, idx) => {
+                    const courseDisplay =
+                      assignment.theory_course_code || assignment.theory_course?.code ||
+                      assignment.theory_course_name || assignment.theory_course?.name ||
+                      assignment.course_code || assignment.course_name || "—";
+                    const teacherDisplay = assignment.generated_by_name || assignment.teacher_name || "—";
+                    const dateDisplay = fmtDate(assignment.generated_at || assignment.created_at);
+                    return (
+                      <tr key={assignment.id || idx}>
+                        <td>{(page - 1) * pageSize + idx + 1}</td>
+                        <td style={{ maxWidth: 200 }}>
+                          <span className="fw-medium" title={assignment.topic || assignment.title}>
+                            {((assignment.topic || assignment.title || "").length > 50
+                              ? (assignment.topic || assignment.title || "").slice(0, 50) + "…"
+                              : assignment.topic || assignment.title || "—")}
                           </span>
-                        )}
-                      </td>
-                      <td className="text-center">
-                        {assignment.clo_ids?.length ?? assignment.clos?.length ?? "—"}
-                      </td>
-                      <td>
-                        <span className={`badge radius-4 ${STATUS_BADGE[assignment.status] || "bg-neutral-200 text-neutral-600"}`}>
-                          {assignment.status || "—"}
-                        </span>
-                      </td>
-                      <td className="text-nowrap">
-                        {assignment.created_at
-                          ? new Date(assignment.created_at).toLocaleDateString()
-                          : "—"}
-                      </td>
-                      <td>
-                        {assignment.status === "COMPLETED" && (
-                          <>
-                            <button
-                              onClick={() => handleDownload(assignment)}
-                              disabled={downloading === assignment.id}
-                              className="w-32-px h-32-px me-8 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
-                              title="Download PDF"
-                            >
-                              {downloading === assignment.id
-                                ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
-                                : <Icon icon="solar:download-linear" />}
-                            </button>
+                        </td>
+                        <td>
+                          <span className="badge bg-info-focus text-info-main radius-4">
+                            {courseDisplay}
+                          </span>
+                        </td>
+                        <td className="text-nowrap">{teacherDisplay}</td>
+                        <td className="text-center">
+                          {assignment.clo_ids?.length ?? assignment.clos?.length ?? "—"}
+                        </td>
+                        <td>
+                          <span className={`badge radius-4 ${STATUS_BADGE[assignment.status] || "bg-neutral-200 text-neutral-600"}`}>
+                            {assignment.status || "—"}
+                          </span>
+                        </td>
+                        <td className="text-nowrap text-sm">{dateDisplay}</td>
+                        <td>
+                          {assignment.status === "COMPLETED" && (
                             <button
                               onClick={() => handleOpenInNewTab(assignment.id)}
                               disabled={openingId === assignment.id}
                               className="w-32-px h-32-px me-8 bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
-                              title="Open in New Tab"
+                              title="Open PDF in New Tab"
                             >
                               {openingId === assignment.id
                                 ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
                                 : <Icon icon="solar:arrow-right-up-outline" />}
                             </button>
-                          </>
-                        )}
-                        {userRole === "ADMIN" && (
-                          <button
-                            onClick={() => handleDelete(assignment.id)}
-                            disabled={deletingId === assignment.id}
-                            className="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
-                            title="Delete"
-                          >
-                            {deletingId === assignment.id
-                              ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
-                              : <Icon icon="mingcute:delete-2-line" />}
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                          )}
+                          {userRole === "ADMIN" && (
+                            <button
+                              onClick={() => handleDelete(assignment.id)}
+                              disabled={deletingId === assignment.id}
+                              className="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
+                              title="Delete"
+                            >
+                              {deletingId === assignment.id
+                                ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
+                                : <Icon icon="mingcute:delete-2-line" />}
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

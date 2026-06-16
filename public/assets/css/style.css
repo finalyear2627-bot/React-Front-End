@@ -15730,11 +15730,14 @@ td.fc-header-center {
 
 @media (min-width: 1200px) {
     .sidebar {
-        width: 16.75rem !important;
+        width: 17.75rem !important;
     }
 }
 @media (min-width: 1200px) {
     .dashboard-main {
-        margin-inline-start: 16.75rem !important;
+        margin-inline-start: 17.75rem !important;
     }
+}
+.sidebar-menu li a {
+    font-size: 0.700rem !important;
 }

@@ -5,6 +5,7 @@ import { programService } from "../api/program.service";
 import { showError, getApiError } from "../utils/toast";
 
 const ProgramViewLayer = () => {
+  const userRole = localStorage.getItem("user_role");
   const navigate = useNavigate();
   const { id } = useParams();
   const [program, setProgram] = useState(null);
@@ -59,14 +60,17 @@ const ProgramViewLayer = () => {
             <div className="card border">
               <div className="card-header border-bottom py-16 px-24 d-flex justify-content-between align-items-center">
                 <h5 className="mb-0">Program Details</h5>
-                <div>
-                  <Link
-                    to={`/program-edit/${program.id}`}
-                    className="btn btn-sm btn-success me-8"
-                  >
-                    <Icon icon="lucide:edit" className="me-2" />
+                
+                  <div>
+                    {userRole === "ADMIN" && (
+                    <Link
+                      to={`/program-edit/${program.id}`}
+                      className="btn btn-sm btn-success me-8"
+                    >
+                      <Icon icon="lucide:edit" className="me-2" />
                     Edit
                   </Link>
+                  )}
                   <Link to="/programs" className="btn btn-sm btn-secondary">
                     Back
                   </Link>

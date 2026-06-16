@@ -228,16 +228,21 @@ const MasterLayout = ({ children }) => {
             {/* Courses */}
             {canView("COURSES") && (
               <li className='dropdown'>
+                {userRole === "ADMIN" && (
                 <Link to='#'>
                   <Icon icon='solar:notebook-outline' className='menu-icon' />
                   <span>Courses</span>
                 </Link>
+                )}
                 <ul className='sidebar-submenu'>
+                  {userRole === "ADMIN" && (
                   <li>
                     <NavLink to='/courses' className={(n) => n.isActive ? "active-page" : ""}>
                       <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> List Courses
                     </NavLink>
                   </li>
+                  )}
+
                   {userRole === "ADMIN" && (
                     <li>
                       <NavLink to='/course-add' className={(n) => n.isActive ? "active-page" : ""}>
@@ -456,7 +461,7 @@ const MasterLayout = ({ children }) => {
                   </li>
                   <li>
                     <NavLink to='/clo-plo-generator' className={(n) => n.isActive ? "active-page" : ""}>
-                      <i className='ri-circle-fill circle-icon text-purple w-auto' /> Generate CLO-PLO
+                      <i className='ri-circle-fill circle-icon text-purple w-auto' /> CLO-PLO
                     </NavLink>
                   </li>
                 </ul>
