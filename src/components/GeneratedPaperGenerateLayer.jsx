@@ -7,9 +7,10 @@ import { courseService } from "../api/course.service";
 import { cloService } from "../api/clo.service";
 import { ploService } from "../api/plo.service";
 import { courseDocumentService } from "../api/courseDocument.service";
+import { semesterService } from "../api/semester.service";
 import { showSuccess, showError, getApiError } from "../utils/toast";
 
-const MARKS_OPTIONS = ["20", "30", "40", "50", "60", "80", "100"];
+const MARKS_OPTIONS = ["20","25", "30", "40", "50", "60", "80", "100"];
 const TIME_OPTIONS  = [
   "1 Hour", "1 Hour 30 Minutes", "2 Hours", "2 Hours 30 Minutes", "3 Hours",
 ];
@@ -84,6 +85,9 @@ const GeneratedPaperGenerateLayer = () => {
   const [selectedCloIds,  setSelectedCloIds]  = useState([]);
   const [selectedPloIds,  setSelectedPloIds]  = useState([]);
 
+  const [semesters,       setSemesters]       = useState([]);
+  const [semesterName,    setSemesterName]    = useState("");
+
   const [loadingCourses,  setLoadingCourses]  = useState(true);
   const [loadingClos,     setLoadingClos]     = useState(false);
   const [loadingPlos,     setLoadingPlos]     = useState(false);
@@ -149,6 +153,17 @@ const GeneratedPaperGenerateLayer = () => {
         .finally(() => setLoadingCourses(false));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /* ── Load semesters ── */
+  useEffect(() => {
+    semesterService.getAll({ is_active: true })
+      .then((d) => {
+        const list = Array.isArray(d) ? d : d.result || d.results || [];
+        setSemesters(list.filter((s) => s.name));
+        if (list.length > 0 && list[0].name) setSemesterName(list[0].name);
+      })
+      .catch(() => {});
   }, []);
 
   /* ── CLOs / PLOs when course changes ── */
@@ -222,6 +237,7 @@ const GeneratedPaperGenerateLayer = () => {
         theory_course_id: parseInt(theoryCourseId, 10),
         topic:            topic.trim(),
         term:             term,
+        semester_name:    semesterName.trim(),
         teacher_name:     teacherName.trim(),
         total_marks:      totalMarks,
         total_time:       totalTime,
@@ -387,6 +403,33 @@ const GeneratedPaperGenerateLayer = () => {
                     </label>
                   ))}
                 </div>
+              </div>
+
+              {/* Semester */}
+              <div className="mb-20">
+                <label className="form-label fw-semibold text-primary-light text-sm mb-8">
+                  Semester <span className="text-danger-600">*</span>
+                </label>
+                {semesters.length > 0 ? (
+                  <select
+                    className="form-control radius-8"
+                    value={semesterName}
+                    onChange={(e) => setSemesterName(e.target.value)}
+                  >
+                    {semesters.map((s) => (
+                      <option key={s.id} value={s.name}>{s.name}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    className="form-control radius-8"
+                    placeholder="e.g. Fall 2025"
+                    value={semesterName}
+                    onChange={(e) => setSemesterName(e.target.value)}
+                  />
+                )}
+                <small className="text-secondary-light">This name will appear on the exam paper.</small>
               </div>
 
               {/* Programming Language */}
