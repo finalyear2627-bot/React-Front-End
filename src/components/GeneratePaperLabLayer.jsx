@@ -7,6 +7,7 @@ import { courseService } from "../api/course.service";
 import { cloService } from "../api/clo.service";
 import { ploService } from "../api/plo.service";
 import { showSuccess, showError, getApiError } from "../utils/toast";
+import CourseDocsMiniPreview from "./CourseDocsMiniPreview";
 
 const MARKS_OPTIONS = ["20", "30", "40", "50", "60", "80", "100"];
 const TIME_OPTIONS = [
@@ -155,26 +156,25 @@ const GeneratePaperLabLayer = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theoryCourseId]);
 
-  // When lab course changes: update teacher (lab course teacher takes priority)
+  // When lab course changes: auto-infer theory course (CMC111-L → CMC111) + update teacher
   useEffect(() => {
     if (!labCourseId) {
-      // Revert to theory course teacher if theory is selected
-      if (theoryCourseId) {
-        const theoryCourse = allCourses.find((c) => String(c.id) === String(theoryCourseId));
-        const tName = theoryCourse?.teacher_name || fallbackTeacher();
-        setTeacherName(tName);
-      } else {
-        setTeacherName("");
-      }
+      setTheoryCourseId("");
+      setTeacherName("");
       return;
     }
 
-    const labCourse = allCourses.find((c) => String(c.id) === String(labCourseId));
-    const theoryCourse = allCourses.find((c) => String(c.id) === String(theoryCourseId));
-    const tName =
-      labCourse?.teacher_name ||
-      theoryCourse?.teacher_name ||
-      fallbackTeacher();
+    const labCourse = labCourses.find((c) => String(c.id) === String(labCourseId));
+    if (!labCourse) return;
+
+    // Strip "-L" (case-insensitive) suffix to find the matching theory course
+    const theoryCode = labCourse.code.replace(/-L$/i, "");
+    const matched = theoryCourses.find(
+      (c) => c.code.toLowerCase() === theoryCode.toLowerCase()
+    );
+    setTheoryCourseId(matched ? String(matched.id) : "");
+
+    const tName = labCourse.teacher_name || matched?.teacher_name || fallbackTeacher();
     setTeacherName(tName);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [labCourseId]);
@@ -187,8 +187,8 @@ const GeneratePaperLabLayer = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!theoryCourseId)             { showError("Please select a theory course"); return; }
     if (!labCourseId)                { showError("Please select a lab course"); return; }
+    if (!theoryCourseId)             { showError("Could not find the matching theory course for the selected lab course. Please contact admin."); return; }
     if (!topic.trim())               { showError("Please enter a topic"); return; }
     if (!teacherName.trim())         { showError("Please enter teacher name"); return; }
     if (!totalMarks)                 { showError("Please enter total marks"); return; }
@@ -234,56 +234,31 @@ const GeneratePaperLabLayer = () => {
       <div className="card-body p-24">
         <form onSubmit={handleSubmit}>
 
-          {/* Row 1: Theory Course + Lab Course */}
-          <div className="row g-3 mb-20">
-            <div className="col-md-6">
-              <label className="form-label fw-semibold text-primary-light text-sm mb-8">
-                Theory Course <span className="text-danger-600">*</span>
-              </label>
-              {loadingCourses ? (
-                <div className="placeholder-glow">
-                  <span className="placeholder col-12 radius-8" style={{ height: 38 }} />
-                </div>
-              ) : (
-                <select
-                  className="form-control radius-8"
-                  value={theoryCourseId}
-                  onChange={(e) => setTheoryCourseId(e.target.value)}
-                  required
-                >
-                  <option value="">-- Select Theory Course --</option>
-                  {theoryCourses.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.code} — {c.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-            <div className="col-md-6">
-              <label className="form-label fw-semibold text-primary-light text-sm mb-8">
-                Lab Course <span className="text-danger-600">*</span>
-              </label>
-              {loadingCourses ? (
-                <div className="placeholder-glow">
-                  <span className="placeholder col-12 radius-8" style={{ height: 38 }} />
-                </div>
-              ) : (
-                <select
-                  className="form-control radius-8"
-                  value={labCourseId}
-                  onChange={(e) => setLabCourseId(e.target.value)}
-                  required
-                >
-                  <option value="">-- Select Lab Course --</option>
-                  {labCourses.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.code} — {c.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
+          {/* Lab Course */}
+          <div className="mb-20">
+            <label className="form-label fw-semibold text-primary-light text-sm mb-8">
+              Lab Course <span className="text-danger-600">*</span>
+            </label>
+            {loadingCourses ? (
+              <div className="placeholder-glow">
+                <span className="placeholder col-12 radius-8" style={{ height: 38 }} />
+              </div>
+            ) : (
+              <select
+                className="form-control radius-8"
+                value={labCourseId}
+                onChange={(e) => setLabCourseId(e.target.value)}
+                required
+              >
+                <option value="">-- Select Lab Course --</option>
+                {labCourses.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.code} — {c.name}
+                  </option>
+                ))}
+              </select>
+            )}
+            <CourseDocsMiniPreview courseId={labCourseId} />
           </div>
 
           {/* Teacher Name (auto-populated, disabled) */}
@@ -445,7 +420,7 @@ const GeneratePaperLabLayer = () => {
                   </div>
                 ) : clos.length === 0 ? (
                   <p className="text-secondary-light text-sm mb-0">
-                    {theoryCourseId ? "No CLOs found for this course" : "Select a theory course first"}
+                    {labCourseId ? (theoryCourseId ? "No CLOs found for this course" : "Could not find matching theory course for CLOs") : "Select a lab course first"}
                   </p>
                 ) : (
                   clos.map((c) => (
@@ -478,7 +453,7 @@ const GeneratePaperLabLayer = () => {
                   </div>
                 ) : plos.length === 0 ? (
                   <p className="text-secondary-light text-sm mb-0">
-                    {theoryCourseId ? "No PLOs found for this program" : "Select a theory course first"}
+                    {labCourseId ? (theoryCourseId ? "No PLOs found for this program" : "Could not find matching theory course for PLOs") : "Select a lab course first"}
                   </p>
                 ) : (
                   plos.map((p) => (

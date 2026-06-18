@@ -770,7 +770,8 @@
                 "value": "Bearer {{access_token}}"
               }
             ],
-            "url": "{{base_url}}/api/academics/course-assignments/my-courses/"
+            "url": "{{base_url}}/api/academics/course-assignments/my-courses/",
+            "description": "Returns courses assigned to the logged-in teacher. Each record now includes separate credit_hours_theory and credit_hours_lab integer fields in addition to the combined credit_hours string."
           }
         },
         {
@@ -1809,6 +1810,67 @@
       ]
     },
     {
+      "name": "COURSE DOCUMENTS",
+      "item": [
+        {
+          "name": "Upload Course Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "course_id",  "value": "1",             "type": "text" },
+                { "key": "title",      "value": "Week 1 Slides", "type": "text" },
+                { "key": "doc_type",   "value": "SLIDES",        "type": "text", "description": "SLIDES | OUTLINE | OTHER" },
+                { "key": "file",       "type": "file",           "description": "PDF, PPTX, or TXT" }
+              ]
+            },
+            "url": "{{base_url}}/api/assessments/course-documents/upload/",
+            "description": "Upload a course document (PDF / PPTX / TXT). The system will:\n1. Extract text from the file.\n2. Call Gemini to summarize key topics and concepts.\n3. Store the summary — it is automatically injected into all paper/quiz/assignment generations for this course.\n\nRequired: course_id, title, file\nOptional: doc_type — SLIDES (default), OUTLINE, OTHER\n\nTeacher must be assigned to the course."
+          },
+          "response": []
+        },
+        {
+          "name": "List Course Documents",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/assessments/course-documents/?course=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "assessments", "course-documents", ""],
+              "query": [{ "key": "course", "value": "1" }]
+            },
+            "description": "List uploaded documents. Filter by ?course=<id>. Admin sees all; Teacher sees only their assigned course documents."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Course Document by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/assessments/course-documents/{{document_id}}/",
+            "description": "Retrieve a single course document by ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Course Document",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{base_url}}/api/assessments/course-documents/{{document_id}}/",
+            "description": "Delete a course document and remove the file from disk. Teacher (own courses) or Admin only."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "ASSESSMENTS",
       "item": [
         {
@@ -1828,9 +1890,9 @@
             "url": "{{base_url}}/api/assessments/generated-papers/generate/",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"theory_course_id\": 1,\n  \"lab_course_id\": 2,\n  \"topic\": \"Machine Learning Fundamentals\",\n  \"programming_language\": \"Python\",\n  \"teacher_name\": \"Ms Tayyaba Shehzad\",\n  \"total_marks\": \"60\",\n  \"total_time\": \"2 Hours and 30 Minutes\",\n  \"clo_ids\": [\n    1,\n    2,\n    3\n  ],\n  \"plo_ids\": [\n    1,\n    2\n  ]\n}"
+              "raw": "{\n  \"theory_course_id\": 1,\n  \"lab_course_id\": 2,\n  \"topic\": \"Machine Learning Fundamentals\",\n  \"term\": \"MIDTERM\",\n  \"programming_language\": \"Python\",\n  \"teacher_name\": \"Ms Tayyaba Shehzad\",\n  \"total_marks\": \"60\",\n  \"total_time\": \"2 Hours and 30 Minutes\",\n  \"mcq_count\": 5,\n  \"short_q_count\": 4,\n  \"long_q_count\": 3,\n  \"clo_ids\": [\n    1,\n    2,\n    3\n  ],\n  \"plo_ids\": [\n    1,\n    2\n  ]\n}"
             },
-            "description": "Generate exam paper PDF.\n\nRequired:\n  theory_course_id  \u2014 ID of the theory course (course_type=THEORY)\n  topic             \u2014 exam topic (must be correctly spelled and relevant to the selected CLOs/PLOs)\n  clo_ids           \u2014 list of CLO IDs (theory CLOs required; lab CLOs auto-fetched if lab course provided but none selected)\n  plo_ids           \u2014 list of PLO IDs\n\nOptional:\n  lab_course_id        \u2014 ID of the lab course (course_type=LAB); omit if no lab course\n  programming_language \u2014 e.g. 'Python', 'Java', 'C++', 'C#', 'JavaScript'. Required if the course is programming-related (detected by course name/code keywords). All code in the generated paper will use this language.\n  teacher_name         \u2014 defaults to logged-in teacher name\n  total_marks          \u2014 default '60'\n  total_time           \u2014 default '2 Hours and 30 Minutes'\n\nProgramming language:\n  If the course name/code contains programming keywords (e.g. 'programming', 'OOP', 'data structure', 'algorithm', 'web development'), the field is REQUIRED. The generated paper will include code questions/examples exclusively in the selected language.\n\nTopic validation (HTTP 422 if failed):\n  Before generating, the system checks that the topic is a valid academic subject with correct spelling and is relevant to the selected CLOs and PLOs. If invalid, an error is returned with a corrective message.\n\nPDF header table:\n  Course Code    | Course Title\n  Teacher's Name | Total Marks\n  Date (auto)    | Total Time\n  Student's Name | Reg. No."
+            "description": "Generate exam paper PDF.\n\nRequired:\n  theory_course_id  \u2014 ID of the theory course (course_type=THEORY)\n  topic             \u2014 exam topic (must be correctly spelled and relevant to the selected CLOs/PLOs)\n  clo_ids           \u2014 list of CLO IDs (theory CLOs required; lab CLOs auto-fetched if lab course provided but none selected)\n  plo_ids           \u2014 list of PLO IDs\n\nOptional:\n  lab_course_id        \u2014 ID of the lab course (course_type=LAB); omit if no lab course\n  term                 \u2014 'MIDTERM' or 'FINAL'. Displayed in PDF title: 'Midterm Examination Paper \u2013 Fall 2026'. Omit for plain 'Examination Paper'.\n  mcq_count            \u2014 number of MCQs in Section A (default 5)\n  short_q_count        \u2014 number of short questions in Section B (default 4)\n  long_q_count         \u2014 number of long questions in Section C (default 3)\n  programming_language \u2014 e.g. 'Python', 'Java', 'C++'. Required if course is programming-related.\n  teacher_name         \u2014 defaults to logged-in teacher name\n  total_marks          \u2014 default '60'; marks distributed proportionally across sections\n  total_time           \u2014 default '2 Hours and 30 Minutes'\n\nPDF title format: [Term] Examination Paper \u2013 [Semester Name from semesters API]\nPDF header table:\n  Course Code & Title  (full width)\n  Program / Department (full width)\n  Teacher's Name | Total Marks\n  Date & Time    | Total Time\n  Student's Name | Reg. No.\n\nTopic validation (HTTP 422): topic must be correctly spelled and relevant to CLOs/PLOs."
           }
         },
         {
@@ -1936,7 +1998,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"course_id\": 1,\n  \"topic\": \"Pointers and Memory Management\",\n  \"programming_language\": \"C++\",\n  \"clo_ids\": [\n    1,\n    2\n  ],\n  \"plo_ids\": [\n    1\n  ]\n}"
+              "raw": "{\n  \"course_id\": 1,\n  \"topic\": \"Pointers and Memory Management\",\n  \"term\": \"MIDTERM\",\n  \"question_count\": 10,\n  \"programming_language\": \"C++\",\n  \"clo_ids\": [\n    1,\n    2\n  ],\n  \"plo_ids\": [\n    1\n  ]\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/assessments/generated-quizzes/generate/",
@@ -1951,7 +2013,7 @@
                 ""
               ]
             },
-            "description": "Generate a quiz PDF for a single assigned course. Teacher only.\n\ncourse_id can be a THEORY or LAB course — the response will label it accordingly via course_component.\n\nRequired: course_id, topic, clo_ids, plo_ids\nOptional:\n  programming_language — e.g. 'Python', 'Java', 'C++'. Required if course is programming-related. All code in the quiz will use this language.\n  teacher_name, total_marks (default 10), total_time (default 15 Minutes)\n\nTopic validation (HTTP 422): topic must be correctly spelled and relevant to the selected CLOs and PLOs."
+            "description": "Generate a quiz PDF for a single assigned course. Teacher only.\n\nRequired: course_id, topic, clo_ids, plo_ids\nOptional:\n  term             — 'MIDTERM' or 'FINAL'. Shown in PDF title.\n  question_count   — total number of questions to generate (default 10)\n  programming_language — e.g. 'Python', 'Java', 'C++'. Required if course is programming-related.\n  teacher_name, total_marks (default 10), total_time (default 15 Minutes)\n\nTopic validation (HTTP 422): topic must be correctly spelled and relevant to the selected CLOs and PLOs."
           },
           "response": []
         },
@@ -2090,7 +2152,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"course_id\": 1,\n  \"topic\": \"Linked Lists and Dynamic Memory\",\n  \"programming_language\": \"C++\",\n  \"clo_ids\": [\n    1,\n    2\n  ],\n  \"plo_ids\": [\n    1\n  ]\n}"
+              "raw": "{\n  \"course_id\": 1,\n  \"topic\": \"Linked Lists and Dynamic Memory\",\n  \"term\": \"MIDTERM\",\n  \"question_count\": 5,\n  \"programming_language\": \"C++\",\n  \"clo_ids\": [\n    1,\n    2\n  ],\n  \"plo_ids\": [\n    1\n  ]\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/assessments/generated-assignments/generate/",
@@ -2105,7 +2167,7 @@
                 ""
               ]
             },
-            "description": "Generate an assignment PDF for a single assigned course. Teacher only.\n\ncourse_id can be a THEORY or LAB course — the response will label it accordingly via course_component.\n\nRequired: course_id, topic, clo_ids, plo_ids\nOptional:\n  programming_language — e.g. 'Python', 'Java', 'C++'. Required if course is programming-related. All code in the assignment will use this language.\n  teacher_name, total_marks (default 20), total_time (default 1 Hour)\n\nTopic validation (HTTP 422): topic must be correctly spelled and relevant to the selected CLOs and PLOs."
+            "description": "Generate an assignment PDF for a single assigned course. Teacher only.\n\nRequired: course_id, topic, clo_ids, plo_ids\nOptional:\n  term             — 'MIDTERM' or 'FINAL'. Shown in PDF title.\n  question_count   — number of assignment questions to generate (default 5)\n  programming_language — e.g. 'Python', 'Java', 'C++'. Required if course is programming-related.\n  teacher_name, total_marks (default 20), total_time (default 1 Hour)\n\nTopic validation (HTTP 422): topic must be correctly spelled and relevant to the selected CLOs and PLOs."
           },
           "response": []
         },

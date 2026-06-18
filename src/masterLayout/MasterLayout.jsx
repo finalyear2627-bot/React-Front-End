@@ -406,6 +406,20 @@ const MasterLayout = ({ children }) => {
                   </NavLink>
                 </li>
 
+                {/* ── Course Documents ── */}
+                {(userRole === "TEACHER" || userRole === "ADMIN") && (
+                  <>
+                    <li style={{ padding: "8px 16px 2px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-secondary-light, #9ca3af)", pointerEvents: "none", borderTop: "1px solid var(--neutral-200, #e5e7eb)", marginTop: 4 }}>
+                      Course Materials
+                    </li>
+                    <li>
+                      <NavLink to='/course-documents' className={(n) => n.isActive ? "active-page" : ""}>
+                        <i className='ri-circle-fill circle-icon text-info-main w-auto' /> Course Documents
+                      </NavLink>
+                    </li>
+                  </>
+                )}
+
               </ul>
             </li>
 

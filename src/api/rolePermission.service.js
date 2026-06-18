@@ -16,6 +16,12 @@ export const rolePermissionService = {
   setBulk: (data) =>
     axiosInstance.post(`${BASE}/set-bulk/`, data).then((r) => r.data),
 
+  activate: (id) =>
+    axiosInstance.post(`${BASE}/${id}/activate/`).then((r) => r.data),
+
+  deactivate: (id) =>
+    axiosInstance.post(`${BASE}/${id}/deactivate/`).then((r) => r.data),
+
   // Single-entry CRUD (kept for legacy / fine-grained use)
   create: (data) =>
     axiosInstance.post(`${BASE}/`, data).then((r) => r.data),

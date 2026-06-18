@@ -74,6 +74,9 @@ export const authService = {
   updateProfile: (data) =>
     axiosInstance.put("/accounts/profile/", data).then((r) => r.data),
 
+  patchProfile: (data) =>
+    axiosInstance.patch("/accounts/profile/", data).then((r) => r.data),
+
   changePassword: (data) =>
     axiosInstance.post("/accounts/change-password/", data).then((r) => r.data),
 

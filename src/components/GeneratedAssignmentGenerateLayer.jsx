@@ -7,6 +7,7 @@ import { courseAssignmentService } from "../api/courseAssignment.service";
 import { cloService } from "../api/clo.service";
 import { ploService } from "../api/plo.service";
 import { showSuccess, showError, getApiError } from "../utils/toast";
+import CourseDocsMiniPreview from "./CourseDocsMiniPreview";
 
 const CloRadioGroup = ({ items, selected, onSelect, emptyMsg }) => (
   <div className="border radius-8 p-12" style={{ maxHeight: 280, overflowY: "auto" }}>
@@ -289,6 +290,7 @@ const GeneratedAssignmentGenerateLayer = ({ courseType = "THEORY" }) => {
                 ))}
               </select>
             )}
+            <CourseDocsMiniPreview courseId={courseId} />
           </div>
 
           {/* Teacher Name (auto-populated, disabled) */}

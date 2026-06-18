@@ -1,8 +1,8 @@
 import axiosInstance from "./axiosInstance";
 
 export const courseService = {
-  getAllCourses: async () => {
-    const response = await axiosInstance.get("/academics/courses/");
+  getAllCourses: async (params = {}) => {
+    const response = await axiosInstance.get("/academics/courses/", { params });
     return response.data;
   },
 

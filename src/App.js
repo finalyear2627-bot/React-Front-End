@@ -74,6 +74,8 @@ import GenerateLabAssignmentPage from "./pages/GenerateLabAssignmentPage";
 import GeneratedTheoryAssignmentsPage from "./pages/GeneratedTheoryAssignmentsPage";
 import GeneratedLabAssignmentsPage from "./pages/GeneratedLabAssignmentsPage";
 
+import CourseDocumentsPage from "./pages/CourseDocumentsPage";
+
 function App() {
   return (
     <BrowserRouter>
@@ -161,6 +163,9 @@ function App() {
         <Route exact path='/generate-lab-assignment'     element={<ProtectedRoute allowedRoles={["TEACHER"]}><GenerateLabAssignmentPage /></ProtectedRoute>} />
         <Route exact path='/generated-theory-assignments' element={<ProtectedRoute><GeneratedTheoryAssignmentsPage /></ProtectedRoute>} />
         <Route exact path='/generated-lab-assignments'   element={<ProtectedRoute><GeneratedLabAssignmentsPage /></ProtectedRoute>} />
+
+        {/* Course Documents */}
+        <Route exact path='/course-documents' element={<ProtectedRoute allowedRoles={["TEACHER","ADMIN"]}><CourseDocumentsPage /></ProtectedRoute>} />
 
         {/* Profile Routes */}
         <Route exact path='/view-profile' element={<ProtectedRoute><ViewProfilePage /></ProtectedRoute>} />
