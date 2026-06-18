@@ -69,6 +69,7 @@ const GeneratedPaperGenerateLayer = () => {
   /* ── Generate form state ── */
   const [theoryCourseId,  setTheoryCourseId]  = useState("");
   const [topic,           setTopic]           = useState("");
+  const [term,            setTerm]            = useState("MIDTERM");
   const [progLang,        setProgLang]        = useState("");
   const [teacherName,     setTeacherName]     = useState("");
   const [totalMarks,      setTotalMarks]      = useState("60");
@@ -220,6 +221,7 @@ const GeneratedPaperGenerateLayer = () => {
       const payload = {
         theory_course_id: parseInt(theoryCourseId, 10),
         topic:            topic.trim(),
+        term:             term,
         teacher_name:     teacherName.trim(),
         total_marks:      totalMarks,
         total_time:       totalTime,
@@ -359,6 +361,32 @@ const GeneratedPaperGenerateLayer = () => {
                 {topicError && (
                   <div className="alert alert-danger radius-8 mt-8 text-sm py-8 px-12">{topicError}</div>
                 )}
+              </div>
+
+              {/* Exam Term */}
+              <div className="mb-20">
+                <label className="form-label fw-semibold text-primary-light text-sm mb-8">
+                  Exam Term <span className="text-danger-600">*</span>
+                </label>
+                <div className="d-flex gap-24">
+                  {[
+                    { value: "MIDTERM", label: "Mid Term" },
+                    { value: "FINAL",   label: "Final Term" },
+                  ].map(({ value, label }) => (
+                    <label key={value} className="d-flex align-items-center gap-8" style={{ cursor: "pointer" }}>
+                      <input
+                        type="radio"
+                        name="examTerm"
+                        value={value}
+                        checked={term === value}
+                        onChange={() => setTerm(value)}
+                        className="form-check-input mt-0"
+                        style={{ width: 16, height: 16 }}
+                      />
+                      <span className="text-sm fw-semibold">{label}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
 
               {/* Programming Language */}
