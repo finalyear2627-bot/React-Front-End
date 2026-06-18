@@ -565,19 +565,15 @@ const GeneratedPaperGenerateLayer = () => {
                     type="file"
                     className="form-control form-control-sm radius-8"
                     accept=".ppt,.pptx"
-                    disabled={!theoryCourseId}
                     onChange={(e) => setSlideFile(e.target.files[0] || null)}
                   />
                 </div>
                 {slideError && (
                   <div className="alert alert-danger py-6 px-10 text-sm radius-8 mb-8">{slideError}</div>
                 )}
-                {!theoryCourseId && (
-                  <p className="text-secondary-light text-sm mb-8">Select a course first.</p>
-                )}
                 <button
                   type="submit"
-                  disabled={uploadingSlide || !theoryCourseId}
+                  disabled={uploadingSlide}
                   className="btn btn-primary-600 btn-sm radius-8 w-100 d-flex align-items-center justify-content-center gap-6"
                 >
                   {uploadingSlide
@@ -638,19 +634,15 @@ const GeneratedPaperGenerateLayer = () => {
                       type="file"
                       className="form-control form-control-sm radius-8"
                       accept=".pdf,.doc,.docx"
-                      disabled={!theoryCourseId}
                       onChange={(e) => setOutlineFile(e.target.files[0] || null)}
                     />
                   </div>
                   {outlineError && (
                     <div className="alert alert-danger py-6 px-10 text-sm radius-8 mb-8">{outlineError}</div>
                   )}
-                  {!theoryCourseId && (
-                    <p className="text-secondary-light text-sm mb-8">Select a course first.</p>
-                  )}
                   <button
                     type="submit"
-                    disabled={uploadingOutline || !theoryCourseId}
+                    disabled={uploadingOutline}
                     className="btn btn-success-600 btn-sm radius-8 w-100 d-flex align-items-center justify-content-center gap-6"
                   >
                     {uploadingOutline
