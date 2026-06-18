@@ -320,9 +320,11 @@ const MasterLayout = ({ children }) => {
               <ul className='sidebar-submenu'>
 
                 {/* ── Paper ── */}
+                {userRole !== "STUDENT" && (
                 <li style={{ padding: "6px 16px 2px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-secondary-light, #9ca3af)", pointerEvents: "none" }}>
                   Paper
                 </li>
+                )}
                 {userRole === "TEACHER" && (
                   <>
                     <li>
@@ -337,21 +339,27 @@ const MasterLayout = ({ children }) => {
                     </li>
                   </>
                 )}
-                <li>
-                  <NavLink to='/generated-theory-papers' className={(n) => n.isActive ? "active-page" : ""}>
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Theory Papers
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink to='/generated-lab-papers' className={(n) => n.isActive ? "active-page" : ""}>
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' /> Generated Lab Papers
-                  </NavLink>
-                </li>
+                {userRole !== "STUDENT" && (
+                  <>
+                    <li>
+                      <NavLink to='/generated-theory-papers' className={(n) => n.isActive ? "active-page" : ""}>
+                        <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Theory Papers
+                      </NavLink>
+                    </li>
+                    <li>
+                      <NavLink to='/generated-lab-papers' className={(n) => n.isActive ? "active-page" : ""}>
+                        <i className='ri-circle-fill circle-icon text-warning-main w-auto' /> Generated Lab Papers
+                      </NavLink>
+                    </li>
+                  </>
+                )}
 
                 {/* ── Quiz ── */}
+                {userRole !== "STUDENT" && (
                 <li style={{ padding: "8px 16px 2px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-secondary-light, #9ca3af)", pointerEvents: "none", borderTop: "1px solid var(--neutral-200, #e5e7eb)", marginTop: 4 }}>
                   Quiz
                 </li>
+                )}
                 {userRole === "TEACHER" && (
                   <>
                     <li>
@@ -366,21 +374,27 @@ const MasterLayout = ({ children }) => {
                     </li>
                   </>
                 )}
-                <li>
-                  <NavLink to='/generated-theory-quizzes' className={(n) => n.isActive ? "active-page" : ""}>
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Theory Quizzes
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink to='/generated-lab-quizzes' className={(n) => n.isActive ? "active-page" : ""}>
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' /> Generated Lab Quizzes
-                  </NavLink>
-                </li>
+                {userRole !== "STUDENT" && (
+                  <>
+                    <li>
+                      <NavLink to='/generated-theory-quizzes' className={(n) => n.isActive ? "active-page" : ""}>
+                        <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Theory Quizzes
+                      </NavLink>
+                    </li>
+                    <li>
+                      <NavLink to='/generated-lab-quizzes' className={(n) => n.isActive ? "active-page" : ""}>
+                        <i className='ri-circle-fill circle-icon text-warning-main w-auto' /> Generated Lab Quizzes
+                      </NavLink>
+                    </li>
+                  </>
+                )}
 
                 {/* ── Assignment ── */}
+                {userRole !== "STUDENT" && (
                 <li style={{ padding: "8px 16px 2px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-secondary-light, #9ca3af)", pointerEvents: "none", borderTop: "1px solid var(--neutral-200, #e5e7eb)", marginTop: 4 }}>
                   Assignment
                 </li>
+                )}
                 {userRole === "TEACHER" && (
                   <>
                     <li>
@@ -395,16 +409,20 @@ const MasterLayout = ({ children }) => {
                     </li>
                   </>
                 )}
-                <li>
-                  <NavLink to='/generated-theory-assignments' className={(n) => n.isActive ? "active-page" : ""}>
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Theory Assignments
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink to='/generated-lab-assignments' className={(n) => n.isActive ? "active-page" : ""}>
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' /> Generated Lab Assignments
-                  </NavLink>
-                </li>
+                {userRole !== "STUDENT" && (
+                  <>
+                    <li>
+                      <NavLink to='/generated-theory-assignments' className={(n) => n.isActive ? "active-page" : ""}>
+                        <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Generated Theory Assignments
+                      </NavLink>
+                    </li>
+                    <li>
+                      <NavLink to='/generated-lab-assignments' className={(n) => n.isActive ? "active-page" : ""}>
+                        <i className='ri-circle-fill circle-icon text-warning-main w-auto' /> Generated Lab Assignments
+                      </NavLink>
+                    </li>
+                  </>
+                )}
 
                 {/* ── Course Documents ── */}
                 {(userRole === "TEACHER" || userRole === "ADMIN") && (
