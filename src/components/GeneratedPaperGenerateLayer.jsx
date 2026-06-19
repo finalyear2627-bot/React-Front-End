@@ -16,7 +16,7 @@ const TIME_OPTIONS  = [
 ];
 const PROG_LANGS = ["Python", "Java", "C++", "C#", "JavaScript", "C", "Other"];
 
-const CheckItem = ({ badge, badgeColor = "info", label, checked, onClick }) => (
+const CheckItem = ({ badge, badgeColor = "info", btLevel, label, checked, onClick }) => (
   <div
     className={`d-flex align-items-start gap-10 p-10 radius-6 mb-6 ${
       checked ? "bg-primary-50 border border-primary-200" : "bg-base border border-transparent"
@@ -33,10 +33,17 @@ const CheckItem = ({ badge, badgeColor = "info", label, checked, onClick }) => (
       style={{ width: 16, height: 16 }}
     />
     <div className="flex-grow-1">
-      <span className={`badge bg-${badgeColor}-100 text-${badgeColor}-600 radius-4 fw-semibold me-6`}>
-        {badge}
-      </span>
-      <span className="text-sm text-secondary-light">{label}</span>
+      <div className="d-flex align-items-center gap-6 flex-wrap mb-4">
+        <span className={`badge bg-${badgeColor}-100 text-${badgeColor}-600 radius-4 fw-semibold`}>
+          {badge}
+        </span>
+        {btLevel && (
+          <span className="badge bg-warning-focus text-warning-main radius-4 text-xs">
+            {btLevel}
+          </span>
+        )}
+      </div>
+      {label && <span className="text-sm text-secondary-light">{label}</span>}
     </div>
   </div>
 );
@@ -513,6 +520,7 @@ const GeneratedPaperGenerateLayer = () => {
                     ) : (
                       clos.map((c) => (
                         <CheckItem key={c.id} badge={`CLO-${c.clo_number}`} badgeColor="info"
+                          btLevel={c.bt_level}
                           label={c.description || `CLO ${c.clo_number}`}
                           checked={selectedCloIds.includes(c.id)} onClick={() => toggleClo(c.id)} />
                       ))

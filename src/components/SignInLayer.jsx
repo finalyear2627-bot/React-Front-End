@@ -2,27 +2,20 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { authService } from "../api/auth.service";
+import { tokenService } from "../services/token.service";
 import { showError, showSuccess } from "../utils/toast";
 
 /* ─── Static data ─────────────────────────────────────────────────── */
 const FEATURES = [
   {
-    icon: "solar:magic-stick-3-bold-duotone",
     title: "AI-Powered Generation",
     desc: "Instantly create exam papers, quizzes & assignments",
   },
   {
-    icon: "solar:target-bold-duotone",
     title: "CLO & PLO Aligned",
     desc: "Assessments mapped to course & program outcomes",
   },
   {
-    icon: "solar:document-add-bold-duotone",
-    title: "Multi-Format Output",
-    desc: "Theory papers, lab reports, and MCQ quizzes",
-  },
-  {
-    icon: "solar:users-group-two-rounded-bold-duotone",
     title: "Role-Based Access",
     desc: "Separate dashboards for Admin, Teacher & Student",
   },
@@ -115,10 +108,19 @@ const SignInLayer = () => {
     setLoading(true);
     try {
       const data = await authService.login(username, password);
-      if (data?.status?.code !== 0) {
-        showError(data?.status?.message || "Login failed");
+
+      // Check if token was actually stored — this is the real success indicator
+      const accessToken = tokenService.getAccessToken();
+      if (!accessToken) {
+        // No token stored — backend returned an error response
+        const errMsg =
+          data?.status?.message ||
+          data?.result?.[0]?.detail ||
+          "Invalid username or password";
+        showError(errMsg);
         return;
       }
+
       setUsername(""); setPassword("");
       showSuccess(data?.status?.message || "Signed in successfully");
       navigate("/dashboard");
@@ -133,7 +135,7 @@ const SignInLayer = () => {
         err.response?.data?.non_field_errors?.[0] ||
         (err.response?.status === 401
           ? "Invalid username or password"
-          : `Login failed (${err.response?.status || "unknown error"}). Please try again.`);
+          : `Login failed (${err.response?.status}). Please try again.`);
       showError(msg);
     } finally {
       setLoading(false);
@@ -263,89 +265,43 @@ const SignInLayer = () => {
           </svg>
 
           {/* ── Logo ── */}
-          <div style={{ position: "relative", zIndex: 2 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-              <div style={{
-                width: 52, height: 52, borderRadius: 16,
-                background: "linear-gradient(135deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 100%)",
-                border: "1.5px solid rgba(255,255,255,0.22)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
-              }}>
-                <Icon icon="solar:graduation-cap-bold-duotone" style={{ fontSize: 28, color: "#93c5fd" }} />
-              </div>
-              <div>
-                <div style={{ fontSize: 17, fontWeight: 800, color: "#fff", letterSpacing: 0.2, lineHeight: 1.2 }}>
-                  Smart Assessment
-                </div>
-                <div style={{
-                  fontSize: 10, color: "rgba(255,255,255,0.55)",
-                  letterSpacing: 2.5, fontWeight: 600, textTransform: "uppercase",
-                }}>
-                  Generator
-                </div>
-              </div>
-            </div>
-          </div>
-
+  
           {/* ── Center hero ── */}
           <div style={{ position: "relative", zIndex: 2, flexGrow: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "40px 0" }}>
 
             {/* AI badge */}
-            <div style={{
-              display: "inline-flex", alignItems: "center", gap: 7,
-              background: "rgba(59,130,246,0.25)",
-              border: "1px solid rgba(147,197,253,0.3)",
-              borderRadius: 100, padding: "5px 14px",
-              marginBottom: 20, width: "fit-content",
-            }}>
-              <span style={{
-                width: 7, height: 7, borderRadius: "50%",
-                background: "#4ade80", display: "inline-block",
-                boxShadow: "0 0 6px #4ade80",
-              }} />
-              <span style={{ fontSize: 12, color: "#bfdbfe", fontWeight: 600, letterSpacing: 0.3 }}>
-                Powered by Generative AI
-              </span>
-            </div>
+          
 
             <h1 style={{
               fontSize: 36, fontWeight: 900, color: "#fff",
               lineHeight: 1.18, letterSpacing: -0.8, marginBottom: 16,
             }}>
-              Intelligent<br />
+             Smart <br />
               <span style={{
                 background: "linear-gradient(90deg, #93c5fd, #a5b4fc)",
                 WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
               }}>
                 Assessment
+
               </span><br />
-              Made Simple
+              Generator
             </h1>
 
             <p style={{
               color: "rgba(255,255,255,0.65)", fontSize: 15,
-              lineHeight: 1.75, marginBottom: 36, maxWidth: 320,
+              lineHeight: 1.75, marginBottom: 26, 
             }}>
               Generate CLO-aligned exam papers, quizzes, and assignments using AI — tailored to your course content.
             </p>
 
             {/* Feature cards */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {FEATURES.map(({ icon, title, desc }, i) => (
+            <div style={{ display: "flex", flexDirection: "unset", gap: 10 }}>
+              {FEATURES.map(({ title, desc }, i) => (
                 <div
                   key={title}
                   className="sag-feature-card sag-fadeup"
                   style={{ animationDelay: `${0.1 * i}s` }}
                 >
-                  <div style={{
-                    width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                    background: "rgba(59,130,246,0.25)",
-                    border: "1px solid rgba(147,197,253,0.2)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                  }}>
-                    <Icon icon={icon} style={{ fontSize: 20, color: "#93c5fd" }} />
-                  </div>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: "#e2e8f0", marginBottom: 2 }}>
                       {title}
@@ -359,36 +315,11 @@ const SignInLayer = () => {
             </div>
           </div>
 
-          {/* ── Stats strip ── */}
-          <div style={{
-            position: "relative", zIndex: 2,
-            display: "flex", gap: 0,
-            background: "rgba(255,255,255,0.07)",
-            borderRadius: 16, overflow: "hidden",
-            border: "1px solid rgba(255,255,255,0.10)",
-          }}>
-            {STATS.map(({ value, label }, i) => (
-              <div
-                key={label}
-                style={{
-                  flex: 1, padding: "14px 0", textAlign: "center",
-                  borderRight: i < STATS.length - 1 ? "1px solid rgba(255,255,255,0.10)" : "none",
-                }}
-              >
-                <div style={{ fontSize: 20, fontWeight: 800, color: "#93c5fd", lineHeight: 1 }}>
-                  {value}
-                </div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 4, fontWeight: 500 }}>
-                  {label}
-                </div>
-              </div>
-            ))}
-          </div>
 
           {/* Footer */}
-          <div style={{ position: "relative", zIndex: 2, marginTop: 20 }}>
+          <div style={{ position: "relative", zIndex: 2, marginTop: 10 }}>
             <p style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", marginBottom: 0 }}>
-              © 2025 Smart Assessment Generator · All rights reserved
+              © 2026 Smart Assessment Generator · All rights reserved
             </p>
           </div>
         </div>
@@ -449,10 +380,7 @@ const SignInLayer = () => {
                 </div>
                 <span style={{ fontSize: 13, fontWeight: 600, color: "#6366f1" }}>Welcome back!</span>
               </div>
-              <h2 style={{
-                fontSize: 28, fontWeight: 900, color: "#0f172a",
-                marginBottom: 6, letterSpacing: -0.6, lineHeight: 1.2,
-              }}>
+              <h2 className="loginDet" >
                 Sign in to your account
               </h2>
               <p style={{ color: "#64748b", fontSize: 14, marginBottom: 0, lineHeight: 1.6 }}>
@@ -511,25 +439,7 @@ const SignInLayer = () => {
                   display: "flex", justifyContent: "space-between",
                   alignItems: "center", margin: "18px 0 26px",
                 }}>
-                  <label style={{
-                    display: "flex", alignItems: "center",
-                    gap: 8, cursor: "pointer", userSelect: "none",
-                  }}>
-                    <input
-                      type="checkbox"
-                      style={{ width: 16, height: 16, accentColor: "#3b82f6", cursor: "pointer" }}
-                    />
-                    <span style={{ fontSize: 13, color: "#475569", fontWeight: 500 }}>
-                      Keep me signed in
-                    </span>
-                  </label>
-                  <Link
-                    to="/forgot-password"
-                    className="sag-forgot"
-                    style={{ fontSize: 13, fontWeight: 700, color: "#3b82f6", textDecoration: "none" }}
-                  >
-                    Forgot Password?
-                  </Link>
+                  
                 </div>
 
                 {/* Submit */}
@@ -555,47 +465,8 @@ const SignInLayer = () => {
 
               </form>
             </div>
-
-            {/* Divider */}
-            <div style={{
-              display: "flex", alignItems: "center",
-              gap: 14, margin: "22px 0 18px",
-            }}>
-              <div style={{ flex: 1, height: 1, background: "#e2e8f0" }} />
-              <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 500, flexShrink: 0 }}>
-                New to Smart Assessment?
-              </span>
-              <div style={{ flex: 1, height: 1, background: "#e2e8f0" }} />
-            </div>
-
-            {/* Sign Up */}
-            <div style={{ textAlign: "center" }}>
-              <Link to="/sign-up" className="sag-signup-link">
-                <span style={{
-                  display: "inline-flex", alignItems: "center", gap: 8,
-                  background: "#fff", border: "2px solid #e2e8f0",
-                  borderRadius: 14, padding: "12px 28px",
-                  fontSize: 14, fontWeight: 700, color: "#1e293b",
-                  textDecoration: "none",
-                  transition: "border-color 0.2s, box-shadow 0.2s",
-                  boxShadow: "0 2px 8px rgba(15,23,42,0.05)",
-                }}>
-                  <Icon icon="solar:user-plus-bold" style={{ fontSize: 18, color: "#3b82f6" }} />
-                  Create an Account
-                </span>
-              </Link>
-            </div>
-
             {/* Security note */}
-            <div style={{
-              display: "flex", alignItems: "center", justifyContent: "center",
-              gap: 6, marginTop: 28,
-            }}>
-              <Icon icon="solar:shield-check-bold" style={{ fontSize: 14, color: "#94a3b8" }} />
-              <span style={{ fontSize: 11, color: "#94a3b8" }}>
-                Secured with JWT authentication · Data encrypted in transit
-              </span>
-            </div>
+            
           </div>
         </div>
       </div>

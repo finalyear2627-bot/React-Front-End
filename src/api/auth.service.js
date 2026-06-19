@@ -4,12 +4,26 @@ import { savePermissions, clearPermissions } from "../utils/permissions";
 
 export const authService = {
   login: async (username, password) => {
+    // Clear stale tokens so the login request goes out without Authorization header
+    tokenService.clearTokens();
+    localStorage.removeItem("user_role");
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("username");
+    localStorage.removeItem("user_email");
+    localStorage.removeItem("user_first_name");
+    localStorage.removeItem("user_last_name");
+
     const response = await axiosInstance.post("/auth/login/", { username, password });
 
-    const result = response.data.result?.[0] ?? {};
+    // Support both { result: [{...}] } and { result: {...} } shapes
+    const raw    = response.data.result;
+    const result = (Array.isArray(raw) ? raw[0] : raw) ?? {};
     const user   = result.user ?? {};
 
-    tokenService.setTokens(result.access, result.refresh);
+    // Only store tokens if they actually exist in the response
+    if (result.access) {
+      tokenService.setTokens(result.access, result.refresh);
+    }
     localStorage.setItem("user_role",       user.role       || "");
     localStorage.setItem("user_id",         String(user.id  || ""));
     localStorage.setItem("username",        user.username   || username);
