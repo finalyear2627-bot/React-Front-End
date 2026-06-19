@@ -22,7 +22,9 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const url = error.config?.url || "";
+    const isLoginEndpoint = url.includes("/auth/login/");
+    if (error.response?.status === 401 && !isLoginEndpoint) {
       tokenService.clearTokens();
       sessionStorage.setItem("session_expired", "1");
       window.location.href = "/sign-in";

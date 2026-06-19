@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { authService } from "../api/auth.service";
 import { showError, showSuccess } from "../utils/toast";
@@ -99,6 +99,7 @@ const SignInLayer = () => {
   const [password, setPassword] = useState("");
   const [showPwd,  setShowPwd]  = useState(false);
   const [loading,  setLoading]  = useState(false);
+  const submittingRef = useRef(false);
 
   useEffect(() => {
     if (sessionStorage.getItem("session_expired")) {
@@ -109,6 +110,8 @@ const SignInLayer = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setLoading(true);
     try {
       const data = await authService.login(username, password);
@@ -120,16 +123,21 @@ const SignInLayer = () => {
       showSuccess(data?.status?.message || "Signed in successfully");
       navigate("/dashboard");
     } catch (err) {
+      if (!err.response) {
+        showError("Cannot connect to server. Please make sure the backend is running.");
+        return;
+      }
       const msg =
         err.response?.data?.status?.message ||
         err.response?.data?.detail ||
         err.response?.data?.non_field_errors?.[0] ||
         (err.response?.status === 401
           ? "Invalid username or password"
-          : "Login failed. Please try again.");
+          : `Login failed (${err.response?.status || "unknown error"}). Please try again.`);
       showError(msg);
     } finally {
       setLoading(false);
+      submittingRef.current = false;
     }
   };
 
