@@ -84,6 +84,7 @@ const GeneratedPaperGenerateLayer = () => {
   const [totalTime,       setTotalTime]       = useState("2 Hours 30 Minutes");
   const [customMarks,     setCustomMarks]     = useState(false);
   const [customTime,      setCustomTime]      = useState(false);
+  const [includeNumerical, setIncludeNumerical] = useState(false);
 
   const [theoryCourses,   setTheoryCourses]   = useState([]);
   const [allCourses,      setAllCourses]      = useState([]);
@@ -241,15 +242,16 @@ const GeneratedPaperGenerateLayer = () => {
     setSubmitting(true);
     try {
       const payload = {
-        theory_course_id: parseInt(theoryCourseId, 10),
-        topic:            topic.trim(),
-        term:             term,
-        semester_name:    semesterName.trim(),
-        teacher_name:     teacherName.trim(),
-        total_marks:      totalMarks,
-        total_time:       totalTime,
-        clo_ids:          selectedCloIds,
-        plo_ids:          selectedPloIds,
+        theory_course_id:  parseInt(theoryCourseId, 10),
+        topic:             topic.trim(),
+        term:              term,
+        semester_name:     semesterName.trim(),
+        teacher_name:      teacherName.trim(),
+        total_marks:       totalMarks,
+        total_time:        totalTime,
+        clo_ids:           selectedCloIds,
+        plo_ids:           selectedPloIds,
+        include_numerical: includeNumerical,
         ...(progLang && { programming_language: progLang }),
       };
       const res = await generatedPaperService.generate(payload);
@@ -447,6 +449,32 @@ const GeneratedPaperGenerateLayer = () => {
                   {PROG_LANGS.map((l) => <option key={l} value={l}>{l}</option>)}
                 </select>
                 <small className="text-secondary-light">Required if the course involves programming topics.</small>
+              </div>
+
+              {/* Question Types */}
+              <div className="mb-20">
+                <label className="form-label fw-semibold text-primary-light text-sm mb-8">Question Types</label>
+                <div
+                  className={`d-flex align-items-start gap-12 p-12 radius-8 border ${includeNumerical ? "bg-warning-focus border-warning-main" : "bg-base"}`}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setIncludeNumerical((v) => !v)}
+                >
+                  <input
+                    type="checkbox"
+                    className="form-check-input flex-shrink-0 mt-1"
+                    checked={includeNumerical}
+                    onChange={(e) => setIncludeNumerical(e.target.checked)}
+                    onClick={(ev) => ev.stopPropagation()}
+                    style={{ width: 16, height: 16 }}
+                  />
+                  <div>
+                    <div className="fw-semibold text-sm">Include Numerical / Calculation Questions</div>
+                    <div className="text-secondary-light mt-2" style={{ fontSize: 12 }}>
+                      For Math, Physics, Engineering subjects — Section B gets mixed theory + numerical,
+                      Section C gets full numerical problems with given values and step-by-step calculations.
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Total Marks + Total Time */}
