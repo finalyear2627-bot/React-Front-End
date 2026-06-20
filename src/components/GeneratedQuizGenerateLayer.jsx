@@ -95,7 +95,7 @@ const PloRadioGroup = ({ items, selected, onSelect, emptyMsg }) => (
   </div>
 );
 
-const PROG_LANGS = ["Python", "Java", "C++", "C#", "JavaScript", "C", "Other"];
+const PROG_LANGS = ["Python", "Java", "C++", "C#", "JavaScript", "C", "HTML/CSS"];
 
 const GeneratedQuizGenerateLayer = ({ courseType = "THEORY" }) => {
   const navigate = useNavigate();

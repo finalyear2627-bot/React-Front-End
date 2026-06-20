@@ -14,7 +14,7 @@ const MARKS_OPTIONS = ["20","25", "30", "40", "50", "60", "80", "100"];
 const TIME_OPTIONS  = [
   "1 Hour", "1 Hour 30 Minutes", "2 Hours", "2 Hours 30 Minutes", "3 Hours",
 ];
-const PROG_LANGS = ["Python", "Java", "C++", "C#", "JavaScript", "C", "Other"];
+const PROG_LANGS = ["Python", "Java", "C++", "C#", "JavaScript", "C", "HTML/CSS"];
 
 const CheckItem = ({ badge, badgeColor = "info", btLevel, label, checked, onClick }) => (
   <div
