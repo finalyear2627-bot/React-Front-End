@@ -13,9 +13,10 @@ const CourseListLayer = () => {
   const [courses,    setCourses]    = useState([]);
   const [programs,   setPrograms]   = useState([]);
   const [loading,    setLoading]    = useState(true);
-  const [togglingId, setTogglingId] = useState(null);
-  const [error,      setError]      = useState("");
-  const [permDenied, setPermDenied] = useState(false);
+  const [togglingId,   setTogglingId]   = useState(null);
+  const [deletingAll,  setDeletingAll]  = useState(false);
+  const [error,        setError]        = useState("");
+  const [permDenied,   setPermDenied]   = useState(false);
 
   // filters
   const [search,      setSearch]      = useState("");
@@ -86,6 +87,23 @@ const CourseListLayer = () => {
     }
   };
 
+  const handleDeleteAll = async () => {
+    if (!window.confirm(
+      "DELETE ALL COURSES?\n\nThis will permanently delete every course record.\n\nThis action cannot be undone. Continue?"
+    )) return;
+    setDeletingAll(true);
+    try {
+      await Promise.all(courses.map((c) => courseService.deleteCourse(c.id)));
+      setCourses([]);
+      showSuccess("All courses deleted successfully");
+    } catch (err) {
+      showError(getApiError(err) || "Some courses could not be deleted");
+      fetchCourses();
+    } finally {
+      setDeletingAll(false);
+    }
+  };
+
   const resetFilters = () => {
     setSearch(""); setFilterCode(""); setFilterProgram(""); setFilterType(""); setFilterClass("");
     setPage(1);
@@ -137,6 +155,18 @@ const CourseListLayer = () => {
       <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
         <h5 className="card-title mb-0">Courses</h5>
         <div className="d-flex align-items-center gap-2 flex-wrap">
+          {userRole === "ADMIN" && courses.length > 0 && (
+            <button
+              onClick={handleDeleteAll}
+              disabled={deletingAll}
+              className="btn btn-sm btn-danger radius-8 d-inline-flex align-items-center gap-1"
+              title="Delete all courses permanently"
+            >
+              {deletingAll
+                ? <><span className="spinner-border spinner-border-sm me-4" /> Deleting…</>
+                : <><Icon icon="mingcute:delete-2-line" className="text-lg" /> Delete All Courses</>}
+            </button>
+          )}
           {userRole === "ADMIN" && (
             <Link to="/course-bulk-upload" className="btn btn-sm btn-outline-primary radius-8 d-inline-flex align-items-center gap-1">
               <Icon icon="vscode-icons:file-type-excel" className="text-lg" />

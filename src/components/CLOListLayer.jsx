@@ -3,16 +3,25 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { cloService } from "../api/clo.service";
 import { courseService } from "../api/course.service";
+import { programService } from "../api/program.service";
 import { showSuccess, showError, getApiError } from "../utils/toast";
 import TablePagination from "./TablePagination";
 
 const CLOListLayer = () => {
   const [clos,         setClos]         = useState([]);
   const [courses,      setCourses]      = useState([]);
+  const [programs,     setPrograms]     = useState([]);
   const [loading,      setLoading]      = useState(true);
   const [clearingAll,  setClearingAll]  = useState(false);
-  const [filterCourse, setFilterCourse] = useState("");
-  const [search,       setSearch]       = useState("");
+
+  // filters
+  const [search,         setSearch]         = useState("");
+  const [filterCode,     setFilterCode]     = useState("");
+  const [filterProgram,  setFilterProgram]  = useState("");
+  const [filterType,     setFilterType]     = useState("");
+  const [filterClass,    setFilterClass]    = useState("");
+  const [filterCourse,   setFilterCourse]   = useState("");
+
   const [page,         setPage]         = useState(1);
   const [pageSize,     setPageSize]     = useState(10);
 
@@ -20,6 +29,10 @@ const CLOListLayer = () => {
     courseService
       .getAllCourses()
       .then((d) => setCourses(Array.isArray(d) ? d : d.result || d.results || []))
+      .catch(() => {});
+    programService
+      .getAllPrograms()
+      .then((d) => setPrograms(Array.isArray(d) ? d : d.result || d.results || []))
       .catch(() => {});
   }, []);
 
@@ -66,10 +79,43 @@ const CLOListLayer = () => {
     }
   };
 
+  const resetFilters = () => {
+    setSearch(""); setFilterCode(""); setFilterProgram("");
+    setFilterType(""); setFilterClass(""); setFilterCourse(""); setPage(1);
+  };
+
+  const hasFilter = search || filterCode || filterProgram || filterType || filterClass || filterCourse;
+
+  // Build set of matching course IDs based on program/type/class/code filters
+  const matchingCourseIds = (() => {
+    if (!filterProgram && !filterType && !filterClass && !filterCode) return null; // no course-level filter
+    return new Set(
+      courses
+        .filter((c) => {
+          if (filterProgram) {
+            const pid = c.program_id || (typeof c.program === "object" ? c.program?.id : c.program);
+            if (String(pid) !== String(filterProgram)) return false;
+          }
+          if (filterType && c.course_type !== filterType) return false;
+          if (filterClass && c.course_class !== filterClass) return false;
+          if (filterCode && !c.code?.toLowerCase().includes(filterCode.toLowerCase())) return false;
+          return true;
+        })
+        .map((c) => c.id)
+    );
+  })();
+
   const filtered = clos.filter((c) => {
-    if (!search) return true;
-    const q = search.toLowerCase();
-    return (c.description || "").toLowerCase().includes(q);
+    if (search) {
+      const q = search.toLowerCase();
+      if (!(c.description || "").toLowerCase().includes(q)) return false;
+    }
+    if (filterCourse && String(c.course) !== String(filterCourse) && String(c.course_id) !== String(filterCourse)) return false;
+    if (matchingCourseIds !== null) {
+      const cid = c.course_id || c.course;
+      if (!matchingCourseIds.has(cid) && !matchingCourseIds.has(Number(cid))) return false;
+    }
+    return true;
   });
 
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
@@ -100,20 +146,9 @@ const CLOListLayer = () => {
 
       <div className="card-body pb-0">
         <div className="row g-2 align-items-end">
-          <div className="col-sm-5 col-md-4">
-            <label className="form-label text-sm fw-semibold text-primary-light mb-4">Course</label>
-            <select
-              className="form-control form-select radius-8"
-              value={filterCourse}
-              onChange={(e) => { setFilterCourse(e.target.value); setPage(1); }}
-            >
-              <option value="">All Courses</option>
-              {courses.map((c) => (
-                <option key={c.id} value={c.id}>{c.code} - {c.name}</option>
-              ))}
-            </select>
-          </div>
-          <div className="col-sm-5 col-md-4">
+
+          {/* Search description */}
+          <div className="col-sm-4 col-md-3">
             <label className="form-label text-sm fw-semibold text-primary-light mb-4">Search Description</label>
             <div className="position-relative">
               <input
@@ -126,17 +161,112 @@ const CLOListLayer = () => {
               <Icon icon="ion:search-outline" className="position-absolute top-50 translate-middle-y text-secondary-light" style={{ left: 10, pointerEvents: "none" }} />
             </div>
           </div>
-          <div className="col-sm-auto">
+
+          {/* Course Code */}
+          <div className="col-sm-4 col-md-2">
+            <label className="form-label text-sm fw-semibold text-primary-light mb-4">Code</label>
+            <input
+              type="text"
+              className="form-control radius-8"
+              placeholder="e.g. CS101"
+              value={filterCode}
+              onChange={(e) => { setFilterCode(e.target.value); setPage(1); }}
+            />
+          </div>
+
+          {/* Program */}
+          <div className="col-sm-4 col-md-2">
+            <label className="form-label text-sm fw-semibold text-primary-light mb-4">Program</label>
+            <select
+              className="form-control form-select radius-8"
+              value={filterProgram}
+              onChange={(e) => { setFilterProgram(e.target.value); setPage(1); }}
+            >
+              <option value="">All Programs</option>
+              {programs.map((p) => (
+                <option key={p.id} value={p.id}>{p.code} - {p.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Type */}
+          <div className="col-sm-4 col-md-2">
+            <label className="form-label text-sm fw-semibold text-primary-light mb-4">Type</label>
+            <select
+              className="form-control form-select radius-8"
+              value={filterType}
+              onChange={(e) => { setFilterType(e.target.value); setPage(1); }}
+            >
+              <option value="">All Types</option>
+              <option value="THEORY">Theory</option>
+              <option value="LAB">Lab</option>
+            </select>
+          </div>
+
+          {/* Class */}
+          <div className="col-sm-4 col-md-2">
+            <label className="form-label text-sm fw-semibold text-primary-light mb-4">Class</label>
+            <select
+              className="form-control form-select radius-8"
+              value={filterClass}
+              onChange={(e) => { setFilterClass(e.target.value); setPage(1); }}
+            >
+              <option value="">All Classes</option>
+              <option value="CORE">Core</option>
+              <option value="GER">GER</option>
+              <option value="ELECTIVE">Elective</option>
+            </select>
+          </div>
+
+          {/* Clear */}
+          <div className="col-sm-auto col-md-1">
             <label className="form-label text-sm mb-4 d-block invisible">x</label>
             <button
-              className="btn btn-outline-secondary radius-8"
-              onClick={() => { setFilterCourse(""); setSearch(""); setPage(1); }}
-              disabled={!filterCourse && !search}
+              className="btn btn-outline-secondary radius-8 w-100"
+              onClick={resetFilters}
+              disabled={!hasFilter}
+              title="Clear filters"
             >
               <Icon icon="material-symbols:filter-alt-off-outline" />
             </button>
           </div>
         </div>
+
+        {/* Active filter chips */}
+        {hasFilter && (
+          <div className="d-flex flex-wrap gap-2 mt-12 mb-0">
+            {search && (
+              <span className="badge bg-primary-100 text-primary-600 radius-4 d-flex align-items-center gap-1">
+                "{search}"
+                <Icon icon="material-symbols:close" style={{ cursor: "pointer" }} onClick={() => { setSearch(""); setPage(1); }} />
+              </span>
+            )}
+            {filterCode && (
+              <span className="badge bg-info-focus text-info-main radius-4 d-flex align-items-center gap-1">
+                Code: {filterCode}
+                <Icon icon="material-symbols:close" style={{ cursor: "pointer" }} onClick={() => { setFilterCode(""); setPage(1); }} />
+              </span>
+            )}
+            {filterProgram && (
+              <span className="badge bg-success-focus text-success-main radius-4 d-flex align-items-center gap-1">
+                {programs.find((p) => String(p.id) === String(filterProgram))?.code || "Program"}
+                <Icon icon="material-symbols:close" style={{ cursor: "pointer" }} onClick={() => { setFilterProgram(""); setPage(1); }} />
+              </span>
+            )}
+            {filterType && (
+              <span className="badge bg-warning-focus text-warning-main radius-4 d-flex align-items-center gap-1">
+                {filterType}
+                <Icon icon="material-symbols:close" style={{ cursor: "pointer" }} onClick={() => { setFilterType(""); setPage(1); }} />
+              </span>
+            )}
+            {filterClass && (
+              <span className="badge bg-neutral-200 text-neutral-600 radius-4 d-flex align-items-center gap-1">
+                {filterClass}
+                <Icon icon="material-symbols:close" style={{ cursor: "pointer" }} onClick={() => { setFilterClass(""); setPage(1); }} />
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="card-body">

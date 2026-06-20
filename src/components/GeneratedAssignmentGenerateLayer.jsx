@@ -177,8 +177,48 @@ const GeneratedAssignmentGenerateLayer = ({ courseType = "THEORY" }) => {
     setLoadingClos(true);
     setSelectedCloId(null);
 
-    cloService.getAll({ course: courseId })
-      .then((d) => setClos(Array.isArray(d) ? d : d.result || d.results || []))
+    // Try lab course CLOs first; fall back to theory counterpart if none found
+    const fetchClos = async () => {
+      const toList = (d) => Array.isArray(d) ? d : d.result || d.results || [];
+      const direct = toList(await cloService.getAll({ course: courseId }));
+      if (direct.length > 0 || courseType !== "LAB") return direct;
+
+      const labCode = (course?.code || "").trim();
+      const labName = (course?.name || "").trim();
+      try {
+        const role = localStorage.getItem("user_role");
+        let rawData;
+        if (role === "TEACHER") {
+          rawData = await courseAssignmentService.getMyCourses({ course_type: "THEORY" });
+        } else {
+          rawData = await courseService.getAllCourses();
+        }
+        const normalize = (a) => ({
+          id:   a.course_id ?? (typeof a.course === "object" ? a.course?.id : a.course) ?? a.id,
+          code: a.course_code || a.course?.code || a.code || "",
+          name: a.course_name || a.course?.name || a.name || "",
+          course_type: a.course_type || a.course?.course_type || "",
+        });
+        const list = (Array.isArray(rawData) ? rawData : rawData.result || rawData.results || [])
+          .map(normalize)
+          .filter((c) => c.course_type === "THEORY" || !c.course_type);
+        const code1 = labCode.replace(/-L$/i, "");
+        const code2 = labCode.replace(/L$/i, "");
+        const name3 = labName.replace(/\s*\(?\s*lab\s*\)?\s*$/i, "").trim();
+        const theory = list.find((c) => {
+          const tc = (c.code || "").toLowerCase();
+          const tn = (c.name || "").toLowerCase();
+          return tc === code1.toLowerCase()
+              || tc === code2.toLowerCase()
+              || (name3 && tn === name3.toLowerCase());
+        });
+        if (!theory?.id) return direct;
+        return toList(await cloService.getAll({ course: theory.id }));
+      } catch { return direct; }
+    };
+
+    fetchClos()
+      .then((list) => setClos(list))
       .catch(() => showError("Failed to load CLOs"))
       .finally(() => setLoadingClos(false));
 

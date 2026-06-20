@@ -183,7 +183,7 @@ const CourseAssignmentListLayer = () => {
                           {a.course_type || a.course?.course_type || "N/A"}
                         </span>
                       </td>
-                      <td>{a.semester || a.course?.semester || "N/A"}</td>
+                      <td>{a.semester_name || a.semester || a.course?.semester_name || a.course?.semester || "N/A"}</td>
                       <td>{a.program_name || a.course?.program_name || a.course?.program || "N/A"}</td>
                       <td>
                         <span className={`badge radius-4 ${a.is_active ? "bg-success-focus text-success-main" : "bg-danger-focus text-danger-main"}`}>
