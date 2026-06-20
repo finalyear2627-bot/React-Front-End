@@ -6,6 +6,7 @@ import { courseService } from "../api/course.service";
 import { courseAssignmentService } from "../api/courseAssignment.service";
 import { cloService } from "../api/clo.service";
 import { ploService } from "../api/plo.service";
+import { semesterService } from "../api/semester.service";
 import { showSuccess, showError, getApiError } from "../utils/toast";
 import CourseDocsMiniPreview from "./CourseDocsMiniPreview";
 
@@ -99,12 +100,15 @@ const PROG_LANGS = ["Python", "Java", "C++", "C#", "JavaScript", "C", "Other"];
 const GeneratedQuizGenerateLayer = ({ courseType = "THEORY" }) => {
   const navigate = useNavigate();
 
-  const [topic,         setTopic]         = useState("");
-  const [progLang,      setProgLang]      = useState("");
-  const [courseId,      setCourseId]      = useState("");
-  const [teacherName,   setTeacherName]   = useState("");
-  const [selectedCloId, setSelectedCloId] = useState(null);
-  const [selectedPloId, setSelectedPloId] = useState(null);
+  const [topic,            setTopic]            = useState("");
+  const [progLang,         setProgLang]         = useState("");
+  const [semesters,        setSemesters]        = useState([]);
+  const [semesterName,     setSemesterName]     = useState("");
+  const [includeNumerical, setIncludeNumerical] = useState(false);
+  const [courseId,         setCourseId]         = useState("");
+  const [teacherName,      setTeacherName]      = useState("");
+  const [selectedCloId,    setSelectedCloId]    = useState(null);
+  const [selectedPloId,    setSelectedPloId]    = useState(null);
 
   const [courses,      setCourses]      = useState([]);
   const [allCourses,   setAllCourses]   = useState([]);
@@ -128,6 +132,17 @@ const GeneratedQuizGenerateLayer = ({ courseType = "THEORY" }) => {
 
   const fallbackTeacher = () =>
     `${localStorage.getItem("user_first_name") || ""} ${localStorage.getItem("user_last_name") || ""}`.trim();
+
+  /* ── Load semesters ── */
+  useEffect(() => {
+    semesterService.getAll({ is_active: true })
+      .then((d) => {
+        const list = Array.isArray(d) ? d : d.result || d.results || [];
+        setSemesters(list.filter((s) => s.name));
+        if (list.length > 0 && list[0].name) setSemesterName(list[0].name);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const role = localStorage.getItem("user_role");
@@ -193,8 +208,8 @@ const GeneratedQuizGenerateLayer = ({ courseType = "THEORY" }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId]);
 
-  const listRoute = courseType === "LAB" ? "/generated-lab-quizzes" : "/generated-theory-quizzes";
-  const buttonLabel = courseType === "LAB" ? "Generate Lab Quiz" : "Generate Theory Quiz";
+  const listRoute    = courseType === "LAB" ? "/generated-lab-quizzes" : "/generated-theory-quizzes";
+  const buttonLabel  = courseType === "LAB" ? "Generate Lab Quiz" : "Generate Theory Quiz";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -206,10 +221,12 @@ const GeneratedQuizGenerateLayer = ({ courseType = "THEORY" }) => {
     setSubmitting(true);
     try {
       const payload = {
-        course_id:    parseInt(courseId, 10),
-        topic:        topic.trim(),
-        clo_ids:      [selectedCloId],
-        plo_ids:      [selectedPloId],
+        course_id:         parseInt(courseId, 10),
+        topic:             topic.trim(),
+        semester_name:     semesterName.trim(),
+        include_numerical: includeNumerical,
+        clo_ids:           [selectedCloId],
+        plo_ids:           [selectedPloId],
         ...(progLang && { programming_language: progLang }),
         ...(teacherName.trim() && { teacher_name: teacherName.trim() }),
       };
@@ -253,6 +270,33 @@ const GeneratedQuizGenerateLayer = ({ courseType = "THEORY" }) => {
             )}
           </div>
 
+          {/* Semester */}
+          <div className="mb-20">
+            <label className="form-label fw-semibold text-primary-light text-sm mb-8">
+              Semester <span className="text-danger-600">*</span>
+            </label>
+            {semesters.length > 0 ? (
+              <select
+                className="form-control radius-8"
+                value={semesterName}
+                onChange={(e) => setSemesterName(e.target.value)}
+              >
+                {semesters.map((s) => (
+                  <option key={s.id} value={s.name}>{s.name}</option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                className="form-control radius-8"
+                placeholder="e.g. Fall 2025"
+                value={semesterName}
+                onChange={(e) => setSemesterName(e.target.value)}
+              />
+            )}
+            <small className="text-secondary-light">This name will appear on the quiz paper.</small>
+          </div>
+
           {/* Programming Language */}
           <div className="mb-20">
             <label className="form-label fw-semibold text-primary-light text-sm mb-8">
@@ -266,7 +310,32 @@ const GeneratedQuizGenerateLayer = ({ courseType = "THEORY" }) => {
               <option value="">-- None / Not Applicable --</option>
               {PROG_LANGS.map((l) => <option key={l} value={l}>{l}</option>)}
             </select>
-            <small className="text-secondary-light">Required if the course involves programming topics. All code in the quiz will use this language.</small>
+            <small className="text-secondary-light">Required if the course involves programming topics.</small>
+          </div>
+
+          {/* Question Types */}
+          <div className="mb-20">
+            <label className="form-label fw-semibold text-primary-light text-sm mb-8">Question Types</label>
+            <div
+              className={`d-flex align-items-start gap-12 p-12 radius-8 border ${includeNumerical ? "bg-warning-focus border-warning-main" : "bg-base"}`}
+              style={{ cursor: "pointer" }}
+              onClick={() => setIncludeNumerical((v) => !v)}
+            >
+              <input
+                type="checkbox"
+                className="form-check-input flex-shrink-0 mt-1"
+                checked={includeNumerical}
+                onChange={(e) => setIncludeNumerical(e.target.checked)}
+                onClick={(ev) => ev.stopPropagation()}
+                style={{ width: 16, height: 16 }}
+              />
+              <div>
+                <div className="fw-semibold text-sm">Include Numerical / Calculation Questions</div>
+                <div className="text-secondary-light mt-2" style={{ fontSize: 12 }}>
+                  For Math, Physics, Engineering subjects — adds calculation-based problems with specific values.
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Course */}
@@ -298,11 +367,7 @@ const GeneratedQuizGenerateLayer = ({ courseType = "THEORY" }) => {
               <label className="form-label fw-semibold text-primary-light text-sm mb-8">
                 Teacher Name
               </label>
-              <select
-                className="form-control radius-8"
-                value={teacherName}
-                disabled
-              >
+              <select className="form-control radius-8" value={teacherName} disabled>
                 <option value={teacherName}>{teacherName || "—"}</option>
               </select>
             </div>
