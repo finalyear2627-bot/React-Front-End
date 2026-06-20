@@ -94,7 +94,7 @@ const PloRadioGroup = ({ items, selected, onSelect, emptyMsg }) => (
   </div>
 );
 
-const PROG_LANGS = ["Python", "Java", "C++", "C#", "JavaScript", "C", "Other"];
+const PROG_LANGS = ["Python", "Java", "C++", "C#", "JavaScript", "C", "HTML/CSS"];
 
 const GeneratedAssignmentGenerateLayer = ({ courseType = "THEORY" }) => {
   const navigate = useNavigate();
@@ -177,12 +177,9 @@ const GeneratedAssignmentGenerateLayer = ({ courseType = "THEORY" }) => {
     setLoadingClos(true);
     setSelectedCloId(null);
 
-    // Try lab course CLOs first; fall back to theory counterpart if none found
-    const fetchClos = async () => {
-      const toList = (d) => Array.isArray(d) ? d : d.result || d.results || [];
-      const direct = toList(await cloService.getAll({ course: courseId }));
-      if (direct.length > 0 || courseType !== "LAB") return direct;
-
+    // For lab courses, CLOs belong to the theory counterpart
+    const getCloCourseId = async () => {
+      if (courseType !== "LAB") return courseId;
       const labCode = (course?.code || "").trim();
       const labName = (course?.name || "").trim();
       try {
@@ -202,9 +199,11 @@ const GeneratedAssignmentGenerateLayer = ({ courseType = "THEORY" }) => {
         const list = (Array.isArray(rawData) ? rawData : rawData.result || rawData.results || [])
           .map(normalize)
           .filter((c) => c.course_type === "THEORY" || !c.course_type);
-        const code1 = labCode.replace(/-L$/i, "");
-        const code2 = labCode.replace(/L$/i, "");
-        const name3 = labName.replace(/\s*\(?\s*lab\s*\)?\s*$/i, "").trim();
+
+        const code1 = labCode.replace(/-L$/i, "");           // CMC391-L → CMC391
+        const code2 = labCode.replace(/L$/i, "");            // CMC391L  → CMC391
+        const name3 = labName.replace(/\s*\(?\s*lab\s*\)?\s*$/i, "").trim(); // "AI (Lab)" → "AI"
+
         const theory = list.find((c) => {
           const tc = (c.code || "").toLowerCase();
           const tn = (c.name || "").toLowerCase();
@@ -212,15 +211,16 @@ const GeneratedAssignmentGenerateLayer = ({ courseType = "THEORY" }) => {
               || tc === code2.toLowerCase()
               || (name3 && tn === name3.toLowerCase());
         });
-        if (!theory?.id) return direct;
-        return toList(await cloService.getAll({ course: theory.id }));
-      } catch { return direct; }
+        return theory?.id || courseId;
+      } catch { return courseId; }
     };
 
-    fetchClos()
-      .then((list) => setClos(list))
-      .catch(() => showError("Failed to load CLOs"))
-      .finally(() => setLoadingClos(false));
+    getCloCourseId().then((fetchId) => {
+      cloService.getAll({ course: fetchId })
+        .then((d) => setClos(Array.isArray(d) ? d : d.result || d.results || []))
+        .catch(() => showError("Failed to load CLOs"))
+        .finally(() => setLoadingClos(false));
+    });
 
     if (programId) {
       setLoadingPlos(true);
