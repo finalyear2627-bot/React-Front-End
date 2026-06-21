@@ -54,6 +54,9 @@ import GAAddPage from "./pages/GAAddPage";
 import GAEditPage from "./pages/GAEditPage";
 import GABulkUploadPage from "./pages/GABulkUploadPage";
 
+import OBEPlanListPage from "./pages/OBEPlanListPage";
+import OBEPlanDetailPage from "./pages/OBEPlanDetailPage";
+
 import GeneratedPaperListPage from "./pages/GeneratedPaperListPage";
 import GeneratedPaperGeneratePage from "./pages/GeneratedPaperGeneratePage";
 import GeneratedQuizListPage from "./pages/GeneratedQuizListPage";
@@ -137,6 +140,10 @@ function App() {
         <Route exact path='/ga-add' element={<ProtectedRoute allowedRoles={["ADMIN"]}><GAAddPage /></ProtectedRoute>} />
         <Route exact path='/ga-edit/:id' element={<ProtectedRoute allowedRoles={["ADMIN"]}><GAEditPage /></ProtectedRoute>} />
         <Route exact path='/ga-bulk-upload' element={<ProtectedRoute allowedRoles={["ADMIN"]}><GABulkUploadPage /></ProtectedRoute>} />
+
+        {/* OBE Plans */}
+        <Route exact path='/obe-plans' element={<ProtectedRoute allowedRoles={["ADMIN", "TEACHER"]}><OBEPlanListPage /></ProtectedRoute>} />
+        <Route exact path='/obe-plan/:id' element={<ProtectedRoute allowedRoles={["ADMIN", "TEACHER"]}><OBEPlanDetailPage /></ProtectedRoute>} />
 
         {/* Assessment Routes — redirects from old paths */}
         <Route exact path='/generated-papers'      element={<Navigate to='/generated-theory-papers' replace />} />

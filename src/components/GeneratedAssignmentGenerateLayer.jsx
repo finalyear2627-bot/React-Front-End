@@ -101,6 +101,7 @@ const GeneratedAssignmentGenerateLayer = ({ courseType = "THEORY" }) => {
 
   const [topic,         setTopic]         = useState("");
   const [progLang,      setProgLang]      = useState("");
+  const [term,          setTerm]          = useState("MIDTERM");
   const [courseId,      setCourseId]      = useState("");
   const [teacherName,   setTeacherName]   = useState("");
   const [selectedCloId, setSelectedCloId] = useState(null);
@@ -247,12 +248,12 @@ const GeneratedAssignmentGenerateLayer = ({ courseType = "THEORY" }) => {
     setSubmitting(true);
     try {
       const payload = {
-        course_id:    parseInt(courseId, 10),
-        topic:        topic.trim(),
-        clo_ids:      [selectedCloId],
-        plo_ids:      [selectedPloId],
+        course_id: parseInt(courseId, 10),
+        topic:     topic.trim(),
+        term,
+        clo_ids:   [selectedCloId],
+        plo_ids:   [selectedPloId],
         ...(progLang && { programming_language: progLang }),
-        ...(teacherName.trim() && { teacher_name: teacherName.trim() }),
       };
       const res = await generatedAssignmentService.generate(payload);
       if (res?.status?.code !== 0) { showError(res?.status?.message || "Generation failed"); return; }
@@ -274,6 +275,26 @@ const GeneratedAssignmentGenerateLayer = ({ courseType = "THEORY" }) => {
     <div className="card h-100 p-0 radius-12">
       <div className="card-body p-24">
         <form onSubmit={handleSubmit}>
+
+          {/* Exam Term */}
+          <div className="mb-20">
+            <label className="form-label fw-semibold text-primary-light text-sm mb-8">
+              Exam Term <span className="text-danger-600">*</span>
+            </label>
+            <div className="d-flex gap-12">
+              {[{ value: "MIDTERM", label: "Mid Term" }, { value: "FINAL", label: "Final Term" }].map(({ value, label }) => (
+                <div
+                  key={value}
+                  className={`d-flex align-items-center gap-8 px-16 py-10 radius-8 border flex-grow-1 ${term === value ? "border-primary-600 bg-primary-50" : "border-neutral-200 bg-base"}`}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setTerm(value)}
+                >
+                  <input type="radio" name="assign_term" value={value} checked={term === value} onChange={() => setTerm(value)} className="form-check-input mb-0 flex-shrink-0" style={{ width: 16, height: 16 }} />
+                  <span className={`fw-semibold text-sm ${term === value ? "text-primary-600" : "text-secondary-light"}`}>{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
 
           {/* Topic */}
           <div className="mb-20">

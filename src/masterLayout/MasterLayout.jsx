@@ -527,6 +527,23 @@ const MasterLayout = ({ children }) => {
               </li>
             )}
 
+            {/* OBE Plans — admin + teacher */}
+            {(localStorage.getItem("user_role") === "ADMIN" || localStorage.getItem("user_role") === "TEACHER") && (
+              <li className='dropdown'>
+                <Link to='#'>
+                  <Icon icon='solar:chart-square-outline' className='menu-icon' />
+                  <span>OBE Plans</span>
+                </Link>
+                <ul className='sidebar-submenu'>
+                  <li>
+                    <NavLink to='/obe-plans' className={(n) => n.isActive ? "active-page" : ""}>
+                      <i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> Assessment Plans
+                    </NavLink>
+                  </li>
+                </ul>
+              </li>
+            )}
+
             {/* Role Permissions — admin only */}
             {localStorage.getItem("user_role") === "ADMIN" && (
               <li className='dropdown'>

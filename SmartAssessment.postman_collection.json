@@ -2,7 +2,7 @@
   "info": {
     "name": "Smart Assessment AI - Backend APIs",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Standardized response format: all responses wrapped in {status, result}. JWT Auth, Accounts, Academics (Programs, Semesters, Courses, PLO, CLO, GA), Assessments. CLO creation blocked for inactive courses. PLO creation blocked when all program semesters are inactive. GA (Graduate Attributes) maps to PLOs \u2014 admin only write access."
+    "description": "Standardized response format: all responses wrapped in {status, result}. JWT Auth, Accounts, Academics (Programs, Semesters, Courses, PLO, CLO, GA), Assessments. CLO creation blocked for inactive courses. PLO creation blocked when all program semesters are inactive. GA (Graduate Attributes) maps to PLOs — admin only write access."
   },
   "variable": [
     {
@@ -1485,7 +1485,7 @@
               "mode": "raw",
               "raw": "{\n  \"course_code\": \"CMC111\",\n  \"clo_number\": 1,\n  \"description\": \"Understand fundamental concepts of programming.\",\n  \"bt_level\": \"C2\",\n  \"ga_code\": \"GA-2\"\n}"
             },
-            "description": "Create a single CLO.\n\nRequired:\n  course_code  \u2014 code from Courses API (e.g. 'CMC111', 'CMC111-L')\n  clo_number   \u2014 1, 2, or 3\n  description  \u2014 CLO description text\n  bt_level     \u2014 C1-C6 (Cognitive) | P1-P5 (Psychomotor) | A1-A5 (Affective)\n\nOptional (GA mapping \u2014 use one):\n  ga_code   \u2014 string code from GA list: 'GA-2', 'GA2', or just '2' (all accepted)\n  mapped_ga \u2014 GA database id (from GA list API response 'id' field)\n\nResponse includes:\n  ga_code \u2014 the resolved GA code as 'GA-2' string (no raw integer id shown)\n\nBlocked if course is inactive."
+            "description": "Create a single CLO.\n\nRequired:\n  course_code  — code from Courses API (e.g. 'CMC111', 'CMC111-L')\n  clo_number   — 1, 2, or 3\n  description  — CLO description text\n  bt_level     — C1-C6 (Cognitive) | P1-P5 (Psychomotor) | A1-A5 (Affective)\n\nOptional (GA mapping — use one):\n  ga_code   — string code from GA list: 'GA-2', 'GA2', or just '2' (all accepted)\n  mapped_ga — GA database id (from GA list API response 'id' field)\n\nResponse includes:\n  ga_code — the resolved GA code as 'GA-2' string (no raw integer id shown)\n\nBlocked if course is inactive."
           }
         },
         {
@@ -1556,7 +1556,7 @@
               }
             ],
             "url": "{{base_url}}/api/academics/courses/1/clo-plo-statement/",
-            "description": "Returns CLOs for a course with their GA\u2192PLO chain."
+            "description": "Returns CLOs for a course with their GA→PLO chain."
           }
         },
         {
@@ -1817,15 +1817,35 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
             ],
             "body": {
               "mode": "formdata",
               "formdata": [
-                { "key": "course_id",  "value": "1",             "type": "text" },
-                { "key": "title",      "value": "Week 1 Slides", "type": "text" },
-                { "key": "doc_type",   "value": "SLIDES",        "type": "text", "description": "SLIDES | OUTLINE | OTHER" },
-                { "key": "file",       "type": "file",           "description": "PDF, PPTX, or TXT" }
+                {
+                  "key": "course_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "title",
+                  "value": "Week 1 Slides",
+                  "type": "text"
+                },
+                {
+                  "key": "doc_type",
+                  "value": "SLIDES",
+                  "type": "text",
+                  "description": "SLIDES | OUTLINE | OTHER"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "PDF, PPTX, or TXT"
+                }
               ]
             },
             "url": "{{base_url}}/api/assessments/course-documents/upload/",
@@ -1837,12 +1857,29 @@
           "name": "List Course Documents",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/assessments/course-documents/?course=1",
-              "host": ["{{base_url}}"],
-              "path": ["api", "assessments", "course-documents", ""],
-              "query": [{ "key": "course", "value": "1" }]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "assessments",
+                "course-documents",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "course",
+                  "value": "1"
+                }
+              ]
             },
             "description": "List uploaded documents. Filter by ?course=<id>. Admin sees all; Teacher sees only their assigned course documents."
           },
@@ -1852,7 +1889,12 @@
           "name": "Get Course Document by ID",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/assessments/course-documents/{{document_id}}/",
             "description": "Retrieve a single course document by ID."
           },
@@ -1862,7 +1904,12 @@
           "name": "Delete Course Document",
           "request": {
             "method": "DELETE",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
             "url": "{{base_url}}/api/assessments/course-documents/{{document_id}}/",
             "description": "Delete a course document and remove the file from disk. Teacher (own courses) or Admin only."
           },
@@ -1890,9 +1937,9 @@
             "url": "{{base_url}}/api/assessments/generated-papers/generate/",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"theory_course_id\": 1,\n  \"lab_course_id\": 2,\n  \"topic\": \"Machine Learning Fundamentals\",\n  \"term\": \"MIDTERM\",\n  \"programming_language\": \"Python\",\n  \"teacher_name\": \"Ms Tayyaba Shehzad\",\n  \"total_marks\": \"60\",\n  \"total_time\": \"2 Hours and 30 Minutes\",\n  \"mcq_count\": 5,\n  \"short_q_count\": 4,\n  \"long_q_count\": 3,\n  \"clo_ids\": [\n    1,\n    2,\n    3\n  ],\n  \"plo_ids\": [\n    1,\n    2\n  ]\n}"
+              "raw": "{\n  \"theory_course_id\": 1,\n  \"lab_course_id\": 2,\n  \"topic\": \"Machine Learning Fundamentals\",\n  \"term\": \"MIDTERM\",\n  \"semester_name\": \"Fall 2025\",\n  \"programming_language\": \"Python\",\n  \"include_numerical\": false,\n  \"teacher_name\": \"Ms Tayyaba Shehzad\",\n  \"total_marks\": \"60\",\n  \"total_time\": \"2 Hours and 30 Minutes\",\n  \"mcq_count\": 5,\n  \"short_q_count\": 4,\n  \"long_q_count\": 3,\n  \"clo_ids\": [\n    1,\n    2,\n    3\n  ],\n  \"plo_ids\": [\n    1,\n    2\n  ]\n}"
             },
-            "description": "Generate exam paper PDF.\n\nRequired:\n  theory_course_id  \u2014 ID of the theory course (course_type=THEORY)\n  topic             \u2014 exam topic (must be correctly spelled and relevant to the selected CLOs/PLOs)\n  clo_ids           \u2014 list of CLO IDs (theory CLOs required; lab CLOs auto-fetched if lab course provided but none selected)\n  plo_ids           \u2014 list of PLO IDs\n\nOptional:\n  lab_course_id        \u2014 ID of the lab course (course_type=LAB); omit if no lab course\n  term                 \u2014 'MIDTERM' or 'FINAL'. Displayed in PDF title: 'Midterm Examination Paper \u2013 Fall 2026'. Omit for plain 'Examination Paper'.\n  mcq_count            \u2014 number of MCQs in Section A (default 5)\n  short_q_count        \u2014 number of short questions in Section B (default 4)\n  long_q_count         \u2014 number of long questions in Section C (default 3)\n  programming_language \u2014 e.g. 'Python', 'Java', 'C++'. Required if course is programming-related.\n  teacher_name         \u2014 defaults to logged-in teacher name\n  total_marks          \u2014 default '60'; marks distributed proportionally across sections\n  total_time           \u2014 default '2 Hours and 30 Minutes'\n\nPDF title format: [Term] Examination Paper \u2013 [Semester Name from semesters API]\nPDF header table:\n  Course Code & Title  (full width)\n  Program / Department (full width)\n  Teacher's Name | Total Marks\n  Date & Time    | Total Time\n  Student's Name | Reg. No.\n\nTopic validation (HTTP 422): topic must be correctly spelled and relevant to CLOs/PLOs."
+            "description": "Generate exam paper PDF.\n\nRequired:\n  theory_course_id  — ID of the theory course (course_type=THEORY)\n  topic             — exam topic (must be correctly spelled and relevant to the selected CLOs/PLOs)\n  clo_ids           — list of CLO IDs (theory CLOs required; lab CLOs auto-fetched if lab course provided but none selected)\n  plo_ids           — list of PLO IDs\n\nOptional:\n  lab_course_id        — ID of the lab course (course_type=LAB); omit if no lab course\n  term                 — 'MIDTERM' or 'FINAL'. Displayed in PDF title: 'Midterm Examination Paper – Fall 2026'. Omit for plain 'Examination Paper'.\n  mcq_count            — number of MCQs in Section A (default 5)\n  short_q_count        — number of short questions in Section B (default 4)\n  long_q_count         — number of long questions in Section C (default 3)\n  programming_language — e.g. 'Python', 'Java', 'C++'. Required if course is programming-related.\n  teacher_name         — defaults to logged-in teacher name\n  total_marks          — default '60'; marks distributed proportionally across sections\n  total_time           — default '2 Hours and 30 Minutes'\n\nPDF title format: [Term] Examination Paper – [Semester Name from semesters API]\nPDF header table:\n  Course Code & Title  (full width)\n  Program / Department (full width)\n  Teacher's Name | Total Marks\n  Date & Time    | Total Time\n  Student's Name | Reg. No.\n\nTopic validation (HTTP 422): topic must be correctly spelled and relevant to CLOs/PLOs."
           }
         },
         {
@@ -1908,10 +1955,17 @@
             ],
             "url": {
               "raw": "{{base_url}}/api/assessments/generated-papers/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "assessments", "generated-papers", ""]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "assessments",
+                "generated-papers",
+                ""
+              ]
             },
-            "description": "List generated exam papers. Admin sees all; Teacher sees only papers for their assigned courses.\n\nEach record includes:\n  course_component     \u2014 'THEORY + LAB' | 'THEORY' | 'LAB'\n  theory_course_code/name/type \u2014 primary (theory) course details\n  lab_course_code/name \u2014 paired lab course details (null if none)\n\nOptional query params:\n  ?course=<id>         \u2014 filter by a specific course ID (theory or lab)\n  ?status=COMPLETED    \u2014 filter by status: COMPLETED or FAILED\n  ?course_type=THEORY  \u2014 show only papers for theory-only courses\n  ?course_type=LAB     \u2014 show only papers that include a lab course"
+            "description": "List generated exam papers. Admin sees all; Teacher sees only papers for their assigned courses.\n\nEach record includes:\n  course_component     — 'THEORY + LAB' | 'THEORY' | 'LAB'\n  theory_course_code/name/type — primary (theory) course details\n  lab_course_code/name — paired lab course details (null if none)\n\nOptional query params:\n  ?course=<id>         — filter by a specific course ID (theory or lab)\n  ?status=COMPLETED    — filter by status: COMPLETED or FAILED\n  ?course_type=THEORY  — show only papers for theory-only courses\n  ?course_type=LAB     — show only papers that include a lab course"
           },
           "response": []
         },
@@ -1928,8 +1982,16 @@
             ],
             "url": {
               "raw": "{{base_url}}/api/assessments/generated-papers/{{paper_id}}/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "assessments", "generated-papers", "{{paper_id}}", ""]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "assessments",
+                "generated-papers",
+                "{{paper_id}}",
+                ""
+              ]
             },
             "description": "Retrieve a single generated exam paper by ID."
           },
@@ -1948,8 +2010,17 @@
             ],
             "url": {
               "raw": "{{base_url}}/api/assessments/generated-papers/{{paper_id}}/download/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "assessments", "generated-papers", "{{paper_id}}", "download", ""]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "assessments",
+                "generated-papers",
+                "{{paper_id}}",
+                "download",
+                ""
+              ]
             },
             "description": "Download the generated exam paper PDF file."
           },
@@ -1968,8 +2039,16 @@
             ],
             "url": {
               "raw": "{{base_url}}/api/assessments/generated-papers/{{paper_id}}/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "assessments", "generated-papers", "{{paper_id}}", ""]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "assessments",
+                "generated-papers",
+                "{{paper_id}}",
+                ""
+              ]
             },
             "description": "Delete a generated exam paper and its PDF file from disk."
           },
@@ -2280,6 +2359,338 @@
               ]
             },
             "description": "Delete a generated assignment. Admin only."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "OBE - ASSESSMENT PLAN",
+      "item": [
+        {
+          "name": "Create OBE Plan (for course)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/obe-plans/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course\": 1\n}"
+            },
+            "description": "Create OBE plan for a course. Returns existing plan if already created."
+          },
+          "response": []
+        },
+        {
+          "name": "List OBE Plans (by course)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/obe-plans/?course=1",
+            "description": "Get OBE plan for a specific course. Pass ?course=<course_id>"
+          },
+          "response": []
+        },
+        {
+          "name": "Get OBE Plan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/obe-plans/1/"
+          },
+          "response": []
+        },
+        {
+          "name": "Get OBE Sheet (Left + Right Table)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/obe-plans/1/sheet/",
+            "description": "Returns full OBE sheet: left_table (assessment breakdown by type) and right_table (CLO-wise distribution). Also returns grand_total."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete OBE Plan",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/obe-plans/1/"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Assessment Component",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/obe-components/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plan\": 1,\n  \"component_type\": \"QUIZ\",\n  \"name\": \"Quiz 01\",\n  \"weight\": 3.12,\n  \"order\": 1\n}"
+            },
+            "description": "component_type choices: QUIZ, ASSIGNMENT, MIDTERM, FINAL, PRESENTATION, PROJECT, LAB, OTHER"
+          },
+          "response": []
+        },
+        {
+          "name": "List Components (by plan)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/obe-components/?plan=1"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Assessment Component",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/obe-components/1/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Quiz 01\",\n  \"weight\": 3.12,\n  \"order\": 1\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Assessment Component",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/obe-components/1/"
+          },
+          "response": []
+        },
+        {
+          "name": "Add CLO Mapping",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/obe-mappings/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clo\": 1,\n  \"component\": 1,\n  \"weight\": 3.12\n}"
+            },
+            "description": "Map a CLO to an assessment component with a specific weight contribution."
+          },
+          "response": []
+        },
+        {
+          "name": "List CLO Mappings (by plan)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/obe-mappings/?plan=1",
+            "description": "Filter by ?plan=<plan_id> or ?clo=<clo_id>"
+          },
+          "response": []
+        },
+        {
+          "name": "Update CLO Mapping (weight)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/obe-mappings/1/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weight\": 13.76\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete CLO Mapping",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/academics/obe-mappings/1/"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "OBE - STUDENTS & MARKS",
+      "item": [
+        {
+          "name": "List Students (by course)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}],
+            "url": {
+              "raw": "{{base_url}}/api/academics/obe-students/?course=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "academics", "obe-students", ""],
+              "query": [{"key": "course", "value": "1"}]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{access_token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course\": 1,\n  \"serial_no\": 1,\n  \"reg_no\": \"32261\",\n  \"student_name\": \"Nouman Zia\",\n  \"section\": \"D\",\n  \"semester_name\": \"Fall 2025\"\n}"
+            },
+            "url": "{{base_url}}/api/academics/obe-students/"
+          },
+          "response": []
+        },
+        {
+          "name": "Bulk Add Students",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{access_token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course\": 1,\n  \"students\": [\n    {\"serial_no\": 1, \"reg_no\": \"32261\", \"student_name\": \"Nouman Zia\", \"section\": \"D\", \"semester_name\": \"Fall 2025\"},\n    {\"serial_no\": 2, \"reg_no\": \"32652\", \"student_name\": \"Fawad Abbasi\", \"section\": \"D\", \"semester_name\": \"Fall 2025\"}\n  ]\n}"
+            },
+            "url": "{{base_url}}/api/academics/obe-students/bulk/"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Student",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}],
+            "url": "{{base_url}}/api/academics/obe-students/1/"
+          },
+          "response": []
+        },
+        {
+          "name": "List Marks (by course)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}],
+            "url": {
+              "raw": "{{base_url}}/api/academics/obe-marks/?course=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "academics", "obe-marks", ""],
+              "query": [{"key": "course", "value": "1"}]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Bulk Save Marks",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{access_token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"marks\": [\n    {\"enrollment\": 1, \"component\": 1, \"obtained_marks\": 8},\n    {\"enrollment\": 1, \"component\": 2, \"obtained_marks\": 8},\n    {\"enrollment\": 2, \"component\": 1, \"obtained_marks\": 7}\n  ]\n}"
+            },
+            "url": "{{base_url}}/api/academics/obe-marks/bulk/"
+          },
+          "response": []
+        },
+        {
+          "name": "Download CLO Excel",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}],
+            "url": "{{base_url}}/api/academics/obe-plans/1/excel/"
           },
           "response": []
         }
