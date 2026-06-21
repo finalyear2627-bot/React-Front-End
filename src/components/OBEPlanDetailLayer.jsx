@@ -59,6 +59,7 @@ const OBEPlanDetailLayer = () => {
   const [newStudent,    setNewStudent]    = useState({ serial_no: "", reg_no: "", student_name: "", section: "", semester_name: "" });
   const [addingStudent, setAddingStudent] = useState(false);
   const [bulkUploading, setBulkUploading] = useState(false);
+  const [maxMarksMap,   setMaxMarksMap]   = useState({});
   const bulkFileRef = useRef(null);
 
   /* ── Loaders ── */
@@ -305,19 +306,189 @@ const OBEPlanDetailLayer = () => {
     }
   };
 
-  /* ── Excel download ── */
+  /* ── CLO Excel — one colored sheet per CLO, formula-based marks ── */
+  const PASS_THRESHOLD = 50;
+
   const downloadExcel = async () => {
+    if (students.length === 0) { showError("Add students before downloading"); return; }
+    if (mappings.length === 0) { showError("Add CLO mappings before downloading"); return; }
+
     setXlLoading(true);
     try {
-      const resp = await obePlanService.downloadExcel(id);
-      const url  = URL.createObjectURL(new Blob([resp.data]));
-      const a    = document.createElement("a");
-      a.href     = url;
-      a.download = `OBE_${plan?.course_code || id}_CLO_Sheet.xlsx`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch {
+      const ExcelJS    = (await import("exceljs")).default;
+      const courseCode = plan?.course_code || plan?.course?.code || "";
+      const courseName = plan?.course_name || plan?.course?.name || "";
+      const teacherName = (() => {
+        try {
+          const u = JSON.parse(localStorage.getItem("user") || "{}");
+          return `${u.first_name || ""} ${u.last_name || ""}`.trim() || u.username || "";
+        } catch { return ""; }
+      })();
+      const title = [courseName, teacherName].filter(Boolean).join(" - ");
+
+      /* ── Colors (ARGB = Alpha + RGB) ── */
+      const NAVY   = "FF17375E"; // dark navy  — title row & Result header
+      const LBLUE  = "FFBDD7EE"; // light blue — CLO label & component name headers
+      const YELLOW = "FFFFFF00"; // yellow     — Total column
+      const PINK   = "FFFFC7CE"; // light pink — obtained marks cells & Fail bg
+      const GREEN  = "FFC6EFCE"; // light green — Pass bg
+      const REDT   = "FF9C0006"; // dark red text — Fail
+      const GRNT   = "FF375623"; // dark green text — Pass
+      const WHITE  = "FFFFFFFF";
+
+      const mkFill = (argb) => ({ type: "pattern", pattern: "solid", fgColor: { argb } });
+      const CTR    = { horizontal: "center", vertical: "middle" };
+
+      /* Convert 1-indexed column number → Excel letter (A, B, … Z, AA …) */
+      const col2L = (n) => {
+        let s = "";
+        while (n > 0) { n--; s = String.fromCharCode(65 + (n % 26)) + s; n = Math.floor(n / 26); }
+        return s;
+      };
+
+      /* ── Group mappings by CLO ── */
+      const cloMap = new Map();
+      mappings.forEach((m) => {
+        const cloId   = typeof m.clo === "object" ? m.clo?.id : m.clo;
+        const cloNum  = m.clo_number || m.clo?.clo_number || cloId;
+        const compId  = typeof m.component === "object" ? m.component?.id : m.component;
+        const comp    = components.find((c) => c.id === compId);
+        const compName = m.component_name || m.component?.name || comp?.name || `Comp-${compId}`;
+        const mWeight  = parseFloat(m.weight) || 0;
+        const maxM     = parseFloat(maxMarksMap[compId] ?? comp?.max_marks ?? 10);
+        if (!cloMap.has(cloId)) cloMap.set(cloId, { cloNumber: cloNum, items: [] });
+        const grp = cloMap.get(cloId);
+        if (!grp.items.find((i) => i.compId === compId))
+          grp.items.push({ compId, compName, mWeight, maxM });
+      });
+
+      const groups = [...cloMap.values()].sort((a, b) => (a.cloNumber || 0) - (b.cloNumber || 0));
+      const wb = new ExcelJS.Workbook();
+
+      /* ══ One worksheet per CLO ══════════════════════════════════════════ */
+      for (const grp of groups) {
+        const n         = grp.items.length;
+        const totColN   = 4 + n * 2;      // 1-indexed Total col  (J when n=3: D=4,E=5,F=6,G=7,H=8,I=9 → J=10)
+        const resColN   = totColN + 1;     // 1-indexed Result col (K when n=3)
+
+        grp.items.forEach((item, idx) => {
+          item.mrkColN = 4 + idx * 2;      // D, F, H …  (1-indexed)
+          item.pctColN = 4 + idx * 2 + 1;  // E, G, I …
+        });
+
+        const ws = wb.addWorksheet(`CLO-${grp.cloNumber}`);
+        ws.columns = [
+          { width: 7  }, { width: 13 }, { width: 26 },
+          ...grp.items.flatMap(() => [{ width: 12 }, { width: 10 }]),
+          { width: 10 }, { width: 10 },
+        ];
+
+        /* Add all 4 header rows FIRST — before any cross-row merge —
+           so ExcelJS doesn't pre-create row 3 and shift everything down */
+        const r1 = ws.addRow([]); r1.height = 22;  // Excel row 1
+        const r2 = ws.addRow([]); r2.height = 18;  // Excel row 2
+        const r3 = ws.addRow([]); r3.height = 18;  // Excel row 3
+        const r4 = ws.addRow([]); r4.height = 16;  // Excel row 4
+
+        /* Now set ALL merges (all rows already exist, no pre-creation risk) */
+        ws.mergeCells(1, 1, 1, resColN);              // Row 1: title full-width
+        ws.mergeCells(2, 4, 2, totColN - 1);          // Row 2: CLO label over component cols
+        ws.mergeCells(2, resColN, 3, resColN);        // "Result" spans rows 2-3
+        grp.items.forEach((item) => {
+          ws.mergeCells(3, item.mrkColN, 3, item.pctColN);  // Row 3: comp name merged
+        });
+
+        /* ROW 1 — Title */
+        r1.getCell(1).value = title;
+        r1.getCell(1).style = { fill: mkFill(NAVY), font: { bold: true, color: { argb: WHITE }, size: 12 }, alignment: CTR };
+
+        /* ROW 2 — CLO label + Result header */
+        r2.getCell(4).value = `CLO - ${grp.cloNumber}`;
+        r2.getCell(4).style = { fill: mkFill(LBLUE), font: { bold: true, size: 11 }, alignment: CTR };
+        r2.getCell(resColN).value = "Result";
+        r2.getCell(resColN).style = { fill: mkFill(NAVY), font: { bold: true, color: { argb: WHITE } }, alignment: CTR };
+
+        /* ROW 3 — S No. | Reg No. | Student Name | component names | Total */
+        const navyHdr = { fill: mkFill(NAVY), font: { bold: true, color: { argb: WHITE } }, alignment: CTR };
+        r3.getCell(1).value = "S No.";        r3.getCell(1).style = navyHdr;
+        r3.getCell(2).value = "Reg No.";      r3.getCell(2).style = navyHdr;
+        r3.getCell(3).value = "Student Name"; r3.getCell(3).style = navyHdr;
+        grp.items.forEach((item) => {
+          r3.getCell(item.mrkColN).value = item.compName;
+          r3.getCell(item.mrkColN).style = { fill: mkFill(LBLUE), font: { bold: true }, alignment: CTR };
+        });
+        r3.getCell(totColN).value = "Total";
+        r3.getCell(totColN).style = { fill: mkFill(YELLOW), font: { bold: true }, alignment: CTR };
+
+        /* ROW 4 — MaxMarks | Weight% | … | TotalWeight% | "Result" */
+        const totalWeight = grp.items.reduce((s, i) => s + i.mWeight, 0);
+        grp.items.forEach((item) => {
+          r4.getCell(item.mrkColN).value = item.maxM;
+          r4.getCell(item.mrkColN).style = { fill: mkFill(PINK), alignment: CTR };
+          r4.getCell(item.pctColN).value = `${item.mWeight}%`;
+          r4.getCell(item.pctColN).style = { alignment: CTR };
+        });
+        r4.getCell(totColN).value = `${totalWeight.toFixed(2)}%`;
+        r4.getCell(totColN).style = { fill: mkFill(YELLOW), font: { bold: true }, alignment: CTR };
+        r4.getCell(resColN).value = "Result";
+        r4.getCell(resColN).style = { fill: mkFill(NAVY), font: { bold: true, color: { argb: WHITE } }, alignment: CTR };
+
+        /* ROWS 5+ — Students: obtained marks + formula + SUM + Pass/Fail */
+        students.forEach((enr, sIdx) => {
+          const rowNum  = 5 + sIdx;  // row 5 = first student (4 header rows above)
+          const dr      = ws.addRow([]);
+          dr.height     = 16;
+          dr.getCell(1).value = enr.serial_no || sIdx + 1;
+          dr.getCell(2).value = String(enr.reg_no || "");
+          dr.getCell(3).value = String(enr.student_name || "");
+
+          const pctAddrs = [];
+          grp.items.forEach((item) => {
+            const obtained  = parseFloat(marks[enr.id]?.[item.compId]?.obtained ?? "") || 0;
+            const mAddr     = `${col2L(item.mrkColN)}${rowNum}`;
+            const pAddr     = `${col2L(item.pctColN)}${rowNum}`;
+            const pctResult = (obtained / item.maxM) * item.mWeight;
+
+            Object.assign(dr.getCell(item.mrkColN), { value: obtained, style: { fill: mkFill(PINK), alignment: CTR } });
+            Object.assign(dr.getCell(item.pctColN), {
+              value: { formula: `=(${mAddr}/${item.maxM})*${item.mWeight}`, result: pctResult },
+              style: { alignment: CTR },
+            });
+            pctAddrs.push(pAddr);
+          });
+
+          const tAddr    = `${col2L(totColN)}${rowNum}`;
+          const totalPct = grp.items.reduce((s, item) => {
+            const ob = parseFloat(marks[enr.id]?.[item.compId]?.obtained ?? "") || 0;
+            return s + (ob / item.maxM) * item.mWeight;
+          }, 0);
+          Object.assign(dr.getCell(totColN), {
+            value: { formula: `=SUM(${pctAddrs.join(",")})`, result: totalPct },
+            style: { fill: mkFill(YELLOW), font: { bold: true }, alignment: CTR },
+          });
+
+          const passing = totalPct >= PASS_THRESHOLD;
+          Object.assign(dr.getCell(resColN), {
+            value: { formula: `=IF(${tAddr}>=${PASS_THRESHOLD},"Pass","Fail")`, result: passing ? "Pass" : "Fail" },
+            style: {
+              fill: mkFill(passing ? GREEN : PINK),
+              font: { bold: true, color: { argb: passing ? GRNT : REDT } },
+              alignment: CTR,
+            },
+          });
+        });
+      }
+
+      /* ── Write buffer → download ── */
+      const buffer = await wb.xlsx.writeBuffer();
+      const blob   = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const url    = URL.createObjectURL(blob);
+      const a      = document.createElement("a");
+      a.href = url; a.download = `OBE_CLO_${courseCode || id}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      a.click(); URL.revokeObjectURL(url);
+    } catch (err) {
       showError("Failed to generate Excel");
+      console.error(err);
     } finally {
       setXlLoading(false);
     }
@@ -640,9 +811,9 @@ const OBEPlanDetailLayer = () => {
       {activeTab === "marks" && (
         <div className="col-12">
           <div className="card">
-            <div className="card-header d-flex justify-content-between align-items-center">
+            <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
               <h6 className="mb-0">Enter Student Marks</h6>
-              <button className="btn btn-primary-600 radius-8 d-inline-flex align-items-center gap-1"
+              <button className="btn btn-primary-600 radius-8 btn-sm d-inline-flex align-items-center gap-1"
                 onClick={saveAllMarks} disabled={savingMarks}>
                 {savingMarks
                   ? <><span className="spinner-border spinner-border-sm me-4" /> Saving…</>
@@ -655,46 +826,97 @@ const OBEPlanDetailLayer = () => {
                   Add students and components first.
                 </p>
               ) : (
-                <div className="table-responsive">
-                  <table className="table bordered-table mb-0 text-sm">
-                    <thead>
-                      <tr>
-                        <th style={{ minWidth: 50 }}>S.No</th>
-                        <th style={{ minWidth: 90 }}>Reg No.</th>
-                        <th style={{ minWidth: 180 }}>Student Name</th>
-                        {components.map((c) => (
-                          <th key={c.id} className="text-center" style={{ minWidth: 90 }}>
-                            {c.name}
-                            <div className="text-secondary-light fw-normal" style={{ fontSize: 11 }}>{c.weight}%</div>
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {students.map((enr) => (
-                        <tr key={enr.id}>
-                          <td>{enr.serial_no}</td>
-                          <td className="fw-medium">{enr.reg_no}</td>
-                          <td>{enr.student_name}</td>
-                          {components.map((comp) => (
-                            <td key={comp.id} className="p-4">
+                <>
+                  <p className="text-secondary-light text-sm mb-12">
+                    Set <strong>Max Marks</strong> for each component below — used in the Excel formula:
+                    <code className="ms-4 px-6 py-2 radius-4 bg-neutral-100"> (Obtained / Max) × Weight% = Contribution%</code>
+                  </p>
+                  <div className="table-responsive">
+                    <table className="table bordered-table mb-0 text-sm">
+                      <thead>
+                        {/* Row 1: Component names */}
+                        <tr>
+                          <th style={{ minWidth: 50 }}>S.No</th>
+                          <th style={{ minWidth: 90 }}>Reg No.</th>
+                          <th style={{ minWidth: 180 }}>Student Name</th>
+                          {components.map((c) => (
+                            <th key={c.id} className="text-center" style={{ minWidth: 110 }}>
+                              <div>{c.name}</div>
+                              <div className="text-primary-600 fw-semibold" style={{ fontSize: 11 }}>Weight: {c.weight}%</div>
+                            </th>
+                          ))}
+                          <th className="text-center" style={{ minWidth: 90 }}>Total %</th>
+                          <th className="text-center" style={{ minWidth: 80 }}>Result</th>
+                        </tr>
+                        {/* Row 2: Max marks inputs */}
+                        <tr className="bg-neutral-50">
+                          <td colSpan={3} className="text-end text-secondary-light fw-semibold pe-8" style={{ fontSize: 11 }}>
+                            Max Marks →
+                          </td>
+                          {components.map((c) => (
+                            <td key={c.id} className="p-4 text-center">
                               <input
                                 type="number"
-                                min="0"
-                                step="0.5"
+                                min="1"
                                 className="form-control form-control-sm text-center radius-6"
-                                style={{ minWidth: 70 }}
-                                placeholder="0"
-                                value={marks[enr.id]?.[comp.id]?.obtained ?? ""}
-                                onChange={(e) => handleMarkChange(enr.id, comp.id, e.target.value)}
+                                style={{ width: 70, margin: "0 auto" }}
+                                value={maxMarksMap[c.id] ?? c.max_marks ?? 10}
+                                onChange={(e) => setMaxMarksMap((p) => ({ ...p, [c.id]: e.target.value }))}
+                                title="Max marks for this component"
                               />
                             </td>
                           ))}
+                          <td className="text-center text-secondary-light" style={{ fontSize: 11 }}>Pass ≥ {PASS_THRESHOLD}%</td>
+                          <td></td>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {students.map((enr) => {
+                          /* Calculate live total % for display */
+                          const totalPct = components.reduce((sum, comp) => {
+                            const obtained = parseFloat(marks[enr.id]?.[comp.id]?.obtained ?? "") || 0;
+                            const maxM     = parseFloat(maxMarksMap[comp.id] ?? comp.max_marks ?? 10) || 10;
+                            const weight   = parseFloat(comp.weight) || 0;
+                            return sum + (obtained / maxM) * weight;
+                          }, 0);
+                          const isPassing = totalPct >= PASS_THRESHOLD;
+                          return (
+                            <tr key={enr.id}>
+                              <td>{enr.serial_no}</td>
+                              <td className="fw-medium">{enr.reg_no}</td>
+                              <td>{enr.student_name}</td>
+                              {components.map((comp) => (
+                                <td key={comp.id} className="p-4">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    max={maxMarksMap[comp.id] ?? comp.max_marks ?? 10}
+                                    step="0.5"
+                                    className="form-control form-control-sm text-center radius-6"
+                                    style={{ minWidth: 70 }}
+                                    placeholder="0"
+                                    value={marks[enr.id]?.[comp.id]?.obtained ?? ""}
+                                    onChange={(e) => handleMarkChange(enr.id, comp.id, e.target.value)}
+                                  />
+                                </td>
+                              ))}
+                              <td className="text-center fw-semibold">
+                                <span className={isPassing ? "text-success-main" : "text-warning-main"}>
+                                  {totalPct.toFixed(2)}%
+                                </span>
+                              </td>
+                              <td className="text-center">
+                                <span className={`badge radius-4 ${isPassing ? "bg-success-focus text-success-main" : "bg-danger-focus text-danger-main"}`}>
+                                  {isPassing ? "Pass" : "Fail"}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
               )}
             </div>
           </div>
