@@ -112,7 +112,13 @@ function App() {
         <Route exact path='/role-permissions' element={<ProtectedRoute allowedRoles={["ADMIN"]}><RolePermissionListPage /></ProtectedRoute>} />
 
         {/* Course Assignment Routes */}
-        <Route exact path='/course-assignments' element={<ProtectedRoute allowedRoles={["ADMIN"]}><CourseAssignmentListPage /></ProtectedRoute>} />
+        <Route exact path='/course-assignments' element={
+          <ProtectedRoute allowedRoles={["ADMIN", "TEACHER"]}>
+            {localStorage.getItem("user_role") === "TEACHER"
+              ? <MyCoursesPage />
+              : <CourseAssignmentListPage />}
+          </ProtectedRoute>
+        } />
         <Route exact path='/course-assignment-add' element={<ProtectedRoute allowedRoles={["ADMIN"]}><CourseAssignmentAddPage /></ProtectedRoute>} />
         <Route exact path='/my-courses' element={<ProtectedRoute allowedRoles={["TEACHER"]}><MyCoursesPage /></ProtectedRoute>} />
 
