@@ -64,6 +64,7 @@ const GeneratePaperLabLayer = () => {
   const [totalTime,   setTotalTime]   = useState("2 Hours 30 Minutes");
   const [customMarks, setCustomMarks] = useState(false);
   const [customTime,  setCustomTime]  = useState(false);
+  const [includeMcqs, setIncludeMcqs] = useState(true);
 
   const [theoryCourses, setTheoryCourses] = useState([]);
   const [labCourses,    setLabCourses]    = useState([]);
@@ -216,6 +217,7 @@ const GeneratePaperLabLayer = () => {
         total_time:       totalTime,
         clo_ids:          selectedCloIds,
         plo_ids:          selectedPloIds,
+        mcq_count:        includeMcqs ? 5 : 0,
         ...(progLang && { programming_language: progLang }),
       };
 
@@ -348,6 +350,30 @@ const GeneratePaperLabLayer = () => {
           </div>
 
           {/* Total Marks + Total Time */}
+          <div className="mb-20">
+            <label className="form-label fw-semibold text-primary-light text-sm mb-8">Question Types</label>
+            <div
+              className={`d-flex align-items-start gap-12 p-12 radius-8 border ${includeMcqs ? "bg-primary-50 border-primary-600" : "bg-base"}`}
+              style={{ cursor: "pointer" }}
+              onClick={() => setIncludeMcqs((v) => !v)}
+            >
+              <input
+                type="checkbox"
+                className="form-check-input flex-shrink-0 mt-1"
+                checked={includeMcqs}
+                onChange={(e) => setIncludeMcqs(e.target.checked)}
+                onClick={(ev) => ev.stopPropagation()}
+                style={{ width: 16, height: 16 }}
+              />
+              <div>
+                <div className="fw-semibold text-sm">Include MCQs</div>
+                <div className="text-secondary-light mt-2" style={{ fontSize: 12 }}>
+                  Turn this off to generate the paper without Section A MCQs. The remaining question sections will still be generated.
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="row g-3 mb-24">
             <div className="col-md-6">
               <label className="form-label fw-semibold text-primary-light text-sm mb-8">
