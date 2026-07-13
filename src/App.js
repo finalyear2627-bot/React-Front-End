@@ -3,6 +3,7 @@ import { ToastContainer } from "react-toastify";
 import HomePageOne from "./pages/HomePageOne";
 import ErrorPage from "./pages/ErrorPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -179,6 +180,7 @@ function App() {
 
         {/* Auth Routes */}
         <Route exact path='/forgot-password' element={<ForgotPasswordPage />} />
+        <Route exact path='/reset-password' element={<ResetPasswordPage />} />
         <Route exact path='/sign-in' element={<SignInPage />} />
         <Route exact path='/sign-up' element={<SignUpPage />} />
 

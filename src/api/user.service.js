@@ -46,4 +46,9 @@ export const userService = {
     const response = await axiosInstance.patch(`/accounts/users/${id}/`, { password, confirm_password });
     return response.data;
   },
+
+  sendPasswordReset: async (id) => {
+    const response = await axiosInstance.post(`/accounts/users/${id}/send-password-reset/`);
+    return response.data;
+  },
 };

@@ -133,6 +133,7 @@ const UserListLayer = () => {
   const [users,      setUsers]      = useState([]);
   const [loading,    setLoading]    = useState(true);
   const [togglingId, setTogglingId] = useState(null);
+  const [resettingId, setResettingId] = useState(null);
   const [error,      setError]      = useState("");
   const [filterUsername, setFilterUsername] = useState("");
   const [filterFullName, setFilterFullName] = useState("");
@@ -190,6 +191,22 @@ const UserListLayer = () => {
       } catch (err) {
         showError(getApiError(err));
       }
+    }
+  };
+
+  const handleSendResetLink = async (user) => {
+    setResettingId(user.id);
+    try {
+      const res = await userService.sendPasswordReset(user.id);
+      if (res?.status?.code !== undefined && res.status.code !== 0) {
+        showError(res?.status?.message || "Failed to send password reset link");
+        return;
+      }
+      showSuccess(res?.status?.message || "Password reset link sent successfully");
+    } catch (err) {
+      showError(getApiError(err));
+    } finally {
+      setResettingId(null);
     }
   };
 
@@ -383,6 +400,20 @@ const UserListLayer = () => {
                               title="Change Password"
                             >
                               <Icon icon="solar:lock-password-outline" />
+                            </button>
+                          )}
+
+                          {admin && user.role !== "ADMIN" && (
+                            <button
+                              onClick={() => handleSendResetLink(user)}
+                              disabled={resettingId === user.id}
+                              className="w-32-px h-32-px me-8 bg-primary-100 text-primary-600 rounded-circle d-inline-flex align-items-center justify-content-center border-0"
+                              title="Send reset link"
+                            >
+                              {resettingId === user.id
+                                ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
+                                : <Icon icon="solar:letter-outline" />
+                              }
                             </button>
                           )}
 

@@ -439,7 +439,13 @@ const SignInLayer = () => {
                   display: "flex", justifyContent: "space-between",
                   alignItems: "center", margin: "18px 0 26px",
                 }}>
-                  
+                  <span />
+                  <Link to="/forgot-password" className="sag-forgot" style={{
+                    color: "#2563eb", fontSize: 13, fontWeight: 700,
+                    textDecoration: "none",
+                  }}>
+                    Forgot password?
+                  </Link>
                 </div>
 
                 {/* Submit */}

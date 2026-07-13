@@ -59,6 +59,12 @@ export const authService = {
     return await axiosInstance.post(endpoint, userData);
   },
 
+  forgotPassword: (email) =>
+    axiosInstance.post("/auth/forgot-password/", { email }).then((r) => r.data),
+
+  resetPassword: (data) =>
+    axiosInstance.post("/auth/reset-password/", data).then((r) => r.data),
+
   logout: async () => {
     const refresh = tokenService.getRefreshToken();
     try {
