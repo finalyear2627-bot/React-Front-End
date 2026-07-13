@@ -101,7 +101,8 @@ const GeneratedQuizGenerateLayer = ({ courseType = "THEORY" }) => {
 
   const [topic,         setTopic]         = useState("");
   const [progLang,      setProgLang]      = useState("");
-  const [term,          setTerm]          = useState("MIDTERM");
+  const [totalMarks,    setTotalMarks]    = useState("10");
+  const [includeMcqs,   setIncludeMcqs]   = useState(true);
   const [courseId,      setCourseId]      = useState("");
   const [teacherName,      setTeacherName]      = useState("");
   const [selectedCloId,    setSelectedCloId]    = useState(null);
@@ -119,11 +120,11 @@ const GeneratedQuizGenerateLayer = ({ courseType = "THEORY" }) => {
   const [topicError,     setTopicError]     = useState("");
 
   const normAssignment = (a) => ({
-    id:          a.course_id ?? (typeof a.course === "object" ? a.course?.id : a.course),
+    id:          a.course_id ?? (typeof a.course === "object" ? a.course?.id : a.course) ?? a.id,
     code:        a.course_code || a.course?.code || "",
     name:        a.course_name || a.course?.name || "",
     program_id:  a.program_id || a.program || a.course?.program || a.course?.program_id,
-    course_type: a.course_type || a.course?.course_type || "",
+    course_type: String(a.course_type || a.course?.course_type || "").toUpperCase(),
     teacher_name: a.teacher_name || (typeof a.teacher === "object" ? `${a.teacher?.first_name || ""} ${a.teacher?.last_name || ""}`.trim() : "") || "",
   });
 
@@ -133,13 +134,16 @@ const GeneratedQuizGenerateLayer = ({ courseType = "THEORY" }) => {
   useEffect(() => {
     const role = localStorage.getItem("user_role");
     if (role === "TEACHER") {
-      courseAssignmentService.getMyCourses({ course_type: courseType })
+      // Fetch all assigned courses first. Some API versions do not apply the
+      // course_type query parameter correctly on the my-courses endpoint.
+      courseAssignmentService.getMyCourses()
         .then((d) => {
           const list = Array.isArray(d) ? d : d.result || d.results || [];
           const mapped = list
             .filter((a) => a.is_active !== false)
             .map(normAssignment)
-            .filter((c) => c.id != null && c.id !== "");
+            .filter((c) => c.id != null && c.id !== "")
+            .filter((c) => !courseType || c.course_type === courseType);
           setCourses(mapped);
           setAllCourses(mapped);
         })
@@ -243,15 +247,19 @@ const GeneratedQuizGenerateLayer = ({ courseType = "THEORY" }) => {
     if (!selectedCloId)  { showError("Please select a CLO"); return; }
     if (!selectedPloId)  { showError("Please select a PLO"); return; }
     if (!topic.trim())   { showError("Please enter a topic"); return; }
+    if (!Number.isInteger(Number(totalMarks)) || Number(totalMarks) < 10) {
+      showError("Total marks must be a whole number of at least 10"); return;
+    }
 
     setSubmitting(true);
     try {
       const payload = {
         course_id: parseInt(courseId, 10),
         topic:     topic.trim(),
-        term,
+        total_marks: totalMarks,
         clo_ids:   [selectedCloId],
         plo_ids:   [selectedPloId],
+        ...(courseType === "THEORY" && { include_mcqs: includeMcqs }),
         ...(progLang && { programming_language: progLang }),
       };
       const res = await generatedQuizService.generate(payload);
@@ -294,25 +302,49 @@ const GeneratedQuizGenerateLayer = ({ courseType = "THEORY" }) => {
             )}
           </div>
 
-          {/* Exam Term */}
           <div className="mb-20">
             <label className="form-label fw-semibold text-primary-light text-sm mb-8">
-              Exam Term <span className="text-danger-600">*</span>
+              Total Marks <span className="text-danger-600">*</span>
             </label>
-            <div className="d-flex gap-12">
-              {[{ value: "MIDTERM", label: "Mid Term" }, { value: "FINAL", label: "Final Term" }].map(({ value, label }) => (
-                <div
-                  key={value}
-                  className={`d-flex align-items-center gap-8 px-16 py-10 radius-8 border flex-grow-1 ${term === value ? "border-primary-600 bg-primary-50" : "border-neutral-200 bg-base"}`}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => setTerm(value)}
-                >
-                  <input type="radio" name="quiz_term" value={value} checked={term === value} onChange={() => setTerm(value)} className="form-check-input mb-0 flex-shrink-0" style={{ width: 16, height: 16 }} />
-                  <span className={`fw-semibold text-sm ${term === value ? "text-primary-600" : "text-secondary-light"}`}>{label}</span>
-                </div>
-              ))}
-            </div>
+            <input type="number" min="10" step="1" className="form-control radius-8" value={totalMarks}
+              onChange={(e) => setTotalMarks(e.target.value)} required />
+            <small className="text-secondary-light">Set custom total marks for this quiz (minimum 10). Marks are distributed exactly across the generated questions.</small>
           </div>
+
+          {/* Theory quiz question format */}
+          {courseType === "THEORY" && (
+            <div className="mb-20">
+              <label className="form-label fw-semibold text-primary-light text-sm mb-8">
+                Quiz Question Format <span className="text-danger-600">*</span>
+              </label>
+              <div className="d-flex gap-12">
+                {[
+                  { value: true, label: "With MCQs", description: "Include MCQs along with other quiz questions" },
+                  { value: false, label: "Theory Questions Only", description: "Generate descriptive written-answer questions only; excludes MCQs, true/false, and fill-in-the-blanks" },
+                ].map(({ value, label, description }) => (
+                  <div
+                    key={label}
+                    className={`d-flex align-items-start gap-8 px-16 py-10 radius-8 border flex-grow-1 ${includeMcqs === value ? "border-primary-600 bg-primary-50" : "border-neutral-200 bg-base"}`}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => setIncludeMcqs(value)}
+                  >
+                    <input
+                      type="radio"
+                      name="theory_quiz_mcqs"
+                      checked={includeMcqs === value}
+                      onChange={() => setIncludeMcqs(value)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="form-check-input mt-1 flex-shrink-0"
+                    />
+                    <div>
+                      <div className={`fw-semibold text-sm ${includeMcqs === value ? "text-primary-600" : "text-secondary-light"}`}>{label}</div>
+                      <small className="text-secondary-light">{description}</small>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Programming Language */}
           <div className="mb-20">

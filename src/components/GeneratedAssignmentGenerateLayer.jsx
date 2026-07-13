@@ -101,7 +101,7 @@ const GeneratedAssignmentGenerateLayer = ({ courseType = "THEORY" }) => {
 
   const [topic,         setTopic]         = useState("");
   const [progLang,      setProgLang]      = useState("");
-  const [term,          setTerm]          = useState("MIDTERM");
+  const [totalMarks,    setTotalMarks]    = useState("20");
   const [courseId,      setCourseId]      = useState("");
   const [teacherName,   setTeacherName]   = useState("");
   const [selectedCloId, setSelectedCloId] = useState(null);
@@ -244,13 +244,16 @@ const GeneratedAssignmentGenerateLayer = ({ courseType = "THEORY" }) => {
     if (!selectedCloId) { showError("Please select a CLO"); return; }
     if (!selectedPloId) { showError("Please select a PLO"); return; }
     if (!topic.trim())  { showError("Please enter a topic"); return; }
+    if (!Number.isInteger(Number(totalMarks)) || Number(totalMarks) < 5) {
+      showError("Total marks must be a whole number of at least 5"); return;
+    }
 
     setSubmitting(true);
     try {
       const payload = {
         course_id: parseInt(courseId, 10),
         topic:     topic.trim(),
-        term,
+        total_marks: totalMarks,
         clo_ids:   [selectedCloId],
         plo_ids:   [selectedPloId],
         ...(progLang && { programming_language: progLang }),
@@ -276,26 +279,6 @@ const GeneratedAssignmentGenerateLayer = ({ courseType = "THEORY" }) => {
       <div className="card-body p-24">
         <form onSubmit={handleSubmit}>
 
-          {/* Exam Term */}
-          <div className="mb-20">
-            <label className="form-label fw-semibold text-primary-light text-sm mb-8">
-              Exam Term <span className="text-danger-600">*</span>
-            </label>
-            <div className="d-flex gap-12">
-              {[{ value: "MIDTERM", label: "Mid Term" }, { value: "FINAL", label: "Final Term" }].map(({ value, label }) => (
-                <div
-                  key={value}
-                  className={`d-flex align-items-center gap-8 px-16 py-10 radius-8 border flex-grow-1 ${term === value ? "border-primary-600 bg-primary-50" : "border-neutral-200 bg-base"}`}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => setTerm(value)}
-                >
-                  <input type="radio" name="assign_term" value={value} checked={term === value} onChange={() => setTerm(value)} className="form-check-input mb-0 flex-shrink-0" style={{ width: 16, height: 16 }} />
-                  <span className={`fw-semibold text-sm ${term === value ? "text-primary-600" : "text-secondary-light"}`}>{label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
           {/* Topic */}
           <div className="mb-20">
             <label className="form-label fw-semibold text-primary-light text-sm mb-8">
@@ -313,6 +296,15 @@ const GeneratedAssignmentGenerateLayer = ({ courseType = "THEORY" }) => {
             {topicError && (
               <div className="alert alert-danger radius-8 mt-8 text-sm py-8 px-12">{topicError}</div>
             )}
+          </div>
+
+          <div className="mb-20">
+            <label className="form-label fw-semibold text-primary-light text-sm mb-8">
+              Total Marks <span className="text-danger-600">*</span>
+            </label>
+            <input type="number" min="5" step="1" className="form-control radius-8" value={totalMarks}
+              onChange={(e) => setTotalMarks(e.target.value)} required />
+            <small className="text-secondary-light">Set custom total marks for this assignment (minimum 5). Marks are distributed exactly across the generated questions.</small>
           </div>
 
           {/* Programming Language */}

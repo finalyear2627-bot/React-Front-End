@@ -1,11 +1,13 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { generatedPaperService } from "../api/generatedPaper.service";
 import { courseAssignmentService } from "../api/courseAssignment.service";
 import { courseService } from "../api/course.service";
 import { cloService } from "../api/clo.service";
 import { ploService } from "../api/plo.service";
+import { courseDocumentService } from "../api/courseDocument.service";
+import { semesterService } from "../api/semester.service";
 import { showSuccess, showError, getApiError } from "../utils/toast";
 import CourseDocsMiniPreview from "./CourseDocsMiniPreview";
 
@@ -51,6 +53,24 @@ const CheckItem = ({ badge, badgeColor = "info", btLevel, label, checked, onClic
   </div>
 );
 
+const DocRow = ({ doc, deletingId, onDelete }) => (
+  <div className="d-flex align-items-start justify-content-between gap-8 p-10 radius-8 border mb-6">
+    <div className="flex-grow-1 min-w-0">
+      <div className="fw-medium text-sm text-truncate" title={doc.title}>{doc.title || "—"}</div>
+      <div className="text-secondary-light mt-2" style={{ fontSize: 11 }}>
+        {doc.file_name || doc.file?.split("/").pop() || ""}
+      </div>
+    </div>
+    <button type="button" disabled={deletingId === doc.id} onClick={() => onDelete(doc.id)}
+      className="flex-shrink-0 w-24-px h-24-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
+      title="Delete">
+      {deletingId === doc.id
+        ? <span className="spinner-border spinner-border-sm" style={{ width: 10, height: 10 }} />
+        : <Icon icon="mingcute:delete-2-line" style={{ fontSize: 12 }} />}
+    </button>
+  </div>
+);
+
 const GeneratePaperLabLayer = () => {
   const navigate = useNavigate();
 
@@ -65,6 +85,21 @@ const GeneratePaperLabLayer = () => {
   const [customMarks, setCustomMarks] = useState(false);
   const [customTime,  setCustomTime]  = useState(false);
   const [includeMcqs, setIncludeMcqs] = useState(true);
+  const [includeNumerical, setIncludeNumerical] = useState(false);
+  const [semesters, setSemesters] = useState([]);
+  const [semesterName, setSemesterName] = useState("");
+
+  const [documents, setDocuments] = useState([]);
+  const [loadingDocs, setLoadingDocs] = useState(false);
+  const [deletingDocId, setDeletingDocId] = useState(null);
+  const [slideFile, setSlideFile] = useState(null);
+  const [uploadingSlide, setUploadingSlide] = useState(false);
+  const [slideError, setSlideError] = useState("");
+  const slideFileRef = useRef(null);
+  const [outlineFile, setOutlineFile] = useState(null);
+  const [uploadingOutline, setUploadingOutline] = useState(false);
+  const [outlineError, setOutlineError] = useState("");
+  const outlineFileRef = useRef(null);
 
   const [theoryCourses, setTheoryCourses] = useState([]);
   const [labCourses,    setLabCourses]    = useState([]);
@@ -82,6 +117,9 @@ const GeneratePaperLabLayer = () => {
 
   const fallbackTeacher = () =>
     `${localStorage.getItem("user_first_name") || ""} ${localStorage.getItem("user_last_name") || ""}`.trim();
+
+  const slides = documents.filter((d) => d.doc_type === "SLIDES");
+  const outlines = documents.filter((d) => d.doc_type === "OUTLINE");
 
   useEffect(() => {
     const role = localStorage.getItem("user_role");
@@ -128,6 +166,31 @@ const GeneratePaperLabLayer = () => {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    semesterService.getAll({ is_active: true })
+      .then((d) => {
+        const list = Array.isArray(d) ? d : d.result || d.results || [];
+        setSemesters(list.filter((s) => s.name));
+        if (list[0]?.name) setSemesterName(list[0].name);
+      })
+      .catch(() => {});
+  }, []);
+
+  const fetchDocs = useCallback(async () => {
+    if (!theoryCourseId) { setDocuments([]); return; }
+    setLoadingDocs(true);
+    try {
+      const d = await courseDocumentService.getAll({ course: theoryCourseId });
+      setDocuments(Array.isArray(d) ? d : d.result || d.results || []);
+    } catch {
+      setDocuments([]);
+    } finally {
+      setLoadingDocs(false);
+    }
+  }, [theoryCourseId]);
+
+  useEffect(() => { fetchDocs(); }, [fetchDocs]);
 
   // When theory course changes: load CLOs + PLOs; if no lab course selected yet, set teacher from theory
   useEffect(() => {
@@ -204,6 +267,8 @@ const GeneratePaperLabLayer = () => {
     if (!totalTime)                  { showError("Please enter total time"); return; }
     if (selectedCloIds.length === 0) { showError("Select at least one CLO"); return; }
     if (selectedPloIds.length === 0) { showError("Select at least one PLO"); return; }
+    if (slides.length === 0) { showError("Upload at least one Slides file before generating"); return; }
+    if (outlines.length === 0) { showError("Upload a Course Outline before generating"); return; }
 
     setSubmitting(true);
     try {
@@ -212,12 +277,14 @@ const GeneratePaperLabLayer = () => {
         lab_course_id:    parseInt(labCourseId, 10),
         topic:            topic.trim(),
         term:             term,
+        semester_name:    semesterName.trim(),
         teacher_name:     teacherName.trim(),
         total_marks:      totalMarks,
         total_time:       totalTime,
         clo_ids:          selectedCloIds,
         plo_ids:          selectedPloIds,
         mcq_count:        includeMcqs ? 5 : 0,
+        include_numerical: includeNumerical,
         ...(progLang && { programming_language: progLang }),
       };
 
@@ -240,9 +307,62 @@ const GeneratePaperLabLayer = () => {
     }
   };
 
+  const handleDocDelete = async (id) => {
+    if (!window.confirm("Delete this document?")) return;
+    setDeletingDocId(id);
+    try {
+      await courseDocumentService.delete(id);
+      setDocuments((prev) => prev.filter((d) => d.id !== id));
+    } catch (err) {
+      showError(getApiError(err));
+    } finally {
+      setDeletingDocId(null);
+    }
+  };
+
+  const handleSlideUpload = async (e) => {
+    e.preventDefault();
+    if (!theoryCourseId) { setSlideError("Select a lab course first"); return; }
+    if (!slideFile) { setSlideError("Select a PPT/PPTX file"); return; }
+    setSlideError("");
+    setUploadingSlide(true);
+    try {
+      await courseDocumentService.upload(parseInt(theoryCourseId, 10), slideFile.name.replace(/\.[^/.]+$/, ""), "SLIDES", slideFile);
+      showSuccess("Slides uploaded");
+      setSlideFile(null);
+      if (slideFileRef.current) slideFileRef.current.value = "";
+      fetchDocs();
+    } catch (err) {
+      setSlideError(getApiError(err) || "Upload failed");
+    } finally {
+      setUploadingSlide(false);
+    }
+  };
+
+  const handleOutlineUpload = async (e) => {
+    e.preventDefault();
+    if (!theoryCourseId) { setOutlineError("Select a lab course first"); return; }
+    if (!outlineFile) { setOutlineError("Select a PDF/Word file"); return; }
+    setOutlineError("");
+    setUploadingOutline(true);
+    try {
+      await courseDocumentService.upload(parseInt(theoryCourseId, 10), outlineFile.name.replace(/\.[^/.]+$/, ""), "OUTLINE", outlineFile);
+      showSuccess("Course outline uploaded");
+      setOutlineFile(null);
+      if (outlineFileRef.current) outlineFileRef.current.value = "";
+      fetchDocs();
+    } catch (err) {
+      setOutlineError(getApiError(err) || "Upload failed");
+    } finally {
+      setUploadingOutline(false);
+    }
+  };
+
   return (
-    <div className="card h-100 p-0 radius-12">
-      <div className="card-body p-24">
+    <div className="row gy-4 align-items-start">
+      <div className="col-lg-8">
+        <div className="card radius-12">
+          <div className="card-body p-24">
         <form onSubmit={handleSubmit}>
 
           {/* Lab Course */}
@@ -333,6 +453,22 @@ const GeneratePaperLabLayer = () => {
             </div>
           </div>
 
+          {/* Semester */}
+          <div className="mb-20">
+            <label className="form-label fw-semibold text-primary-light text-sm mb-8">
+              Semester <span className="text-danger-600">*</span>
+            </label>
+            {semesters.length > 0 ? (
+              <select className="form-control radius-8" value={semesterName} onChange={(e) => setSemesterName(e.target.value)}>
+                {semesters.map((s) => <option key={s.id} value={s.name}>{s.name}</option>)}
+              </select>
+            ) : (
+              <input type="text" className="form-control radius-8" placeholder="e.g. Fall 2026" value={semesterName}
+                onChange={(e) => setSemesterName(e.target.value)} />
+            )}
+            <small className="text-secondary-light">This name will appear on the exam paper.</small>
+          </div>
+
           {/* Programming Language */}
           <div className="mb-20">
             <label className="form-label fw-semibold text-primary-light text-sm mb-8">
@@ -369,6 +505,21 @@ const GeneratePaperLabLayer = () => {
                 <div className="fw-semibold text-sm">Include MCQs</div>
                 <div className="text-secondary-light mt-2" style={{ fontSize: 12 }}>
                   Turn this off to generate the paper without Section A MCQs. The remaining question sections will still be generated.
+                </div>
+              </div>
+            </div>
+            <div
+              className={`d-flex align-items-start gap-12 p-12 radius-8 border mt-10 ${includeNumerical ? "bg-warning-focus border-warning-main" : "bg-base"}`}
+              style={{ cursor: "pointer" }}
+              onClick={() => setIncludeNumerical((v) => !v)}
+            >
+              <input type="checkbox" className="form-check-input flex-shrink-0 mt-1" checked={includeNumerical}
+                onChange={(e) => setIncludeNumerical(e.target.checked)} onClick={(ev) => ev.stopPropagation()}
+                style={{ width: 16, height: 16 }} />
+              <div>
+                <div className="fw-semibold text-sm">Include Numerical / Calculation Questions</div>
+                <div className="text-secondary-light mt-2" style={{ fontSize: 12 }}>
+                  Include practical calculations and step-by-step numerical problems where appropriate.
                 </div>
               </div>
             </div>
@@ -533,6 +684,16 @@ const GeneratePaperLabLayer = () => {
             </div>
           </div>
 
+          {theoryCourseId && (slides.length === 0 || outlines.length === 0) && (
+            <div className="alert alert-warning radius-8 py-10 px-14 text-sm mb-20 d-flex align-items-center gap-8">
+              <Icon icon="solar:danger-triangle-outline" style={{ fontSize: 16, flexShrink: 0 }} />
+              <span>{slides.length === 0 && outlines.length === 0
+                ? "Upload at least 1 Slides file and 1 Course Outline before generating."
+                : slides.length === 0 ? "Upload at least 1 Slides file (PPT/PPTX) before generating."
+                : "Upload a Course Outline (PDF/Word) before generating."}</span>
+            </div>
+          )}
+
           {/* Submit */}
           <div className="d-flex gap-3 pt-24 border-top mt-4">
             <button
@@ -555,6 +716,61 @@ const GeneratePaperLabLayer = () => {
             </button>
           </div>
         </form>
+          </div>
+        </div>
+      </div>
+
+      <div className="col-lg-4">
+        <div style={{ position: "sticky", top: 24 }} className="d-flex flex-column gap-16">
+          <div className="card radius-12">
+            <div className="card-header border-bottom pb-12">
+              <h6 className="card-title mb-0 d-flex align-items-center gap-8">
+                <Icon icon="solar:presentation-graph-outline" className="text-primary-600" style={{ fontSize: 18 }} />
+                Slides {slides.length > 0 && <span className="badge bg-primary-100 text-primary-600 radius-4 ms-auto">{slides.length} uploaded</span>}
+              </h6>
+              <p className="text-secondary-light text-sm mb-0 mt-4">PPT / PPTX only. Multiple files allowed.</p>
+            </div>
+            <div className="card-body p-16">
+              <form onSubmit={handleSlideUpload}>
+                <div className="mb-10"><label className="form-label text-sm fw-semibold mb-4">File (PPT / PPTX)</label>
+                  <input ref={slideFileRef} type="file" className="form-control form-control-sm radius-8" accept=".ppt,.pptx"
+                    onChange={(e) => setSlideFile(e.target.files[0] || null)} /></div>
+                {slideError && <div className="alert alert-danger py-6 px-10 text-sm radius-8 mb-8">{slideError}</div>}
+                <button type="submit" disabled={uploadingSlide} className="btn btn-primary-600 btn-sm radius-8 w-100">
+                  {uploadingSlide ? "Uploading…" : "Upload Slides"}
+                </button>
+              </form>
+              {theoryCourseId && <div className="mt-14 pt-14 border-top">
+                {loadingDocs ? <div className="text-center py-10"><span className="spinner-border spinner-border-sm text-primary" /></div>
+                  : slides.length === 0 ? <p className="text-secondary-light text-sm mb-0">No slides uploaded yet.</p>
+                  : slides.map((doc) => <DocRow key={doc.id} doc={doc} deletingId={deletingDocId} onDelete={handleDocDelete} />)}
+              </div>}
+            </div>
+          </div>
+
+          <div className="card radius-12">
+            <div className="card-header border-bottom pb-12">
+              <h6 className="card-title mb-0 d-flex align-items-center gap-8">
+                <Icon icon="solar:document-text-outline" className="text-success-main" style={{ fontSize: 18 }} /> Course Outline
+              </h6>
+              <p className="text-secondary-light text-sm mb-0 mt-4">PDF / DOC / DOCX only. Only one outline allowed.</p>
+            </div>
+            <div className="card-body p-16">
+              {outlines.length > 0 ? <><DocRow doc={outlines[0]} deletingId={deletingDocId} onDelete={handleDocDelete} />
+                <p className="text-secondary-light text-sm mt-6 mb-0">Delete the existing outline to upload a new one.</p></> : (
+                <form onSubmit={handleOutlineUpload}>
+                  <div className="mb-10"><label className="form-label text-sm fw-semibold mb-4">File (PDF / DOC / DOCX)</label>
+                    <input ref={outlineFileRef} type="file" className="form-control form-control-sm radius-8" accept=".pdf,.doc,.docx"
+                      onChange={(e) => setOutlineFile(e.target.files[0] || null)} /></div>
+                  {outlineError && <div className="alert alert-danger py-6 px-10 text-sm radius-8 mb-8">{outlineError}</div>}
+                  <button type="submit" disabled={uploadingOutline} className="btn btn-success-600 btn-sm radius-8 w-100">
+                    {uploadingOutline ? "Uploading…" : "Upload Outline"}
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
