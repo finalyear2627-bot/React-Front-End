@@ -11,7 +11,7 @@ const ProtectedRoute = ({ children, allowedRoles = null }) => {
     setIsAuthenticated(!!token);
 
     if (token && allowedRoles) {
-      const userRole = localStorage.getItem("user_role");
+      const userRole = (localStorage.getItem("user_role") || "").toUpperCase();
       setIsAuthorized(allowedRoles.includes(userRole));
     }
   }, [allowedRoles]);
@@ -25,7 +25,7 @@ const ProtectedRoute = ({ children, allowedRoles = null }) => {
   }
 
   if (!isAuthorized) {
-    return <Navigate to="/access-denied" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;

@@ -79,6 +79,11 @@ import GeneratedTheoryAssignmentsPage from "./pages/GeneratedTheoryAssignmentsPa
 import GeneratedLabAssignmentsPage from "./pages/GeneratedLabAssignmentsPage";
 
 import CourseDocumentsPage from "./pages/CourseDocumentsPage";
+import EnrollmentPage from "./pages/EnrollmentPage";
+import TeacherTasksPage from "./pages/TeacherTasksPage";
+import StudentTasksPage from "./pages/StudentTasksPage";
+import StudyBotPage from "./pages/StudyBotPage";
+import StudentCoursesPage from "./pages/StudentCoursesPage";
 
 function App() {
   return (
@@ -121,6 +126,11 @@ function App() {
         } />
         <Route exact path='/course-assignment-add' element={<ProtectedRoute allowedRoles={["ADMIN"]}><CourseAssignmentAddPage /></ProtectedRoute>} />
         <Route exact path='/my-courses' element={<ProtectedRoute allowedRoles={["TEACHER"]}><MyCoursesPage /></ProtectedRoute>} />
+        <Route exact path='/student-enrollments' element={<ProtectedRoute allowedRoles={["ADMIN"]}><EnrollmentPage /></ProtectedRoute>} />
+        <Route exact path='/course-tasks' element={<ProtectedRoute allowedRoles={["TEACHER"]}><TeacherTasksPage /></ProtectedRoute>} />
+        <Route exact path='/my-assessments' element={<ProtectedRoute allowedRoles={["STUDENT"]}><StudentTasksPage /></ProtectedRoute>} />
+        <Route exact path='/my-enrolled-courses' element={<ProtectedRoute allowedRoles={["STUDENT"]}><StudentCoursesPage /></ProtectedRoute>} />
+        <Route exact path='/study-companion' element={<ProtectedRoute allowedRoles={["STUDENT"]}><StudyBotPage /></ProtectedRoute>} />
 
         {/* Semester Routes — admin + teacher only */}
         <Route exact path='/semesters' element={<ProtectedRoute allowedRoles={["ADMIN","TEACHER"]}><SemesterListPage /></ProtectedRoute>} />

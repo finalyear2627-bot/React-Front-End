@@ -1,8 +1,11 @@
 import axios from "axios";
 import { tokenService } from "../services/token.service";
 
+const localApiUrl = "http://127.0.0.1:8000/api";
+const apiUrl = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === "production" ? "/api" : localApiUrl);
+
 const axiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://127.0.0.1:8000/api",
+  baseURL: apiUrl,
   headers: {
     "Content-Type": "application/json",
   },

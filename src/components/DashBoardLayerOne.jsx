@@ -133,13 +133,16 @@ const DashBoardLayerOne = () => {
   // ── Non-admin dashboard ─────────────────────────────────────────────────────
   if (userRole !== "ADMIN") {
     const roleColor  = userRole === "TEACHER" ? "#7c3aed" : "#0ea5e9";
-    const roleLinks  = [
-      { to: "/my-courses",          icon: "solar:notebook-outline",                     label: "My Courses",          desc: "View courses assigned to you", cardStyle: { background: "linear-gradient(135deg, #e0f7ff 0%, #ffffff 100%)" }, iconStyle: { backgroundColor: "#06b6d4" } },
-      { to: userRole === "TEACHER" ? "/my-courses" : "/course-assignments", icon: "solar:bookmark-square-minimalistic-outline", label: userRole === "TEACHER" ? "My Course Assignments" : "Course Assignments", desc: userRole === "TEACHER" ? "View courses assigned to you" : "See all course assignments", cardStyle: { background: "linear-gradient(135deg, #f5e8ff 0%, #ffffff 100%)" }, iconStyle: { backgroundColor: "#8b5cf6" } },
-      { to: "/courses",             icon: "solar:notebook-outline",                     label: "All Courses",         desc: "Browse available courses",      cardStyle: { background: "linear-gradient(135deg, #e6edff 0%, #ffffff 100%)" }, iconStyle: { backgroundColor: "#2563eb" } },
-      { to: "/programs",            icon: "solar:book-outline",                         label: "Programs",            desc: "View programs",                 cardStyle: { background: "linear-gradient(135deg, #e4fff2 0%, #ffffff 100%)" }, iconStyle: { backgroundColor: "#22c55e" } },
-      { to: "/semesters",           icon: "solar:calendar-outline",                    label: "Semesters",           desc: "View semesters",                cardStyle: { background: "linear-gradient(135deg, #fff2df 0%, #ffffff 100%)" }, iconStyle: { backgroundColor: "#f59e0b" } },
-      { to: "/view-profile",        icon: "solar:user-outline",                         label: "My Profile",          desc: "Update your profile",           cardStyle: { background: "linear-gradient(135deg, #ffe8ee 0%, #ffffff 100%)" }, iconStyle: { backgroundColor: "#ef476f" } },
+    const roleLinks  = userRole === "STUDENT" ? [
+      { to: "/my-enrolled-courses", icon: "solar:notebook-outline", label: "My Enrolled Courses", desc: "View only your enrolled courses", cardStyle: { background: "linear-gradient(135deg, #e0f7ff 0%, #ffffff 100%)" }, iconStyle: { backgroundColor: "#06b6d4" } },
+      { to: "/my-assessments", icon: "solar:clipboard-text-outline", label: "My Assessments", desc: "View and submit assigned work", cardStyle: { background: "linear-gradient(135deg, #f5e8ff 0%, #ffffff 100%)" }, iconStyle: { backgroundColor: "#8b5cf6" } },
+      { to: "/study-companion", icon: "solar:stars-line-duotone", label: "StudyMate", desc: "Get clear study help in text", cardStyle: { background: "linear-gradient(135deg, #e6edff 0%, #ffffff 100%)" }, iconStyle: { backgroundColor: "#2563eb" } },
+      { to: "/view-profile", icon: "solar:user-outline", label: "My Profile", desc: "Update your profile", cardStyle: { background: "linear-gradient(135deg, #ffe8ee 0%, #ffffff 100%)" }, iconStyle: { backgroundColor: "#ef476f" } },
+    ] : [
+      { to: "/my-courses", icon: "solar:notebook-outline", label: "My Courses", desc: "View courses assigned to you", cardStyle: { background: "linear-gradient(135deg, #e0f7ff 0%, #ffffff 100%)" }, iconStyle: { backgroundColor: "#06b6d4" } },
+      { to: "/course-tasks", icon: "solar:bookmark-square-minimalistic-outline", label: "Tasks & Submissions", desc: "Create and review course work", cardStyle: { background: "linear-gradient(135deg, #f5e8ff 0%, #ffffff 100%)" }, iconStyle: { backgroundColor: "#8b5cf6" } },
+      { to: "/programs", icon: "solar:book-outline", label: "Programs", desc: "View programs", cardStyle: { background: "linear-gradient(135deg, #e4fff2 0%, #ffffff 100%)" }, iconStyle: { backgroundColor: "#22c55e" } },
+      { to: "/view-profile", icon: "solar:user-outline", label: "My Profile", desc: "Update your profile", cardStyle: { background: "linear-gradient(135deg, #ffe8ee 0%, #ffffff 100%)" }, iconStyle: { backgroundColor: "#ef476f" } },
     ];
     return (
       <div>

@@ -24,7 +24,8 @@ export const authService = {
     if (result.access) {
       tokenService.setTokens(result.access, result.refresh);
     }
-    localStorage.setItem("user_role",       user.role       || "");
+    const role = (user.role || "").toUpperCase();
+    localStorage.setItem("user_role",       role);
     localStorage.setItem("user_id",         String(user.id  || ""));
     localStorage.setItem("username",        user.username   || username);
     localStorage.setItem("user_email",      user.email      || "");
@@ -32,10 +33,10 @@ export const authService = {
     localStorage.setItem("user_last_name",  user.last_name  || "");
 
     // Load role permissions (non-blocking — ADMIN has no restrictions so skip)
-    if (user.role && user.role !== "ADMIN") {
+    if (role && role !== "ADMIN") {
       try {
         const permRes = await axiosInstance.get("/accounts/role-permissions/by-role/", {
-          params: { role: user.role },
+          params: { role },
           headers: { Authorization: `Bearer ${result.access}` },
         });
         const perms = permRes.data?.result || permRes.data?.results || permRes.data || [];

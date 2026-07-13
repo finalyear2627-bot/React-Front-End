@@ -274,15 +274,27 @@ const MasterLayout = ({ children }) => {
                           <i className='ri-circle-fill circle-icon text-success-main w-auto' /> Assign Course
                         </NavLink>
                       </li>
+                      <li>
+                        <NavLink to='/student-enrollments' className={(n) => n.isActive ? "active-page" : ""}>
+                          <i className='ri-circle-fill circle-icon text-info-main w-auto' /> Enroll Students
+                        </NavLink>
+                      </li>
                     </>
                   )}
                   {userRole === "TEACHER" && (
-                    <li>
-                      <NavLink to='/my-courses' className={(n) => n.isActive ? "active-page" : ""}>
-                        <i className='ri-circle-fill circle-icon text-info-main w-auto' /> My Courses
-                      </NavLink>
-                    </li>
+                    <><li><NavLink to='/my-courses' className={(n) => n.isActive ? "active-page" : ""}><i className='ri-circle-fill circle-icon text-info-main w-auto' /> My Courses</NavLink></li><li><NavLink to='/course-tasks' className={(n) => n.isActive ? "active-page" : ""}><i className='ri-circle-fill circle-icon text-success-main w-auto' /> Tasks & Submissions</NavLink></li></>
                   )}
+                </ul>
+              </li>
+            )}
+
+            {userRole === "STUDENT" && (
+              <li className='dropdown'>
+                <Link to='#'><Icon icon='solar:book-bookmark-outline' className='menu-icon' /><span>My Learning</span></Link>
+                <ul className='sidebar-submenu'>
+                  <li><NavLink to='/my-enrolled-courses' className={(n) => n.isActive ? "active-page" : ""}><i className='ri-circle-fill circle-icon text-info-main w-auto' /> My Enrolled Courses</NavLink></li>
+                  <li><NavLink to='/my-assessments' className={(n) => n.isActive ? "active-page" : ""}><i className='ri-circle-fill circle-icon text-primary-600 w-auto' /> My Assessments</NavLink></li>
+                  <li><NavLink to='/study-companion' className={(n) => n.isActive ? "active-page" : ""}><i className='ri-circle-fill circle-icon text-success-main w-auto' /> StudyMate</NavLink></li>
                 </ul>
               </li>
             )}
@@ -311,7 +323,8 @@ const MasterLayout = ({ children }) => {
               </li>
             )}
 
-            {/* Assessments — all authenticated roles */}
+            {/* Assessment generation is intentionally unavailable to students. */}
+            {userRole !== "STUDENT" && (
             <li className='dropdown'>
               <Link to='#'>
                 <Icon icon='solar:document-add-outline' className='menu-icon' />
@@ -440,6 +453,7 @@ const MasterLayout = ({ children }) => {
 
               </ul>
             </li>
+            )}
 
             {/* PLO — admin only */}
             {localStorage.getItem("user_role") === "ADMIN" && (
