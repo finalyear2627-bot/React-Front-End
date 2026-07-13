@@ -144,7 +144,7 @@ const DashBoardLayerOne = () => {
     return (
       <div>
         {/* Welcome banner */}
-        <div className="card border-0 mb-24" style={{ background: `linear-gradient(135deg, #1a3a6e 0%, ${roleColor} 100%)` }}>
+        <div className="card dashboard-welcome border-0 mb-24" style={{ background: `linear-gradient(135deg, #1a3a6e 0%, ${roleColor} 100%)` }}>
           <div className="card-body p-24 d-flex flex-wrap align-items-center justify-content-between gap-3">
             <div>
               <h5 className="text-white mb-4">Welcome back, {firstName}!</h5>
@@ -162,7 +162,7 @@ const DashBoardLayerOne = () => {
         <div className="row gy-4">
           {roleLinks.map((link) => (
             <div key={link.to} className="col-xl-4 col-md-6">
-              <Link to={link.to} className="card shadow-none border h-100 text-decoration-none"
+              <Link to={link.to} className="card dashboard-quick-card shadow-none border h-100 text-decoration-none"
                 style={{ ...link.cardStyle, transition: "box-shadow 0.2s, transform 0.2s" }}
                 onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.1)"}
                 onMouseLeave={(e) => e.currentTarget.style.boxShadow = "none"}>
@@ -189,7 +189,7 @@ const DashBoardLayerOne = () => {
     <div>
 
       {/* ── Welcome banner ── */}
-      <div className="card border-0 mb-24" style={{ background: "linear-gradient(135deg, #1a3a6e 0%, #4361ee 100%)" }}>
+      <div className="card dashboard-welcome border-0 mb-24" style={{ background: "linear-gradient(135deg, #1a3a6e 0%, #4361ee 100%)" }}>
         <div className="card-body p-24 d-flex flex-wrap align-items-center justify-content-between gap-3">
           <div>
             <h5 className="text-white mb-4">Welcome back, {firstName}! 👋</h5>
@@ -325,7 +325,7 @@ const DashBoardLayerOne = () => {
                 <Link
                   key={link.to}
                   to={link.to}
-                  className="d-flex align-items-center gap-12 p-10 radius-8 mb-8 text-decoration-none"
+                  className="dashboard-quick-link d-flex align-items-center gap-12 p-10 radius-8 mb-8 text-decoration-none"
                   style={{ transition: "background 0.15s" }}
                   onMouseEnter={(e) => e.currentTarget.style.background = "#f5f5f5"}
                   onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
