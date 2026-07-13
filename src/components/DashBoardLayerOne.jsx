@@ -6,9 +6,9 @@ import { showError, getApiError } from "../utils/toast";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
-const StatCard = ({ label, value, icon, gradient, iconBg, loading }) => (
-  <div className="col">
-    <div className={`card shadow-none border ${gradient} h-100`}>
+const StatCard = ({ label, value, icon, gradient, iconBg, loading, to }) => {
+  const card = (
+    <div className={`card shadow-none border ${gradient} h-100`} style={{ transition: "box-shadow 0.2s, transform 0.2s" }}>
       <div className="card-body p-20">
         <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
           <div>
@@ -23,8 +23,32 @@ const StatCard = ({ label, value, icon, gradient, iconBg, loading }) => (
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+
+  return (
+    <div className="col">
+      {to ? (
+        <Link
+          to={to}
+          className="d-block h-100 text-decoration-none"
+          aria-label={`View ${label}`}
+          onMouseEnter={(e) => {
+            const target = e.currentTarget.firstElementChild;
+            target.style.boxShadow = "0 6px 20px rgba(37, 99, 235, 0.16)";
+            target.style.transform = "translateY(-2px)";
+          }}
+          onMouseLeave={(e) => {
+            const target = e.currentTarget.firstElementChild;
+            target.style.boxShadow = "none";
+            target.style.transform = "none";
+          }}
+        >
+          {card}
+        </Link>
+      ) : card}
+    </div>
+  );
+};
 
 const RoleCard = ({ role, count, icon, color, loading }) => (
   <div className="col-sm-4">
@@ -110,12 +134,12 @@ const DashBoardLayerOne = () => {
   if (userRole !== "ADMIN") {
     const roleColor  = userRole === "TEACHER" ? "#7c3aed" : "#0ea5e9";
     const roleLinks  = [
-      { to: "/my-courses",          icon: "solar:notebook-outline",                        label: "My Courses",          desc: "View courses assigned to you"         },
-      { to: "/course-assignments",  icon: "solar:bookmark-square-minimalistic-outline",    label: "Course Assignments",  desc: "See all course assignments"            },
-      { to: "/courses",             icon: "solar:notebook-outline",                        label: "All Courses",         desc: "Browse available courses"             },
-      { to: "/programs",            icon: "solar:book-outline",                            label: "Programs",            desc: "View programs"                        },
-      { to: "/semesters",           icon: "solar:calendar-outline",                        label: "Semesters",           desc: "View semesters"                       },
-      { to: "/view-profile",        icon: "solar:user-outline",                            label: "My Profile",          desc: "Update your profile"                  },
+      { to: "/my-courses",          icon: "solar:notebook-outline",                     label: "My Courses",          desc: "View courses assigned to you", cardStyle: { background: "linear-gradient(135deg, #e0f7ff 0%, #ffffff 100%)" }, iconStyle: { backgroundColor: "#06b6d4" } },
+      { to: "/course-assignments",  icon: "solar:bookmark-square-minimalistic-outline", label: "Course Assignments",  desc: "See all course assignments",    cardStyle: { background: "linear-gradient(135deg, #f5e8ff 0%, #ffffff 100%)" }, iconStyle: { backgroundColor: "#8b5cf6" } },
+      { to: "/courses",             icon: "solar:notebook-outline",                     label: "All Courses",         desc: "Browse available courses",      cardStyle: { background: "linear-gradient(135deg, #e6edff 0%, #ffffff 100%)" }, iconStyle: { backgroundColor: "#2563eb" } },
+      { to: "/programs",            icon: "solar:book-outline",                         label: "Programs",            desc: "View programs",                 cardStyle: { background: "linear-gradient(135deg, #e4fff2 0%, #ffffff 100%)" }, iconStyle: { backgroundColor: "#22c55e" } },
+      { to: "/semesters",           icon: "solar:calendar-outline",                    label: "Semesters",           desc: "View semesters",                cardStyle: { background: "linear-gradient(135deg, #fff2df 0%, #ffffff 100%)" }, iconStyle: { backgroundColor: "#f59e0b" } },
+      { to: "/view-profile",        icon: "solar:user-outline",                         label: "My Profile",          desc: "Update your profile",           cardStyle: { background: "linear-gradient(135deg, #ffe8ee 0%, #ffffff 100%)" }, iconStyle: { backgroundColor: "#ef476f" } },
     ];
     return (
       <div>
@@ -138,13 +162,13 @@ const DashBoardLayerOne = () => {
         <div className="row gy-4">
           {roleLinks.map((link) => (
             <div key={link.to} className="col-xl-4 col-md-6">
-              <Link to={link.to} className="card h-100 text-decoration-none border"
-                style={{ transition: "box-shadow 0.2s" }}
+              <Link to={link.to} className="card shadow-none border h-100 text-decoration-none"
+                style={{ ...link.cardStyle, transition: "box-shadow 0.2s, transform 0.2s" }}
                 onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.1)"}
                 onMouseLeave={(e) => e.currentTarget.style.boxShadow = "none"}>
                 <div className="card-body p-20 d-flex align-items-center gap-16">
-                  <div className="w-56-px h-56-px bg-primary-100 rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0">
-                    <Icon icon={link.icon} className="text-primary-600 text-2xl" />
+                  <div className="w-56-px h-56-px rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style={link.iconStyle}>
+                    <Icon icon={link.icon} className="text-white text-2xl" />
                   </div>
                   <div>
                     <h6 className="fw-semibold mb-4 text-primary-light">{link.label}</h6>
@@ -183,11 +207,11 @@ const DashBoardLayerOne = () => {
 
       {/* ── Top stat cards ── */}
       <div className="row row-cols-xxxl-5 row-cols-lg-3 row-cols-sm-2 row-cols-1 gy-4 mb-24">
-        <StatCard label="Total Users"       value={totalUsers}    icon="gridicons:multiple-users"         gradient="bg-gradient-start-1" iconBg="bg-cyan"          loading={loading} />
-        <StatCard label="Total Programs"    value={totalPrograms} icon="solar:book-outline"               gradient="bg-gradient-start-2" iconBg="bg-purple"        loading={loading} />
-        <StatCard label="Total Courses"     value={totalCourses}  icon="solar:notebook-outline"           gradient="bg-gradient-start-3" iconBg="bg-info"          loading={loading} />
-        <StatCard label="Active Courses"    value={activeCourses} icon="mingcute:play-circle-line"        gradient="bg-gradient-start-4" iconBg="bg-success-main"  loading={loading} />
-        <StatCard label="Inactive Courses"  value={inactiveCourses} icon="mingcute:pause-circle-line"    gradient="bg-gradient-start-5" iconBg="bg-red"           loading={loading} />
+        <StatCard label="Total Users"      value={totalUsers}      icon="gridicons:multiple-users"          gradient="bg-gradient-start-1" iconBg="bg-cyan"         loading={loading} to="/users" />
+        <StatCard label="Total Programs"   value={totalPrograms}   icon="solar:book-outline"                gradient="bg-gradient-start-2" iconBg="bg-purple"       loading={loading} to="/programs" />
+        <StatCard label="Total Courses"    value={totalCourses}    icon="solar:notebook-outline"            gradient="bg-gradient-start-3" iconBg="bg-info"         loading={loading} to="/courses" />
+        <StatCard label="Active Courses"   value={activeCourses}   icon="mingcute:play-circle-line"         gradient="bg-gradient-start-4" iconBg="bg-success-main" loading={loading} to="/courses?status=active" />
+        <StatCard label="Inactive Courses" value={inactiveCourses} icon="mingcute:pause-circle-line"        gradient="bg-gradient-start-5" iconBg="bg-red"          loading={loading} to="/courses?status=inactive" />
       </div>
 
       {/* ── Second row: Users breakdown + Course status + Semesters ── */}

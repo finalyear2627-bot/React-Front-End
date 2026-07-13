@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { courseService } from "../api/course.service";
 import { programService } from "../api/program.service";
 import { showSuccess, showError, getApiError } from "../utils/toast";
@@ -9,6 +9,8 @@ import { canView } from "../utils/permissions";
 
 const CourseListLayer = () => {
   const userRole = localStorage.getItem("user_role");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const statusFilter = searchParams.get("status");
 
   const [courses,    setCourses]    = useState([]);
   const [programs,   setPrograms]   = useState([]);
@@ -107,9 +109,10 @@ const CourseListLayer = () => {
   const resetFilters = () => {
     setSearch(""); setFilterCode(""); setFilterProgram(""); setFilterType(""); setFilterClass("");
     setPage(1);
+    setSearchParams({});
   };
 
-  const hasFilter = search || filterCode || filterProgram || filterType || filterClass;
+  const hasFilter = search || filterCode || filterProgram || filterType || filterClass || statusFilter;
 
   const getCourseProgramId = (course) => {
     if (course.program_detail?.id) return course.program_detail.id;
@@ -131,6 +134,8 @@ const CourseListLayer = () => {
     if (filterProgram && String(getCourseProgramId(c)) !== String(filterProgram)) return false;
     if (filterType  && c.course_type  !== filterType)  return false;
     if (filterClass && c.course_class !== filterClass) return false;
+    if (statusFilter === "active" && !c.is_active) return false;
+    if (statusFilter === "inactive" && c.is_active) return false;
     return true;
   });
 
