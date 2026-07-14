@@ -18,6 +18,7 @@ const MasterLayout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const userRole = localStorage.getItem("user_role");
+  const [profileImage, setProfileImage] = useState("");
 
   const handleLogout = async () => {
     _permRefreshedThisLoad = false; // reset so next login fetches fresh permissions
@@ -27,6 +28,21 @@ const MasterLayout = ({ children }) => {
 
   // Refresh permissions from backend once per page load for non-admin users.
   // This ensures sidebar reflects permission changes made by admin without requiring re-login.
+  useEffect(() => {
+    const loadProfileImage = () => {
+      authService.getProfile()
+        .then((data) => {
+          const profile = data?.result?.[0] ?? data?.result ?? data;
+          setProfileImage(profile?.profile_image_url || "");
+        })
+        .catch(() => setProfileImage(""));
+    };
+    loadProfileImage();
+    const updateProfileImage = (event) => setProfileImage(event.detail || "");
+    window.addEventListener('profile-image-updated', updateProfileImage);
+    return () => window.removeEventListener('profile-image-updated', updateProfileImage);
+  }, []);
+
   useEffect(() => {
     const role = localStorage.getItem("user_role");
     if (!_permRefreshedThisLoad && role && role !== "ADMIN") {
@@ -626,11 +642,11 @@ const MasterLayout = ({ children }) => {
                     type='button'
                     data-bs-toggle='dropdown'
                   >
-                    <img
-                      src='assets/images/lang-flag.png'
-                      alt='Wowdash'
-                      className='w-24 h-24 object-fit-cover rounded-circle'
-                    />
+                    {profileImage ? (
+                      <img src={profileImage} alt='Profile' className='w-40-px h-40-px object-fit-cover rounded-circle' />
+                    ) : (
+                      <Icon icon='solar:user-bold' className='text-primary-600 text-xl' />
+                    )}
                   </button>
                   
                   <div className='dropdown-menu to-top dropdown-menu-sm'>
