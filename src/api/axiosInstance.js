@@ -2,7 +2,12 @@ import axios from "axios";
 import { tokenService } from "../services/token.service";
 
 const localApiUrl = "http://127.0.0.1:8000/api";
-const apiUrl = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === "production" ? "/api" : localApiUrl);
+// Vercel builds must always call the deployed backend. Local development
+// keeps using REACT_APP_API_URL from .env (or the local default).
+const productionApiUrl = "https://django-backend-si6i.onrender.com/api";
+const apiUrl = process.env.NODE_ENV === "production"
+  ? productionApiUrl
+  : (process.env.REACT_APP_API_URL || localApiUrl);
 
 const axiosInstance = axios.create({
   baseURL: apiUrl,
