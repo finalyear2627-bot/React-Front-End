@@ -360,7 +360,7 @@ const UserListLayer = () => {
                 <table className="table bordered-table mb-0">
                   <thead>
                     <tr>
-                      <th>ID</th>
+                      <th>#</th>
                       <th>Username</th>
                       <th>Full Name</th>
                       <th>Email</th>
@@ -372,7 +372,7 @@ const UserListLayer = () => {
                   <tbody>
                     {paginated.map((user, index) => (
                       <tr key={user.id || index}>
-                        <td>{user.id}</td>
+                        <td>{(page - 1) * pageSize + index + 1}</td>
                         <td className="fw-medium">{user.username || "N/A"}</td>
                         <td>{`${user.first_name || ""} ${user.last_name || ""}`.trim() || "N/A"}</td>
                         <td>{user.email || "N/A"}</td>
