@@ -145,6 +145,9 @@ const UserListLayer = () => {
   const [pwdTarget, setPwdTarget] = useState(null); // user object or null
 
   const admin = isAdmin();
+  const currentUserId = localStorage.getItem("user_id");
+  const isProtectedAdmin = (user) =>
+    user.role === "ADMIN" || String(user.id) === String(currentUserId);
 
   useEffect(() => { fetchUsers(); }, []);
 
@@ -417,25 +420,29 @@ const UserListLayer = () => {
                             </button>
                           )}
 
-                          <button
-                            onClick={() => handleToggleStatus(user)}
-                            disabled={togglingId === user.id}
-                            className={`w-32-px h-32-px me-8 rounded-circle d-inline-flex align-items-center justify-content-center border-0 ${user.is_active ? "bg-warning-focus text-warning-main" : "bg-success-focus text-success-main"}`}
-                            title={user.is_active ? "Deactivate" : "Activate"}
-                          >
-                            {togglingId === user.id
-                              ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
-                              : <Icon icon={user.is_active ? "mingcute:pause-circle-line" : "mingcute:play-circle-line"} />
-                            }
-                          </button>
+                          {!isProtectedAdmin(user) && (
+                            <>
+                              <button
+                                onClick={() => handleToggleStatus(user)}
+                                disabled={togglingId === user.id}
+                                className={`w-32-px h-32-px me-8 rounded-circle d-inline-flex align-items-center justify-content-center border-0 ${user.is_active ? "bg-warning-focus text-warning-main" : "bg-success-focus text-success-main"}`}
+                                title={user.is_active ? "Deactivate" : "Activate"}
+                              >
+                                {togglingId === user.id
+                                  ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
+                                  : <Icon icon={user.is_active ? "mingcute:pause-circle-line" : "mingcute:play-circle-line"} />
+                                }
+                              </button>
 
-                          <button
-                            onClick={() => handleDelete(user.id)}
-                            className="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
-                            title="Delete"
-                          >
-                            <Icon icon="mingcute:delete-2-line" />
-                          </button>
+                              <button
+                                onClick={() => handleDelete(user.id)}
+                                className="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center border-0"
+                                title="Delete"
+                              >
+                                <Icon icon="mingcute:delete-2-line" />
+                              </button>
+                            </>
+                          )}
                         </td>
                       </tr>
                     ))}
