@@ -75,7 +75,40 @@ const ViewProfileLayer = () => {
     }
     if (imagePreview.startsWith("blob:")) URL.revokeObjectURL(imagePreview);
     setSelectedImage(file);
-    setImagePreview(URL.createObjectURL(file));
+    // A data URL works in both local development and the deployed CSP setup.
+    // Blob URLs caused the local preview to stay on the placeholder in some browsers.
+    const reader = new FileReader();
+    reader.onload = () => setImagePreview(String(reader.result || ''));
+    reader.onerror = () => showError('This image could not be read. Please choose another file.');
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = async () => {
+    // If the image is only selected locally, clearing it must not make an API call.
+    if (selectedImage || imagePreview) {
+      setSelectedImage(null);
+      setImagePreview('');
+      const input = document.getElementById('profile-image-upload');
+      if (input) input.value = '';
+      return;
+    }
+    if (!profile.profile_image_url) return;
+
+    setProfileSaving(true);
+    try {
+      const res = await authService.patchProfile({ profile_image: null });
+      if (res?.status?.code !== 0) {
+        showError(res?.status?.message || 'Failed to remove profile image');
+        return;
+      }
+      setProfile((current) => ({ ...current, profile_image_url: '' }));
+      window.dispatchEvent(new CustomEvent('profile-image-updated', { detail: '' }));
+      showSuccess(res?.status?.message || 'Profile image removed successfully');
+    } catch (err) {
+      showError(getApiError(err));
+    } finally {
+      setProfileSaving(false);
+    }
   };
 
   const handleProfileSubmit = async (e) => {
@@ -253,8 +286,19 @@ const ViewProfileLayer = () => {
                     <div className="col-sm-12">
                       <div className="mb-20">
                         <label className="form-label fw-semibold text-primary-light text-sm mb-8">Profile Image</label>
-                        <input type="file" className="form-control radius-8" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} />
+                        <input id="profile-image-upload" type="file" className="form-control radius-8" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} />
                         <span className="text-secondary-light text-xs d-block mt-6">JPG, PNG, or WebP · maximum 5 MB</span>
+                        {(selectedImage || imagePreview || profile.profile_image_url) && (
+                          <button
+                            type="button"
+                            className="btn btn-outline-danger btn-sm mt-12"
+                            onClick={handleRemoveImage}
+                            disabled={profileSaving}
+                          >
+                            <Icon icon="solar:trash-bin-trash-outline" className="me-6" />
+                            Remove Photo
+                          </button>
+                        )}
                       </div>
                     </div>
                     <div className="col-sm-6">
