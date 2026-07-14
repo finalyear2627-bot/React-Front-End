@@ -93,7 +93,7 @@ const ViewProfileLayer = () => {
 
     setProfileSaving(true);
     try {
-      const res = await authService.patchProfile({ profile_image: null });
+      const res = await authService.patchProfile({ remove_profile_image: true });
       if (res?.status?.code !== 0) {
         showError(res?.status?.message || 'Failed to remove profile image');
         return;
