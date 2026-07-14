@@ -20,6 +20,11 @@ const MasterLayout = ({ children }) => {
   const userRole = localStorage.getItem("user_role");
   const [profileImage, setProfileImage] = useState("");
 
+  const profileImageUrl = (value) => {
+    if (!value || /^(data:|https?:)/i.test(value)) return value;
+    return new URL(value, axiosInstance.defaults.baseURL).toString();
+  };
+
   const handleLogout = async () => {
     _permRefreshedThisLoad = false; // reset so next login fetches fresh permissions
     await authService.logout();
@@ -33,7 +38,7 @@ const MasterLayout = ({ children }) => {
       authService.getProfile()
         .then((data) => {
           const profile = data?.result?.[0] ?? data?.result ?? data;
-          setProfileImage(profile?.profile_image_url || "");
+          setProfileImage(profile?.profile_image_url || profile?.profile_image || profile?.avatar || profile?.photo || "");
         })
         .catch(() => setProfileImage(""));
     };
@@ -643,7 +648,7 @@ const MasterLayout = ({ children }) => {
                     data-bs-toggle='dropdown'
                   >
                     {profileImage ? (
-                      <img src={profileImage} alt='Profile' className='w-40-px h-40-px object-fit-cover rounded-circle' />
+                      <img src={profileImageUrl(profileImage)} alt='Profile' className='w-40-px h-40-px object-fit-cover rounded-circle' />
                     ) : (
                       <Icon icon='solar:user-bold' className='text-primary-600 text-xl' />
                     )}

@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { authService } from "../api/auth.service";
 import axiosInstance from "../api/axiosInstance";
@@ -15,6 +15,8 @@ const ViewProfileLayer = () => {
   const [profile, setProfile] = useState({ first_name: "", last_name: "", email: "", role: "", profile_image_url: "" });
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
+  const [removeImage, setRemoveImage] = useState(false);
+  const fileInputRef = useRef(null);
   // Prefer the role returned by the profile endpoint; localStorage can be
   // stale or missing when this screen first loads.
   const isStudent = (profile.role || userRole || "").toUpperCase() === "STUDENT";
@@ -46,10 +48,6 @@ const ViewProfileLayer = () => {
       .finally(() => setProfileLoading(false));
   }, []);
 
-  useEffect(() => () => {
-    if (imagePreview.startsWith("blob:")) URL.revokeObjectURL(imagePreview);
-  }, [imagePreview]);
-
   const imageUrl = (value) => {
     if (!value || /^(blob:|data:|https?:)/i.test(value)) return value;
     return new URL(value, axiosInstance.defaults.baseURL).toString();
@@ -73,9 +71,21 @@ const ViewProfileLayer = () => {
       e.target.value = '';
       return;
     }
-    if (imagePreview.startsWith("blob:")) URL.revokeObjectURL(imagePreview);
     setSelectedImage(file);
-    setImagePreview(URL.createObjectURL(file));
+    setRemoveImage(false);
+    // Data URLs render consistently in localhost and deployed builds, unlike
+    // object URLs which can be invalidated by a development-server refresh.
+    const reader = new FileReader();
+    reader.onload = () => setImagePreview(typeof reader.result === "string" ? reader.result : "");
+    reader.onerror = () => showError("Could not preview this image. Please choose another file.");
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedImage(null);
+    setImagePreview("");
+    setRemoveImage(true);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleProfileSubmit = async (e) => {
@@ -89,6 +99,7 @@ const ViewProfileLayer = () => {
       // complete request, including the uploaded profile image.
       if (!isStudent) formData.append('email', profile.email);
       if (selectedImage) formData.append('profile_image', selectedImage);
+      if (removeImage) formData.append('remove_profile_image', 'true');
       const res = await authService.updateProfile(formData);
       if (res?.status?.code !== 0) {
         showError(res?.status?.message || "Failed to update profile");
@@ -108,8 +119,9 @@ const ViewProfileLayer = () => {
         profile_image_url: savedImage,
       }));
       setSelectedImage(null);
-      if (imagePreview.startsWith("blob:")) URL.revokeObjectURL(imagePreview);
       setImagePreview("");
+      setRemoveImage(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
       window.dispatchEvent(new CustomEvent('profile-image-updated', { detail: savedImage }));
       showSuccess(res?.status?.message || "Profile updated successfully");
     } catch (err) {
@@ -170,7 +182,7 @@ const ViewProfileLayer = () => {
           />
           <div className="pb-24 ms-16 mb-24 me-16 mt--100">
             <div className="text-center border border-top-0 border-start-0 border-end-0 pb-16">
-              {imagePreview || profile.profile_image_url ? (
+              {!removeImage && (imagePreview || profile.profile_image_url) ? (
                 <img
                   src={imageUrl(imagePreview || profile.profile_image_url)}
                   alt="Profile"
@@ -253,8 +265,22 @@ const ViewProfileLayer = () => {
                     <div className="col-sm-12">
                       <div className="mb-20">
                         <label className="form-label fw-semibold text-primary-light text-sm mb-8">Profile Image</label>
-                        <input type="file" className="form-control radius-8" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} />
+                        <input ref={fileInputRef} type="file" className="form-control radius-8" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} />
                         <span className="text-secondary-light text-xs d-block mt-6">JPG, PNG, or WebP · maximum 5 MB</span>
+                        {!removeImage && (imagePreview || profile.profile_image_url) && (
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-danger mt-8"
+                            onClick={handleRemoveImage}
+                            disabled={profileSaving}
+                          >
+                            <Icon icon="solar:trash-bin-trash-outline" className="me-1" />
+                            Remove Photo
+                          </button>
+                        )}
+                        {removeImage && (
+                          <span className="text-danger-600 text-xs d-block mt-6">Photo will be removed when you save changes.</span>
+                        )}
                       </div>
                     </div>
                     <div className="col-sm-6">
