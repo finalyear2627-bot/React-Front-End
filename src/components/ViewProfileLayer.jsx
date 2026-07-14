@@ -107,7 +107,6 @@ const ViewProfileLayer = () => {
       setProfileSaving(false);
     }
   };
-  };
 
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
