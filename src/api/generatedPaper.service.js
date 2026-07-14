@@ -27,14 +27,21 @@ export const generatedPaperService = {
   },
 
   openInNewTab: async (id) => {
-    const response = await axiosInstance.get(`${BASE}/${id}/download/`, {
-      responseType: "blob",
-    });
-    const url = window.URL.createObjectURL(
-      new Blob([response.data], { type: "application/pdf" })
-    );
-    window.open(url, "_blank");
-    setTimeout(() => window.URL.revokeObjectURL(url), 30000);
+    // Open synchronously from the user's click so browsers do not block the
+    // document as an asynchronous popup (especially on the deployed site).
+    const tab = window.open("", "_blank");
+    try {
+      const response = await axiosInstance.get(`${BASE}/${id}/download/`, {
+        responseType: "blob",
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
+      if (tab) tab.location.href = url;
+      else window.open(url, "_blank");
+      setTimeout(() => window.URL.revokeObjectURL(url), 30000);
+    } catch (error) {
+      tab?.close();
+      throw error;
+    }
   },
 
   delete: (id) =>

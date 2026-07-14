@@ -92,8 +92,13 @@ export const authService = {
   getProfile: () =>
     axiosInstance.get("/accounts/profile/").then((r) => r.data),
 
-  updateProfile: (data) =>
-    axiosInstance.put("/accounts/profile/", data).then((r) => r.data),
+  updateProfile: (data) => {
+    const isMultipart = data instanceof FormData;
+    return axiosInstance.put("/accounts/profile/", data, isMultipart
+      ? { headers: { "Content-Type": "multipart/form-data" } }
+      : undefined
+    ).then((r) => r.data);
+  },
 
   patchProfile: (data) =>
     axiosInstance.patch("/accounts/profile/", data).then((r) => r.data),

@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { authService } from "../api/auth.service";
+import axiosInstance from "../api/axiosInstance";
 import { showSuccess, showError, getApiError } from "../utils/toast";
 
 const ViewProfileLayer = () => {
@@ -15,6 +16,8 @@ const ViewProfileLayer = () => {
   const [profile, setProfile] = useState({ first_name: "", last_name: "", email: "", role: "" });
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileSaving, setProfileSaving] = useState(false);
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState("");
 
   const [pwdForm, setPwdForm] = useState({ current_password: "", new_password: "", confirm_password: "" });
   const [pwdSaving, setPwdSaving] = useState(false);
@@ -34,11 +37,40 @@ const ViewProfileLayer = () => {
           last_name:  p.last_name  || "",
           email:      p.email      || "",
           role,
+          profile_image: p.profile_image || p.avatar || p.photo || "",
         });
       })
       .catch((err) => showError(getApiError(err)))
       .finally(() => setProfileLoading(false));
   }, []);
+
+  useEffect(() => () => {
+    if (photoPreview.startsWith("blob:")) URL.revokeObjectURL(photoPreview);
+  }, [photoPreview]);
+
+  const imageUrl = (value) => {
+    if (!value) return "";
+    if (/^(blob:|data:|https?:)/i.test(value)) return value;
+    return new URL(value, axiosInstance.defaults.baseURL).toString();
+  };
+
+  const handlePhotoChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      showError("Please choose an image file.");
+      event.target.value = "";
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showError("Profile photo must be 5 MB or smaller.");
+      event.target.value = "";
+      return;
+    }
+    if (photoPreview.startsWith("blob:")) URL.revokeObjectURL(photoPreview);
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
+  };
 
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
@@ -49,11 +81,22 @@ const ViewProfileLayer = () => {
     e.preventDefault();
     setProfileSaving(true);
     try {
-      const res = await authService.updateProfile(profile);
+      const payload = new FormData();
+      payload.append("first_name", profile.first_name);
+      payload.append("last_name", profile.last_name);
+      payload.append("email", profile.email);
+      if (photoFile) payload.append("profile_image", photoFile);
+      const res = await authService.updateProfile(payload);
       if (res?.status?.code !== 0) {
         showError(res?.status?.message || "Failed to update profile");
         return;
       }
+      const saved = res?.result?.[0] ?? res?.result ?? res;
+      const savedImage = saved?.profile_image || saved?.avatar || saved?.photo;
+      if (savedImage) setProfile((current) => ({ ...current, profile_image: savedImage }));
+      setPhotoFile(null);
+      if (photoPreview.startsWith("blob:")) URL.revokeObjectURL(photoPreview);
+      setPhotoPreview("");
       showSuccess(res?.status?.message || "Profile updated successfully");
     } catch (err) {
       showError(getApiError(err));
@@ -108,9 +151,11 @@ const ViewProfileLayer = () => {
             <div className="text-center border border-top-0 border-start-0 border-end-0 pb-16">
               <div
                 className="border br-white border-width-2-px w-200-px h-200-px rounded-circle d-inline-flex align-items-center justify-content-center bg-primary-100 mx-auto"
-                style={{ fontSize: 64 }}
+                style={{ fontSize: 64, overflow: "hidden" }}
               >
-                <Icon icon="solar:user-bold" className="text-primary-600" />
+                {photoPreview || profile.profile_image
+                  ? <img src={imageUrl(photoPreview || profile.profile_image)} alt="Profile" className="w-100 h-100 object-fit-cover" />
+                  : <Icon icon="solar:user-bold" className="text-primary-600" />}
               </div>
               <h6 className="mb-4 mt-16">
                 {profileLoading ? "..." : `${profile.first_name} ${profile.last_name}`.trim() || username}
@@ -226,6 +271,13 @@ const ViewProfileLayer = () => {
                           readOnly={isStudent}
                           required={!isStudent}
                         />
+                      </div>
+                    </div>
+                    <div className="col-sm-12">
+                      <div className="mb-20">
+                        <label className="form-label fw-semibold text-primary-light text-sm mb-8">Profile Photo</label>
+                        <input type="file" className="form-control radius-8" accept="image/png,image/jpeg,image/webp" onChange={handlePhotoChange} />
+                        <div className="text-secondary-light text-xs mt-6">PNG, JPG, or WebP — maximum 5 MB.</div>
                       </div>
                     </div>
                   </div>

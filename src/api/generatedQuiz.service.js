@@ -27,10 +27,17 @@ export const generatedQuizService = {
   },
 
   openInNewTab: async (id) => {
-    const response = await axiosInstance.get(`${BASE}/${id}/download/`, { responseType: "blob" });
-    const url = window.URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
-    window.open(url, "_blank");
-    setTimeout(() => window.URL.revokeObjectURL(url), 30000);
+    const tab = window.open("", "_blank");
+    try {
+      const response = await axiosInstance.get(`${BASE}/${id}/download/`, { responseType: "blob" });
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
+      if (tab) tab.location.href = url;
+      else window.open(url, "_blank");
+      setTimeout(() => window.URL.revokeObjectURL(url), 30000);
+    } catch (error) {
+      tab?.close();
+      throw error;
+    }
   },
 
   delete: (id) =>
