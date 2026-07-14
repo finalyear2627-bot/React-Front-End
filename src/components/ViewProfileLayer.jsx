@@ -2,11 +2,11 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { authService } from "../api/auth.service";
+import axiosInstance from "../api/axiosInstance";
 import { showSuccess, showError, getApiError } from "../utils/toast";
 
 const ViewProfileLayer = () => {
   const userRole = localStorage.getItem("user_role");
-  const isStudent = userRole === "STUDENT";
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(
     searchParams.get("tab") === "password" ? "change-password" : "edit-profile"
@@ -15,6 +15,9 @@ const ViewProfileLayer = () => {
   const [profile, setProfile] = useState({ first_name: "", last_name: "", email: "", role: "", profile_image_url: "" });
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
+  // Prefer the role returned by the profile endpoint; localStorage can be
+  // stale or missing when this screen first loads.
+  const isStudent = (profile.role || userRole || "").toUpperCase() === "STUDENT";
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileSaving, setProfileSaving] = useState(false);
 
@@ -28,7 +31,7 @@ const ViewProfileLayer = () => {
     authService.getProfile()
       .then((data) => {
         const p = data?.result?.[0] ?? data?.result ?? data;
-        const role = p.role || p.user_role || "";
+        const role = (p.role || p.user_role || "").toUpperCase();
         // keep localStorage in sync with what the API says
         if (role) localStorage.setItem("user_role", role);
         setProfile({
@@ -36,12 +39,21 @@ const ViewProfileLayer = () => {
           last_name:  p.last_name  || "",
           email:      p.email      || "",
           role,
-          profile_image_url: p.profile_image_url || "",
+          profile_image_url: p.profile_image_url || p.profile_image || p.avatar || p.photo || "",
         });
       })
       .catch((err) => showError(getApiError(err)))
       .finally(() => setProfileLoading(false));
   }, []);
+
+  useEffect(() => () => {
+    if (imagePreview.startsWith("blob:")) URL.revokeObjectURL(imagePreview);
+  }, [imagePreview]);
+
+  const imageUrl = (value) => {
+    if (!value || /^(blob:|data:|https?:)/i.test(value)) return value;
+    return new URL(value, axiosInstance.defaults.baseURL).toString();
+  };
 
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
@@ -61,6 +73,7 @@ const ViewProfileLayer = () => {
       e.target.value = '';
       return;
     }
+    if (imagePreview.startsWith("blob:")) URL.revokeObjectURL(imagePreview);
     setSelectedImage(file);
     setImagePreview(URL.createObjectURL(file));
   };
@@ -72,6 +85,8 @@ const ViewProfileLayer = () => {
       const formData = new FormData();
       formData.append('first_name', profile.first_name);
       formData.append('last_name', profile.last_name);
+      // Student email is read-only. Sending it makes the API reject the
+      // complete request, including the uploaded profile image.
       if (!isStudent) formData.append('email', profile.email);
       if (selectedImage) formData.append('profile_image', selectedImage);
       const res = await authService.updateProfile(formData);
@@ -79,12 +94,23 @@ const ViewProfileLayer = () => {
         showError(res?.status?.message || "Failed to update profile");
         return;
       }
-      const savedProfile = res?.result?.[0] ?? res?.result ?? res;
-      const savedImageUrl = savedProfile?.profile_image_url || imagePreview || profile.profile_image_url;
-      setProfile((current) => ({ ...current, ...savedProfile, profile_image_url: savedImageUrl }));
+      // Reload the canonical profile from the API so the persisted image URL
+      // is used immediately and remains correct after a refresh or new login.
+      const latest = await authService.getProfile();
+      const saved = latest?.result?.[0] ?? latest?.result ?? latest;
+      const savedImage = saved?.profile_image_url || saved?.profile_image || saved?.avatar || saved?.photo || "";
+      setProfile((current) => ({
+        ...current,
+        first_name: saved?.first_name || current.first_name,
+        last_name: saved?.last_name || current.last_name,
+        email: saved?.email || current.email,
+        role: (saved?.role || saved?.user_role || current.role || "").toUpperCase(),
+        profile_image_url: savedImage,
+      }));
       setSelectedImage(null);
-      setImagePreview('');
-      window.dispatchEvent(new CustomEvent('profile-image-updated', { detail: savedImageUrl }));
+      if (imagePreview.startsWith("blob:")) URL.revokeObjectURL(imagePreview);
+      setImagePreview("");
+      window.dispatchEvent(new CustomEvent('profile-image-updated', { detail: savedImage }));
       showSuccess(res?.status?.message || "Profile updated successfully");
     } catch (err) {
       showError(getApiError(err));
@@ -134,12 +160,19 @@ const ViewProfileLayer = () => {
       {/* Left Panel */}
       <div className="col-lg-4">
         <div className="user-grid-card position-relative border radius-16 overflow-hidden bg-base h-100">
-          <img src="assets/images/user-grid/user-grid-bg1.png" alt="" className="w-100 object-fit-cover" />
+          <div
+            aria-hidden="true"
+            className="w-100"
+            style={{
+              height: 134,
+              background: "radial-gradient(circle at 15% 20%, rgba(255,255,255,.28) 0 10%, transparent 10.5%), radial-gradient(circle at 84% 35%, rgba(255,255,255,.18) 0 13%, transparent 13.5%), linear-gradient(125deg, #132b6e 0%, #2463d4 52%, #7b61d9 100%)",
+            }}
+          />
           <div className="pb-24 ms-16 mb-24 me-16 mt--100">
             <div className="text-center border border-top-0 border-start-0 border-end-0 pb-16">
               {imagePreview || profile.profile_image_url ? (
                 <img
-                  src={imagePreview || profile.profile_image_url}
+                  src={imageUrl(imagePreview || profile.profile_image_url)}
                   alt="Profile"
                   className="border br-white border-width-2-px w-200-px h-200-px rounded-circle object-fit-cover mx-auto"
                 />
