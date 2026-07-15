@@ -101,37 +101,46 @@ const OBEPlanDetailLayer = () => {
   }, [id]);
 
   useEffect(() => {
-    Promise.all([
-      obePlanService.getById(id),
-      obePlanService.getSheet(id).catch(() => null),
-      obeComponentService.getAll({ plan: id }),
-      obeMappingService.getAll({ plan: id }),
-    ]).then(([planData, sheetData, compsData, mapsData]) => {
-      const p = planData?.result?.[0] || planData?.result || planData;
-      setPlan(p);
-      const sheetRaw = sheetData?.result?.[0] || sheetData?.result || sheetData;
-      setSheet(sheetRaw && typeof sheetRaw === "object" ? sheetRaw : null);
-      setComponents(toList(compsData));
-      setMappings(toList(mapsData));
+    let isCurrent = true;
+    const setIfCurrent = (setter, value) => { if (isCurrent) setter(value); };
+    const loadStudents = (courseId) => {
+      obeStudentService.getAll({ course: courseId }).then((d) => {
+        const list = toList(d);
+        const map = {};
+        list.forEach((enr) => {
+          map[enr.id] = {};
+          (enr.marks || []).forEach((m) => {
+            map[enr.id][m.component] = { id: m.id, obtained: String(m.obtained_marks) };
+          });
+        });
+        setIfCurrent(setStudents, list);
+        setIfCurrent(setMarks, map);
+      }).catch(() => {});
+    };
 
+    setLoading(true);
+    setPlan(null);
+
+    // These are supplementary sections; none should delay the plan itself.
+    obeComponentService.getAll({ plan: id }).then((d) => setIfCurrent(setComponents, toList(d))).catch(() => {});
+    obeMappingService.getAll({ plan: id }).then((d) => setIfCurrent(setMappings, toList(d))).catch(() => {});
+    obePlanService.getSheet(id).then((d) => {
+      const raw = d?.result?.[0] || d?.result || d;
+      setIfCurrent(setSheet, raw && typeof raw === "object" ? raw : null);
+    }).catch(() => setIfCurrent(setSheet, null));
+
+    obePlanService.getById(id).then((planData) => {
+      const p = planData?.result?.[0] || planData?.result || planData;
+      setIfCurrent(setPlan, p);
       const courseId = typeof p?.course === "object" ? p?.course?.id : (p?.course_id || p?.course);
       if (courseId) {
-        cloService.getAll({ course: courseId }).then((d) => setClos(toList(d))).catch(() => {});
-        obeStudentService.getAll({ course: courseId }).then((d) => {
-          const list = toList(d);
-          setStudents(list);
-          const map = {};
-          list.forEach((enr) => {
-            map[enr.id] = {};
-            (enr.marks || []).forEach((m) => {
-              map[enr.id][m.component] = { id: m.id, obtained: String(m.obtained_marks) };
-            });
-          });
-          setMarks(map);
-        }).catch(() => {});
+        cloService.getAll({ course: courseId }).then((d) => setIfCurrent(setClos, toList(d))).catch(() => {});
+        loadStudents(courseId);
       }
     }).catch(() => showError("Failed to load OBE plan"))
-      .finally(() => setLoading(false));
+      .finally(() => setIfCurrent(setLoading, false));
+
+    return () => { isCurrent = false; };
   }, [id]);
 
   /* ── Component actions ── */

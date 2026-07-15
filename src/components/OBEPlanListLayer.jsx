@@ -92,7 +92,9 @@ const OBEPlanListLayer = () => {
     }
   };
 
-  const loading    = loadingPlans || loadingCourses;
+  // Plans and the course selector are independent requests.  Do not hide
+  // already-loaded records while a slow course request is still pending.
+  const loading    = loadingPlans;
   const paginated  = plans.slice((page - 1) * pageSize, page * pageSize);
 
   return (
